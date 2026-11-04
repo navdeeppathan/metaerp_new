@@ -1,0 +1,15 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Models\PaymentType;
+use Illuminate\Http\Request;
+
+class PaymentTypeController extends BaseApiController
+{
+    public function index() { return response()->json(PaymentType::all()); }
+    public function show($id) { return response()->json(PaymentType::findOrFail($id)); }
+    public function store(Request $request) { return response()->json(PaymentType::create($request->all()), 201); }
+    public function update(Request $request, $id) { $p = PaymentType::findOrFail($id); $p->update($request->all()); return response()->json($p); }
+    public function destroy($id) { PaymentType::findOrFail($id)->delete(); return response()->json(['message' => 'Deleted']); }
+}
