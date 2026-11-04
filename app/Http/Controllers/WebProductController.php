@@ -15,16 +15,21 @@ class WebProductController extends Controller
             $query->where('productCategory', $request->input('category'));
         }
 
-        if ($request->filled('q')) {
-            $q = $request->input('q');
-            $query->where(function($sub) use ($q) {
-                $sub->where('name', 'like', "%{$q}%")
-                    ->orWhere('code', 'like', "%{$q}%")
-                    ->orWhere('chemicalFormula', 'like', "%{$q}%");
+        $search = $request->input('q') ?? $request->input('search');
+        if (!empty($search)) {
+            $query->where(function($sub) use ($search) {
+                $sub->where('name', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%")
+                    ->orWhere('chemicalFormula', 'like', "%{$search}%");
             });
         }
 
-        $products = $query->orderBy('name')->paginate(20);
+        $perPage = (int) $request->input('per_page', 10);
+        if (!in_array($perPage, [10, 25, 50, 100])) {
+            $perPage = 10;
+        }
+
+        $products = $query->orderBy('name')->paginate($perPage)->withQueryString();
         return view('products.index', compact('products'));
     }
 

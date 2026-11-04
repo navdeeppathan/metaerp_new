@@ -96,6 +96,10 @@ class WebRoutesTest extends TestCase
         $response = $this->actingAs($this->user)->get('/products');
         $response->assertStatus(200);
         $response->assertSee('Products');
+        $response->assertSee('Search product');
+        $response->assertSee('Symbol');
+        $response->assertSee('Name');
+        $response->assertSee('Rows per page:');
     }
 
     public function test_users_management_renders()
