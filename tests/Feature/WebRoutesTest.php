@@ -150,4 +150,215 @@ class WebRoutesTest extends TestCase
         $response->assertSee('Detached Notes');
         $response->assertSee('There are no detachedNotes!');
     }
+
+    public function test_templates_index_renders()
+    {
+        $response = $this->actingAs($this->user)->get('/templates');
+        $response->assertStatus(200);
+        $response->assertSee('Templates');
+        $response->assertSee('ANNEX_VII');
+        $response->assertSee('English (United Kingdom)');
+    }
+
+    public function test_templates_show_and_update()
+    {
+        $template = \App\Models\Template::where('name', 'ANNEX_VII')->first();
+        if (!$template) {
+            $template = \App\Models\Template::first();
+        }
+
+        $response = $this->actingAs($this->user)->get('/templates/' . $template->id);
+        $response->assertStatus(200);
+        $response->assertSee('Template Detail');
+        $response->assertSee('HTML Code');
+
+        $updateResponse = $this->actingAs($this->user)->put('/templates/' . $template->id, [
+            'html' => '<html><body>Updated Annex VII</body></html>',
+            'name' => $template->name,
+            'type' => $template->type,
+        ]);
+        $updateResponse->assertRedirect();
+        $this->assertDatabaseHas('templates', [
+            'id' => $template->id,
+            'html' => '<html><body>Updated Annex VII</body></html>',
+        ]);
+    }
+
+    public function test_countries_index_renders()
+    {
+        $response = $this->actingAs($this->user)->get('/countries');
+        $response->assertStatus(200);
+        $response->assertSee('Countries');
+        $response->assertSee('Albania');
+        $response->assertSee('Algeria');
+    }
+
+    public function test_country_create_and_store()
+    {
+        $response = $this->actingAs($this->user)->get('/countries/new');
+        $response->assertStatus(200);
+        $response->assertSee('New Country');
+        $response->assertSee('Country Detail');
+        $response->assertSee('Basic Info');
+
+        $postResponse = $this->actingAs($this->user)->post('/countries', [
+            'name' => 'Testland',
+            'alpha2' => 'TL',
+            'alpha3' => 'TLS',
+            'region' => 'Europe',
+            'vat' => 20,
+        ]);
+        $postResponse->assertRedirect();
+        $this->assertDatabaseHas('countries', ['name' => 'Testland']);
+    }
+
+    public function test_company_types_index_and_create()
+    {
+        $response = $this->actingAs($this->user)->get('/company-types');
+        $response->assertStatus(200);
+        $response->assertSee('Company Types');
+        $response->assertSee('Buyer');
+        $response->assertSee('Seller');
+
+        $createResponse = $this->actingAs($this->user)->get('/company-types/new');
+        $createResponse->assertStatus(200);
+        $createResponse->assertSee('New CompanyType');
+        $createResponse->assertSee('Company Type Detail');
+        $createResponse->assertSee('Basic Info');
+
+        $postResponse = $this->actingAs($this->user)->post('/company-types', [
+            'name' => 'Custom Broker',
+        ]);
+        $postResponse->assertRedirect();
+        $this->assertDatabaseHas('types', ['description' => 'Custom Broker']);
+    }
+
+    public function test_credit_debit_types_index_and_create()
+    {
+        $response = $this->actingAs($this->user)->get('/credit-debit-types');
+        $response->assertStatus(200);
+        $response->assertSee('CreditDebitTypes');
+        $response->assertSee('Delay');
+        $response->assertSee('Container Damage');
+
+        $createResponse = $this->actingAs($this->user)->get('/credit-debit-types/new');
+        $createResponse->assertStatus(200);
+        $createResponse->assertSee('New CreditDebitType');
+        $createResponse->assertSee('CreditDebitType Detail');
+        $createResponse->assertSee('Description *');
+
+        $postResponse = $this->actingAs($this->user)->post('/credit-debit-types', [
+            'description' => 'Test Fee Discrepancy',
+        ]);
+        $postResponse->assertRedirect();
+        $this->assertDatabaseHas('creditdebittype', ['description' => 'Test Fee Discrepancy']);
+    }
+
+    public function test_currencies_index_and_create()
+    {
+        $response = $this->actingAs($this->user)->get('/currencies');
+        $response->assertStatus(200);
+        $response->assertSee('Currencies');
+        $response->assertSee('United States Dollar');
+        $response->assertSee('USD');
+
+        $createResponse = $this->actingAs($this->user)->get('/currencies/new');
+        $createResponse->assertStatus(200);
+        $createResponse->assertSee('New Currency');
+        $createResponse->assertSee('Currency Detail');
+        $createResponse->assertSee('HTML encode Symbol *');
+
+        $postResponse = $this->actingAs($this->user)->post('/currencies', [
+            'name' => 'Japanese Yen',
+            'abbreviation' => 'JPY',
+            'symbol' => '¥',
+            'htmlEncodeSymbol' => '&yen;',
+        ]);
+        $postResponse->assertRedirect();
+        $this->assertDatabaseHas('currency', ['abbreviation' => 'JPY']);
+    }
+
+    public function test_departments_index_and_create()
+    {
+        $response = $this->actingAs($this->user)->get('/departments');
+        $response->assertStatus(200);
+        $response->assertSee('Departments');
+        $response->assertSee('Sales');
+        $response->assertSee('Marketing');
+
+        $createResponse = $this->actingAs($this->user)->get('/departments/new');
+        $createResponse->assertStatus(200);
+        $createResponse->assertSee('New Department');
+        $createResponse->assertSee('Department Detail');
+        $createResponse->assertSee('Description *');
+
+        $postResponse = $this->actingAs($this->user)->post('/departments', [
+            'description' => 'Human Resources',
+        ]);
+        $postResponse->assertRedirect();
+        $this->assertDatabaseHas('department', ['description' => 'Human Resources']);
+    }
+
+    public function test_pack_types_index_and_create()
+    {
+        $response = $this->actingAs($this->user)->get('/packTypes');
+        $response->assertStatus(200);
+        $response->assertSee('PackTypes');
+        $response->assertSee('Big Bags');
+        $response->assertSee('Pallets');
+
+        $createResponse = $this->actingAs($this->user)->get('/packTypes/new');
+        $createResponse->assertStatus(200);
+        $createResponse->assertSee('New PackType');
+        $createResponse->assertSee('PackType Detail');
+        $createResponse->assertSee('Description *');
+
+        $postResponse = $this->actingAs($this->user)->post('/packTypes', [
+            'description' => 'Wooden Crates',
+        ]);
+        $postResponse->assertRedirect();
+        $this->assertDatabaseHas('packtype', ['description' => 'Wooden Crates']);
+    }
+
+    public function test_payment_types_index_and_create()
+    {
+        $response = $this->actingAs($this->user)->get('/paymentTypes');
+        $response->assertStatus(200);
+        $response->assertSee('PaymentTypes');
+        $response->assertSee('Sight LC');
+        $response->assertSee('Deferred LC');
+
+        $createResponse = $this->actingAs($this->user)->get('/paymentTypes/new');
+        $createResponse->assertStatus(200);
+        $createResponse->assertSee('New PaymentType');
+        $createResponse->assertSee('PaymentType Detail');
+        $createResponse->assertSee('Description *');
+
+        $postResponse = $this->actingAs($this->user)->post('/paymentTypes', [
+            'description' => 'Escrow Payment',
+        ]);
+        $postResponse->assertRedirect();
+        $this->assertDatabaseHas('paymenttype', ['description' => 'Escrow Payment']);
+    }
+
+    public function test_payment_terms_index_and_create()
+    {
+        $response = $this->actingAs($this->user)->get('/paymentTermsTypes');
+        $response->assertStatus(200);
+        $response->assertSee('PaymentTermsTypes');
+        $response->assertSee('Days');
+        $response->assertSee('Months');
+
+        $createResponse = $this->actingAs($this->user)->get('/paymentTermsTypes/new');
+        $createResponse->assertStatus(200);
+        $createResponse->assertSee('New PaymentTermsType');
+        $createResponse->assertSee('PaymentTermsType Detail');
+        $createResponse->assertSee('Description *');
+
+        $postResponse = $this->actingAs($this->user)->post('/paymentTermsTypes', [
+            'description' => 'Fortnightly',
+        ]);
+        $postResponse->assertRedirect();
+        $this->assertDatabaseHas('paymenttermstype', ['description' => 'Fortnightly']);
+    }
 }

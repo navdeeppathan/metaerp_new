@@ -1,8 +1,7 @@
 -- phpMyAdmin SQL Dump
--- MetaERP Enterprise Modernization Database Dump
+-- MetaERP Enterprise Database Dump (100% Dynamic Schema Sync)
+-- Generated on: 2026-11-04 12:06:20
 -- Compatible with MySQL 8.0+ / MariaDB 10.4+ / phpMyAdmin
--- Generated on: 2026-11-04 09:02:14
---
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -16,15 +15,17 @@ SET time_zone = "+00:00";
 SET FOREIGN_KEY_CHECKS=0;
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `access`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `access`;
-CREATE TABLE IF NOT EXISTS `access` (
+CREATE TABLE `access` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `accessgroup_id` bigint(20) UNSIGNED NULL,
-  `module` varchar(255) NULL,
-  `accessType` varchar(255) NULL,
-  `active` tinyint(1) NOT NULL DEFAULT '0',
+  `accessgroup_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `module` varchar(191) NOT NULL,
+  `accessType` varchar(191) NOT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
@@ -74,13 +75,15 @@ INSERT INTO `access` (`id`, `accessgroup_id`, `module`, `accessType`, `active`, 
 (36, 1, 'SYSTEM_SETTINGS', 'DELETE', 1, 0, '2026-10-29 15:21:13', '2026-10-29 15:21:13');
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `accessgroups`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `accessgroups`;
-CREATE TABLE IF NOT EXISTS `accessgroups` (
+CREATE TABLE `accessgroups` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `active` tinyint(1) NOT NULL DEFAULT '0',
+  `name` varchar(191) NOT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
@@ -92,7 +95,7 @@ CREATE TABLE IF NOT EXISTS `accessgroups` (
 --
 
 INSERT INTO `accessgroups` (`id`, `name`, `active`, `version`, `created_at`, `updated_at`) VALUES
-(1, 'Super Administrator', 1, 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12'),
+(1, 'Super Administrator', 0, 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12'),
 (2, 'ADMINISTRATOR', 1, 0, '2026-11-03 11:17:41', '2026-11-03 11:17:41'),
 (3, 'SUPER ADMIN', 1, 0, '2026-11-03 11:17:41', '2026-11-03 11:17:41'),
 (4, 'USERS', 1, 0, '2026-11-03 11:17:41', '2026-11-03 11:17:41'),
@@ -101,13 +104,15 @@ INSERT INTO `accessgroups` (`id`, `name`, `active`, `version`, `created_at`, `up
 (7, 'Teste Bruno', 1, 0, '2026-11-03 11:17:41', '2026-11-03 11:17:41');
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `actions`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `actions`;
-CREATE TABLE IF NOT EXISTS `actions` (
+CREATE TABLE `actions` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NULL,
-  `action` varchar(255) NULL,
+  `name` varchar(191) NOT NULL,
+  `action` varchar(191) NOT NULL,
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
@@ -115,23 +120,25 @@ CREATE TABLE IF NOT EXISTS `actions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `addresses`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `addresses`;
-CREATE TABLE IF NOT EXISTS `addresses` (
+CREATE TABLE `addresses` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `addressName` varchar(255) NULL,
-  `addressLine1` varchar(255) NULL,
-  `addressLine2` varchar(255) NULL,
-  `city` varchar(255) NULL,
-  `state` varchar(255) NULL,
-  `postalCode` varchar(255) NULL,
-  `postalBox` varchar(255) NULL,
-  `active` tinyint(1) NOT NULL DEFAULT '0',
-  `forGoogleMapsSearch` varchar(255) NULL,
-  `country_id` bigint(20) UNSIGNED NULL,
-  `company_id` bigint(20) UNSIGNED NULL,
-  `contact_id` bigint(20) UNSIGNED NULL,
+  `addressName` varchar(191) NULL DEFAULT NULL,
+  `addressLine1` varchar(191) NULL DEFAULT NULL,
+  `addressLine2` varchar(191) NULL DEFAULT NULL,
+  `city` varchar(191) NULL DEFAULT NULL,
+  `state` varchar(191) NULL DEFAULT NULL,
+  `postalCode` varchar(191) NULL DEFAULT NULL,
+  `postalBox` varchar(191) NULL DEFAULT NULL,
+  `active` tinyint(1) NULL DEFAULT '1',
+  `forGoogleMapsSearch` varchar(191) NULL DEFAULT NULL,
+  `country_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `company_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `contact_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
@@ -150,35 +157,39 @@ INSERT INTO `addresses` (`id`, `addressName`, `addressLine1`, `addressLine2`, `c
 (5, NULL, 'Second Industrial City, Al Mursi District, Al Laith Road', NULL, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 23, 0, '2026-11-04 03:21:41', '2026-11-04 03:21:41');
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `archive`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `archive`;
-CREATE TABLE IF NOT EXISTS `archive` (
+CREATE TABLE `archive` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `file` text NULL,
-  `fileName` varchar(255) NULL,
+  `file` longtext NOT NULL,
+  `fileName` varchar(191) NOT NULL,
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `bankaccounts`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `bankaccounts`;
-CREATE TABLE IF NOT EXISTS `bankaccounts` (
+CREATE TABLE `bankaccounts` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `company_id` bigint(20) UNSIGNED NULL,
-  `contact_id` bigint(20) UNSIGNED NULL,
-  `name` varchar(255) NULL,
-  `sortCode` varchar(255) NULL,
-  `accountNumber` varchar(255) NULL,
-  `iban` varchar(255) NULL,
-  `swift` varchar(255) NULL,
+  `company_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `contact_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `name` varchar(191) NULL DEFAULT NULL,
+  `sortCode` varchar(191) NULL DEFAULT NULL,
+  `accountNumber` varchar(191) NULL DEFAULT NULL,
+  `iban` varchar(191) NULL DEFAULT NULL,
+  `swift` varchar(191) NULL DEFAULT NULL,
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
-  `description` varchar(255) NULL,
+  `description` varchar(191) NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -192,13 +203,15 @@ INSERT INTO `bankaccounts` (`id`, `company_id`, `contact_id`, `name`, `sortCode`
 (3, 5, NULL, 'Virgin Money USD', NULL, NULL, NULL, NULL, 0, '2026-11-04 03:20:27', '2026-11-04 03:20:27', 'Virgin Money USD');
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `checkitems`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `checkitems`;
-CREATE TABLE IF NOT EXISTS `checkitems` (
+CREATE TABLE `checkitems` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `checklist_id` bigint(20) UNSIGNED NULL,
-  `name` varchar(255) NULL,
+  `checklist_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(191) NOT NULL,
   `checked` tinyint(1) NOT NULL DEFAULT '0',
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
@@ -214,16 +227,18 @@ INSERT INTO `checkitems` (`id`, `checklist_id`, `name`, `checked`, `version`, `c
 (1, 1, 'Sanctions & AML Screening', 1, 0, '2026-10-29 15:21:13', '2026-10-29 15:21:13'),
 (2, 1, 'Credit Insurance Approval', 1, 0, '2026-10-29 15:21:13', '2026-10-29 15:21:13'),
 (3, 1, 'Proforma Invoice Signed by Supplier', 0, 0, '2026-10-29 15:21:13', '2026-10-29 15:21:13'),
-(4, 1, 'Bill of Lading Verified', 1, 0, '2026-10-29 15:36:09', '2026-11-04 07:57:30');
+(4, 1, 'Bill of Lading Verified', 1, 0, '2026-10-29 15:36:09', '2026-11-04 10:09:06');
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `checklists`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `checklists`;
-CREATE TABLE IF NOT EXISTS `checklists` (
+CREATE TABLE `checklists` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `contract_id` bigint(20) UNSIGNED NULL,
-  `name` varchar(255) NULL,
+  `contract_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(191) NOT NULL,
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
@@ -238,14 +253,16 @@ INSERT INTO `checklists` (`id`, `contract_id`, `name`, `version`, `created_at`, 
 (1, 1, 'KYC & Trade Compliance', 0, '2026-10-29 15:21:13', '2026-10-29 15:21:13');
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `comments`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `comments`;
-CREATE TABLE IF NOT EXISTS `comments` (
+CREATE TABLE `comments` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `contract_id` bigint(20) UNSIGNED NULL,
-  `user_id` bigint(20) UNSIGNED NULL,
-  `message` text NULL,
+  `contract_id` bigint(20) UNSIGNED NOT NULL,
+  `user_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `message` longtext NOT NULL,
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -272,36 +289,48 @@ INSERT INTO `comments` (`id`, `contract_id`, `user_id`, `message`, `created_at`,
 (14, 1, 1, 'Shipment inspection scheduled for next Monday.', '2026-11-04 04:02:03', '2026-11-04 04:02:03'),
 (15, 1, 1, 'Shipment inspection scheduled for next Monday.', '2026-11-04 07:21:15', '2026-11-04 07:21:15'),
 (16, 1, 1, 'Shipment inspection scheduled for next Monday.', '2026-11-04 07:52:27', '2026-11-04 07:52:27'),
-(17, 1, 1, 'Shipment inspection scheduled for next Monday.', '2026-11-04 07:57:30', '2026-11-04 07:57:30');
+(17, 1, 1, 'Shipment inspection scheduled for next Monday.', '2026-11-04 07:57:30', '2026-11-04 07:57:30'),
+(18, 1, 1, 'Shipment inspection scheduled for next Monday.', '2026-11-04 08:33:06', '2026-11-04 08:33:06'),
+(19, 1, 1, 'Shipment inspection scheduled for next Monday.', '2026-11-04 08:48:16', '2026-11-04 08:48:16'),
+(20, 1, 1, 'Shipment inspection scheduled for next Monday.', '2026-11-04 08:48:45', '2026-11-04 08:48:45'),
+(21, 1, 1, 'Shipment inspection scheduled for next Monday.', '2026-11-04 09:09:21', '2026-11-04 09:09:21'),
+(22, 1, 1, 'Shipment inspection scheduled for next Monday.', '2026-11-04 09:11:19', '2026-11-04 09:11:19'),
+(23, 1, 1, 'Shipment inspection scheduled for next Monday.', '2026-11-04 09:29:07', '2026-11-04 09:29:07'),
+(24, 1, 1, 'Shipment inspection scheduled for next Monday.', '2026-11-04 09:44:55', '2026-11-04 09:44:55'),
+(25, 1, 1, 'Shipment inspection scheduled for next Monday.', '2026-11-04 09:56:43', '2026-11-04 09:56:43'),
+(26, 1, 1, 'Shipment inspection scheduled for next Monday.', '2026-11-04 10:06:39', '2026-11-04 10:06:39'),
+(27, 1, 1, 'Shipment inspection scheduled for next Monday.', '2026-11-04 10:09:06', '2026-11-04 10:09:06');
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `companies`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `companies`;
-CREATE TABLE IF NOT EXISTS `companies` (
+CREATE TABLE `companies` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `code` varchar(64) NOT NULL,
-  `countryId` bigint(20) UNSIGNED NULL,
-  `logoUrl` varchar(255) NULL,
-  `companyNumber` varchar(255) NULL,
-  `vatNumber` varchar(255) NULL,
-  `phoneNumber` varchar(255) NULL,
-  `faxNumber` varchar(255) NULL,
-  `email` varchar(255) NULL,
-  `webSite` varchar(255) NULL,
-  `footer` varchar(255) NULL,
-  `eoriNumber` varchar(255) NULL,
-  `address_id` bigint(20) UNSIGNED NULL,
-  `archiveLogoId` bigint(20) UNSIGNED NULL,
-  `archiveFooterId` bigint(20) UNSIGNED NULL,
-  `archiveStampId` bigint(20) UNSIGNED NULL,
-  `active` tinyint(1) NOT NULL DEFAULT '0',
+  `name` varchar(191) NOT NULL,
+  `code` varchar(191) NOT NULL,
+  `countryId` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `logoUrl` varchar(191) NULL DEFAULT NULL,
+  `companyNumber` varchar(191) NULL DEFAULT NULL,
+  `vatNumber` varchar(191) NULL DEFAULT NULL,
+  `phoneNumber` varchar(191) NULL DEFAULT NULL,
+  `faxNumber` varchar(191) NULL DEFAULT NULL,
+  `email` varchar(191) NULL DEFAULT NULL,
+  `webSite` varchar(191) NULL DEFAULT NULL,
+  `footer` varchar(191) NULL DEFAULT NULL,
+  `eoriNumber` varchar(191) NULL DEFAULT NULL,
+  `address_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `archiveLogoId` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `archiveFooterId` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `archiveStampId` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
-  `domain` varchar(255) NULL,
-  `stampUrl` varchar(255) NULL,
+  `domain` varchar(191) NULL DEFAULT NULL,
+  `stampUrl` varchar(191) NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -322,13 +351,15 @@ INSERT INTO `companies` (`id`, `name`, `code`, `countryId`, `logoUrl`, `companyN
 (10, 'sofinish.co.uk', 'SOF', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, '2026-11-03 11:17:41', '2026-11-03 13:37:42', NULL, NULL);
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `contact_products`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `contact_products`;
-CREATE TABLE IF NOT EXISTS `contact_products` (
+CREATE TABLE `contact_products` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `contact_id` bigint(20) UNSIGNED NULL,
-  `product_id` bigint(20) UNSIGNED NULL,
+  `contact_id` bigint(20) UNSIGNED NOT NULL,
+  `product_id` bigint(20) UNSIGNED NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -341,13 +372,15 @@ INSERT INTO `contact_products` (`id`, `contact_id`, `product_id`) VALUES
 (2, 1, 3);
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `contact_types`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `contact_types`;
-CREATE TABLE IF NOT EXISTS `contact_types` (
+CREATE TABLE `contact_types` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `contact_id` bigint(20) UNSIGNED NULL,
-  `type_id` bigint(20) UNSIGNED NULL,
+  `contact_id` bigint(20) UNSIGNED NOT NULL,
+  `type_id` bigint(20) UNSIGNED NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -360,29 +393,31 @@ INSERT INTO `contact_types` (`id`, `contact_id`, `type_id`) VALUES
 (2, 1, 2);
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `contacts`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `contacts`;
-CREATE TABLE IF NOT EXISTS `contacts` (
+CREATE TABLE `contacts` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `initials` varchar(255) NULL,
-  `companyId` bigint(20) UNSIGNED NULL,
-  `vat` varchar(255) NULL,
-  `registration` varchar(255) NULL,
-  `codeMeta` varchar(255) NULL,
-  `currency_id` bigint(20) UNSIGNED NULL,
-  `countryId` bigint(20) UNSIGNED NULL,
-  `language_id` bigint(20) UNSIGNED NULL,
-  `active` tinyint(1) NOT NULL DEFAULT '0',
+  `name` varchar(191) NOT NULL,
+  `initials` varchar(191) NULL DEFAULT NULL,
+  `companyId` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `vat` varchar(191) NULL DEFAULT NULL,
+  `registration` varchar(191) NULL DEFAULT NULL,
+  `codeMeta` varchar(191) NULL DEFAULT NULL,
+  `currency_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `countryId` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `language_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
-  `eoriNumber` varchar(255) NULL,
-  `website` varchar(255) NULL,
-  `additionalInformation` text NULL,
-  `types` varchar(255) NULL,
-  `template_language` varchar(255) NULL,
+  `eoriNumber` varchar(191) NULL DEFAULT NULL,
+  `website` varchar(191) NULL DEFAULT NULL,
+  `additionalInformation` longtext NULL DEFAULT NULL,
+  `types` varchar(191) NULL DEFAULT NULL,
+  `template_language` varchar(191) NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -391,7 +426,7 @@ CREATE TABLE IF NOT EXISTS `contacts` (
 --
 
 INSERT INTO `contacts` (`id`, `name`, `initials`, `companyId`, `vat`, `registration`, `codeMeta`, `currency_id`, `countryId`, `language_id`, `active`, `version`, `created_at`, `updated_at`, `eoriNumber`, `website`, `additionalInformation`, `types`, `template_language`) VALUES
-(1, 'CSN Siderúrgica Nacional', 'CSN', NULL, 'BR-33042730000104', 'REG-109283', 'BR00001', 1, 2, 3, 0, 0, '2026-10-29 15:21:12', '2026-11-04 02:45:36', NULL, NULL, NULL, NULL, NULL),
+(1, 'CSN Siderúrgica Nacional', 'CSN', NULL, 'BR-33042730000104', 'REG-109283', 'BR00001', NULL, 2, 3, 0, 0, '2026-10-29 15:21:12', '2026-11-04 02:45:36', NULL, NULL, NULL, NULL, NULL),
 (2, 'John Seller', NULL, 2, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, '2026-10-29 15:35:19', '2026-11-04 02:45:36', NULL, NULL, NULL, NULL, NULL),
 (14, 'Al-Babtain Power & Telecommunication Co.', NULL, 7, '300079665400003', NULL, 'SA00014', NULL, 5, NULL, 1, 0, '2026-11-04 02:45:00', '2026-11-04 02:45:36', NULL, NULL, NULL, NULL, NULL),
 (16, 'Saudi Steel Galvanizing Industries (SSG-RIYADH)', NULL, 7, '300508664900003', NULL, 'SA00016', NULL, 5, NULL, 1, 0, '2026-11-04 02:45:00', '2026-11-04 02:45:36', NULL, NULL, NULL, NULL, NULL),
@@ -404,13 +439,15 @@ INSERT INTO `contacts` (`id`, `name`, `initials`, `companyId`, `vat`, `registrat
 (24, 'Kannan Metallurgicals Private Limited', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, '2026-11-04 03:21:41', '2026-11-04 03:21:41', NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `contractOrderCodeSequence`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `contractOrderCodeSequence`;
-CREATE TABLE IF NOT EXISTS `contractOrderCodeSequence` (
+CREATE TABLE `contractOrderCodeSequence` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `year` int(11) NULL DEFAULT '0',
-  `lastId` bigint(20) UNSIGNED NULL,
+  `year` bigint(20) UNSIGNED NOT NULL,
+  `lastId` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -423,41 +460,43 @@ CREATE TABLE IF NOT EXISTS `contractOrderCodeSequence` (
 INSERT INTO `contractOrderCodeSequence` (`id`, `year`, `lastId`, `created_at`, `updated_at`) VALUES
 (1, 2024, 100, '2026-10-29 15:21:13', '2026-10-29 15:21:13'),
 (2, 2025, 200, '2026-10-29 15:21:13', '2026-10-29 15:21:13'),
-(3, 2026, 33, '2026-10-29 15:21:13', '2026-11-04 07:57:30');
+(3, 2026, 53, '2026-10-29 15:21:13', '2026-11-04 10:09:06');
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `contracts`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `contracts`;
-CREATE TABLE IF NOT EXISTS `contracts` (
+CREATE TABLE `contracts` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `orderCode` varchar(255) NULL,
+  `orderCode` varchar(191) NULL DEFAULT NULL,
   `date` datetime NULL DEFAULT NULL,
-  `type` varchar(64) NOT NULL,
-  `stage_id` bigint(20) UNSIGNED NULL,
-  `purchase_id` bigint(20) UNSIGNED NULL,
-  `sale_id` bigint(20) UNSIGNED NULL,
-  `contractStatus` varchar(255) NULL,
-  `active` tinyint(1) NOT NULL DEFAULT '0',
+  `type` varchar(191) NOT NULL,
+  `stage_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `purchase_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `sale_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `contractStatus` varchar(191) NOT NULL DEFAULT 'ACTIVE',
+  `active` tinyint(1) NOT NULL DEFAULT '1',
   `loadingDate` datetime NULL DEFAULT NULL,
-  `deliveryTerms` varchar(255) NULL,
-  `suppliesNote` text NULL,
-  `customerPurchaseOrder` varchar(255) NULL,
-  `modeOfPayment` varchar(255) NULL,
-  `qualityCheck` varchar(255) NULL,
-  `packing` varchar(255) NULL,
-  `remarks` text NULL,
-  `memberIds` text NULL,
+  `deliveryTerms` varchar(191) NULL DEFAULT NULL,
+  `suppliesNote` longtext NULL DEFAULT NULL,
+  `customerPurchaseOrder` varchar(191) NULL DEFAULT NULL,
+  `modeOfPayment` varchar(191) NULL DEFAULT NULL,
+  `qualityCheck` varchar(191) NULL DEFAULT NULL,
+  `packing` varchar(191) NULL DEFAULT NULL,
+  `remarks` longtext NULL DEFAULT NULL,
+  `memberIds` longtext NULL DEFAULT NULL,
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
-  `weightTolerance` varchar(255) NULL,
-  `orderDescription` text NULL,
+  `weightTolerance` varchar(191) NULL DEFAULT NULL,
+  `orderDescription` longtext NULL DEFAULT NULL,
   `finishDate` datetime NULL DEFAULT NULL,
   `cancellationDate` datetime NULL DEFAULT NULL,
-  `priceAgreed` varchar(255) NULL,
-  `transportNotes` text NULL,
-  `specialNotes` text NULL,
+  `priceAgreed` varchar(191) NULL DEFAULT NULL,
+  `transportNotes` longtext NULL DEFAULT NULL,
+  `specialNotes` longtext NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -466,7 +505,7 @@ CREATE TABLE IF NOT EXISTS `contracts` (
 --
 
 INSERT INTO `contracts` (`id`, `orderCode`, `date`, `type`, `stage_id`, `purchase_id`, `sale_id`, `contractStatus`, `active`, `loadingDate`, `deliveryTerms`, `suppliesNote`, `customerPurchaseOrder`, `modeOfPayment`, `qualityCheck`, `packing`, `remarks`, `memberIds`, `version`, `created_at`, `updated_at`, `weightTolerance`, `orderDescription`, `finishDate`, `cancellationDate`, `priceAgreed`, `transportNotes`, `specialNotes`) VALUES
-(1, 'MENON_FERROUS26-001', '2026-10-29 15:21:13', 'BUY', 1, 1, NULL, 'ACTIVE', 1, '2026-11-12 15:21:13', 'CIF Rotterdam Port', 'High purity electrolytic grade cathodes with mill test certificates.', 'PO-CSN-2026-99', 'CAD through Barclays London', 'SGS Inspection at loading port', 'Strapped bundles on wooden pallets, plastic wrapped', 'Priority shipment for Q1 2026.', NULL, 0, '2026-10-29 15:21:13', '2026-11-04 07:57:30', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(1, 'MENON_FERROUS26-001', '2026-10-29 15:21:13', 'BUY', 1, 1, NULL, 'ACTIVE', 1, '2026-11-12 15:21:13', 'CIF Rotterdam Port', 'High purity electrolytic grade cathodes with mill test certificates.', 'PO-CSN-2026-99', 'CAD through Barclays London', 'SGS Inspection at loading port', 'Strapped bundles on wooden pallets, plastic wrapped', 'Priority shipment for Q1 2026.', NULL, 0, '2026-10-29 15:21:13', '2026-11-04 10:09:06', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (2, 'MENONFERROUS26-2', '2026-10-29 15:36:09', 'BUY', 2, 2, NULL, 'ACTIVE', 1, '2026-11-12 15:36:09', 'CIF', NULL, NULL, 'TT in Advance', NULL, NULL, NULL, NULL, 0, '2026-10-29 15:36:09', '2026-10-29 15:36:09', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (3, 'MENONFERROUS26-3', '2026-10-29 15:36:09', 'BUY', 2, 3, NULL, 'ACTIVE', 1, '2026-11-12 15:36:09', 'CIF', NULL, NULL, 'TT in Advance', NULL, NULL, NULL, NULL, 0, '2026-10-29 15:36:09', '2026-10-29 15:36:09', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (4, 'CANCEL-TEST-1793288169', NULL, 'SELL', NULL, NULL, NULL, 'ACTIVE', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, '2026-10-29 15:36:09', '2026-10-29 15:36:09', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
@@ -515,9 +554,7 @@ INSERT INTO `contracts` (`id`, `orderCode`, `date`, `type`, `stage_id`, `purchas
 (47, 'CANCEL-TEST-1793764732', NULL, 'SELL', NULL, NULL, NULL, 'CANCELLED', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, '2026-11-04 03:58:52', '2026-11-04 03:58:52', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (48, 'MENONFERROUS26-22', '2026-11-04 03:59:28', 'BUY', 2, 43, NULL, 'OPEN', 1, '2026-11-18 03:59:28', 'CIF', NULL, NULL, '100%', NULL, NULL, NULL, NULL, 0, '2026-11-04 03:59:28', '2026-11-04 03:59:28', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (49, 'MENONFERROUS26-23', '2026-11-04 03:59:28', 'BUY', 2, 44, NULL, 'OPEN', 1, '2026-11-18 03:59:28', 'CIF', NULL, NULL, '100%', NULL, NULL, NULL, NULL, 0, '2026-11-04 03:59:28', '2026-11-04 03:59:28', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(50, 'CANCEL-TEST-1793764768', NULL, 'SELL', NULL, NULL, NULL, 'CANCELLED', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, '2026-11-04 03:59:28', '2026-11-04 03:59:28', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-
-INSERT INTO `contracts` (`id`, `orderCode`, `date`, `type`, `stage_id`, `purchase_id`, `sale_id`, `contractStatus`, `active`, `loadingDate`, `deliveryTerms`, `suppliesNote`, `customerPurchaseOrder`, `modeOfPayment`, `qualityCheck`, `packing`, `remarks`, `memberIds`, `version`, `created_at`, `updated_at`, `weightTolerance`, `orderDescription`, `finishDate`, `cancellationDate`, `priceAgreed`, `transportNotes`, `specialNotes`) VALUES
+(50, 'CANCEL-TEST-1793764768', NULL, 'SELL', NULL, NULL, NULL, 'CANCELLED', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, '2026-11-04 03:59:28', '2026-11-04 03:59:28', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (51, 'MENONFERROUS26-24', '2026-11-04 03:59:58', 'BUY', 2, 45, NULL, 'ACTIVE', 1, '2026-11-18 03:59:58', 'CIF', NULL, NULL, '100%', NULL, NULL, NULL, NULL, 0, '2026-11-04 03:59:58', '2026-11-04 03:59:58', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (52, 'MENONFERROUS26-25', '2026-11-04 03:59:58', 'BUY', 2, 46, NULL, 'ACTIVE', 1, '2026-11-18 03:59:58', 'CIF', NULL, NULL, '100%', NULL, NULL, NULL, NULL, 0, '2026-11-04 03:59:58', '2026-11-04 03:59:59', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (53, 'CANCEL-TEST-1793764799', NULL, 'SELL', NULL, NULL, NULL, 'CANCELLED', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, '2026-11-04 03:59:59', '2026-11-04 03:59:59', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
@@ -532,25 +569,57 @@ INSERT INTO `contracts` (`id`, `orderCode`, `date`, `type`, `stage_id`, `purchas
 (62, 'CANCEL-TEST-1793778747', NULL, 'SELL', NULL, NULL, NULL, 'CANCELLED', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, '2026-11-04 07:52:27', '2026-11-04 07:52:27', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (63, 'MENONFERROUS26-32', '2026-11-04 07:57:30', 'BUY', 2, 53, NULL, 'ACTIVE', 1, '2026-11-18 07:57:30', 'CIF', NULL, NULL, '100%', NULL, NULL, NULL, NULL, 0, '2026-11-04 07:57:30', '2026-11-04 07:57:30', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (64, 'MENONFERROUS26-33', '2026-11-04 07:57:30', 'BUY', 2, 54, NULL, 'ACTIVE', 1, '2026-11-18 07:57:30', 'CIF', NULL, NULL, '100%', NULL, NULL, NULL, NULL, 0, '2026-11-04 07:57:30', '2026-11-04 07:57:30', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(65, 'CANCEL-TEST-1793779050', NULL, 'SELL', NULL, NULL, NULL, 'CANCELLED', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, '2026-11-04 07:57:30', '2026-11-04 07:57:30', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+(65, 'CANCEL-TEST-1793779050', NULL, 'SELL', NULL, NULL, NULL, 'CANCELLED', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, '2026-11-04 07:57:30', '2026-11-04 07:57:30', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(66, 'MENONFERROUS26-34', '2026-11-04 08:33:06', 'BUY', 2, 55, NULL, 'ACTIVE', 1, '2026-11-18 08:33:06', 'CIF', NULL, NULL, '100%', NULL, NULL, NULL, NULL, 0, '2026-11-04 08:33:06', '2026-11-04 08:33:06', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(67, 'MENONFERROUS26-35', '2026-11-04 08:33:06', 'BUY', 2, 56, NULL, 'ACTIVE', 1, '2026-11-18 08:33:06', 'CIF', NULL, NULL, '100%', NULL, NULL, NULL, NULL, 0, '2026-11-04 08:33:06', '2026-11-04 08:33:06', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(68, 'CANCEL-TEST-1793781186', NULL, 'SELL', NULL, NULL, NULL, 'CANCELLED', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, '2026-11-04 08:33:06', '2026-11-04 08:33:06', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(69, 'MENONFERROUS26-36', '2026-11-04 08:48:16', 'BUY', 2, 57, NULL, 'ACTIVE', 1, '2026-11-18 08:48:16', 'CIF', NULL, NULL, '100%', NULL, NULL, NULL, NULL, 0, '2026-11-04 08:48:16', '2026-11-04 08:48:16', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(70, 'MENONFERROUS26-37', '2026-11-04 08:48:16', 'BUY', 2, 58, NULL, 'ACTIVE', 1, '2026-11-18 08:48:16', 'CIF', NULL, NULL, '100%', NULL, NULL, NULL, NULL, 0, '2026-11-04 08:48:16', '2026-11-04 08:48:16', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(71, 'CANCEL-TEST-1793782096', NULL, 'SELL', NULL, NULL, NULL, 'CANCELLED', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, '2026-11-04 08:48:16', '2026-11-04 08:48:16', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(72, 'MENONFERROUS26-38', '2026-11-04 08:48:45', 'BUY', 2, 59, NULL, 'ACTIVE', 1, '2026-11-18 08:48:45', 'CIF', NULL, NULL, '100%', NULL, NULL, NULL, NULL, 0, '2026-11-04 08:48:45', '2026-11-04 08:48:45', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(73, 'MENONFERROUS26-39', '2026-11-04 08:48:45', 'BUY', 2, 60, NULL, 'ACTIVE', 1, '2026-11-18 08:48:45', 'CIF', NULL, NULL, '100%', NULL, NULL, NULL, NULL, 0, '2026-11-04 08:48:45', '2026-11-04 08:48:45', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(74, 'CANCEL-TEST-1793782125', NULL, 'SELL', NULL, NULL, NULL, 'CANCELLED', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, '2026-11-04 08:48:45', '2026-11-04 08:48:45', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(75, 'MENONFERROUS26-40', '2026-11-04 09:09:21', 'BUY', 2, 61, NULL, 'ACTIVE', 1, '2026-11-18 09:09:21', 'CIF', NULL, NULL, '100%', NULL, NULL, NULL, NULL, 0, '2026-11-04 09:09:21', '2026-11-04 09:09:21', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(76, 'MENONFERROUS26-41', '2026-11-04 09:09:21', 'BUY', 2, 62, NULL, 'ACTIVE', 1, '2026-11-18 09:09:21', 'CIF', NULL, NULL, '100%', NULL, NULL, NULL, NULL, 0, '2026-11-04 09:09:21', '2026-11-04 09:09:21', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(77, 'CANCEL-TEST-1793783361', NULL, 'SELL', NULL, NULL, NULL, 'CANCELLED', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, '2026-11-04 09:09:21', '2026-11-04 09:09:21', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(78, 'MENONFERROUS26-42', '2026-11-04 09:11:18', 'BUY', 2, 63, NULL, 'ACTIVE', 1, '2026-11-18 09:11:18', 'CIF', NULL, NULL, '100%', NULL, NULL, NULL, NULL, 0, '2026-11-04 09:11:18', '2026-11-04 09:11:18', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(79, 'MENONFERROUS26-43', '2026-11-04 09:11:18', 'BUY', 2, 64, NULL, 'ACTIVE', 1, '2026-11-18 09:11:18', 'CIF', NULL, NULL, '100%', NULL, NULL, NULL, NULL, 0, '2026-11-04 09:11:18', '2026-11-04 09:11:18', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(80, 'CANCEL-TEST-1793783479', NULL, 'SELL', NULL, NULL, NULL, 'CANCELLED', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, '2026-11-04 09:11:19', '2026-11-04 09:11:19', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(81, 'MENONFERROUS26-44', '2026-11-04 09:29:07', 'BUY', 2, 65, NULL, 'ACTIVE', 1, '2026-11-18 09:29:07', 'CIF', NULL, NULL, '100%', NULL, NULL, NULL, NULL, 0, '2026-11-04 09:29:07', '2026-11-04 09:29:07', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(82, 'MENONFERROUS26-45', '2026-11-04 09:29:07', 'BUY', 2, 66, NULL, 'ACTIVE', 1, '2026-11-18 09:29:07', 'CIF', NULL, NULL, '100%', NULL, NULL, NULL, NULL, 0, '2026-11-04 09:29:07', '2026-11-04 09:29:07', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(83, 'CANCEL-TEST-1793784547', NULL, 'SELL', NULL, NULL, NULL, 'CANCELLED', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, '2026-11-04 09:29:07', '2026-11-04 09:29:07', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(84, 'MENONFERROUS26-46', '2026-11-04 09:44:55', 'BUY', 2, 67, NULL, 'ACTIVE', 1, '2026-11-18 09:44:55', 'CIF', NULL, NULL, '100%', NULL, NULL, NULL, NULL, 0, '2026-11-04 09:44:55', '2026-11-04 09:44:55', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(85, 'MENONFERROUS26-47', '2026-11-04 09:44:55', 'BUY', 2, 68, NULL, 'ACTIVE', 1, '2026-11-18 09:44:55', 'CIF', NULL, NULL, '100%', NULL, NULL, NULL, NULL, 0, '2026-11-04 09:44:55', '2026-11-04 09:44:55', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(86, 'CANCEL-TEST-1793785495', NULL, 'SELL', NULL, NULL, NULL, 'CANCELLED', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, '2026-11-04 09:44:55', '2026-11-04 09:44:55', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(87, 'MENONFERROUS26-48', '2026-11-04 09:56:43', 'BUY', 2, 69, NULL, 'ACTIVE', 1, '2026-11-18 09:56:43', 'CIF', NULL, NULL, '100%', NULL, NULL, NULL, NULL, 0, '2026-11-04 09:56:43', '2026-11-04 09:56:43', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(88, 'MENONFERROUS26-49', '2026-11-04 09:56:43', 'BUY', 2, 70, NULL, 'ACTIVE', 1, '2026-11-18 09:56:43', 'CIF', NULL, NULL, '100%', NULL, NULL, NULL, NULL, 0, '2026-11-04 09:56:43', '2026-11-04 09:56:43', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(89, 'CANCEL-TEST-1793786203', NULL, 'SELL', NULL, NULL, NULL, 'CANCELLED', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, '2026-11-04 09:56:43', '2026-11-04 09:56:43', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(90, 'MENONFERROUS26-50', '2026-11-04 10:06:39', 'BUY', 2, 71, NULL, 'ACTIVE', 1, '2026-11-18 10:06:39', 'CIF', NULL, NULL, '100%', NULL, NULL, NULL, NULL, 0, '2026-11-04 10:06:39', '2026-11-04 10:06:39', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(91, 'MENONFERROUS26-51', '2026-11-04 10:06:39', 'BUY', 2, 72, NULL, 'ACTIVE', 1, '2026-11-18 10:06:39', 'CIF', NULL, NULL, '100%', NULL, NULL, NULL, NULL, 0, '2026-11-04 10:06:39', '2026-11-04 10:06:39', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(92, 'CANCEL-TEST-1793786799', NULL, 'SELL', NULL, NULL, NULL, 'CANCELLED', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, '2026-11-04 10:06:39', '2026-11-04 10:06:39', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(93, 'MENONFERROUS26-52', '2026-11-04 10:09:06', 'BUY', 2, 73, NULL, 'ACTIVE', 1, '2026-11-18 10:09:06', 'CIF', NULL, NULL, '100%', NULL, NULL, NULL, NULL, 0, '2026-11-04 10:09:06', '2026-11-04 10:09:06', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(94, 'MENONFERROUS26-53', '2026-11-04 10:09:06', 'BUY', 2, 74, NULL, 'ACTIVE', 1, '2026-11-18 10:09:06', 'CIF', NULL, NULL, '100%', NULL, NULL, NULL, NULL, 0, '2026-11-04 10:09:06', '2026-11-04 10:09:06', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(95, 'CANCEL-TEST-1793786946', NULL, 'SELL', NULL, NULL, NULL, 'CANCELLED', 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, '2026-11-04 10:09:06', '2026-11-04 10:09:06', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `countries`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `countries`;
-CREATE TABLE IF NOT EXISTS `countries` (
+CREATE TABLE `countries` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NULL,
-  `alpha2` varchar(255) NULL,
-  `alpha3` varchar(255) NULL,
-  `region` varchar(255) NULL,
-  `subRegion` varchar(255) NULL,
-  `intermediateRegion` varchar(255) NULL,
-  `currencyName` varchar(255) NULL,
-  `currencyCode` varchar(255) NULL,
-  `currencySymbol` varchar(255) NULL,
-  `vat` double(12,4) NULL DEFAULT '0.0000',
-  `active` tinyint(1) NOT NULL DEFAULT '0',
+  `name` varchar(191) NOT NULL,
+  `alpha2` varchar(191) NULL DEFAULT NULL,
+  `alpha3` varchar(191) NULL DEFAULT NULL,
+  `region` varchar(191) NULL DEFAULT NULL,
+  `subRegion` varchar(191) NULL DEFAULT NULL,
+  `intermediateRegion` varchar(191) NULL DEFAULT NULL,
+  `currencyName` varchar(191) NULL DEFAULT NULL,
+  `currencyCode` varchar(191) NULL DEFAULT NULL,
+  `currencySymbol` varchar(191) NULL DEFAULT NULL,
+  `vat` double NOT NULL DEFAULT '0',
+  `active` tinyint(1) NOT NULL DEFAULT '1',
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
@@ -566,15 +635,28 @@ INSERT INTO `countries` (`id`, `name`, `alpha2`, `alpha3`, `region`, `subRegion`
 (2, 'Brazil', 'BR', 'BRA', 'South America', NULL, NULL, 'Brazilian Real', 'BRL', 'R$', 10, 1, 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12'),
 (3, 'United States', 'US', 'USA', 'North America', NULL, NULL, 'US Dollar', 'USD', '$', 0, 1, 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12'),
 (4, 'Germany', 'DE', 'DEU', 'Europe', NULL, NULL, 'Euro', 'EUR', '€', 19, 1, 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12'),
-(5, 'Saudi Arabia', 'SA', 'SAU', NULL, NULL, NULL, 'Saudi Riyal', 'SAR', 'SR', 0, 1, 0, '2026-11-04 02:44:59', '2026-11-04 02:44:59');
+(5, 'Saudi Arabia', 'SA', 'SAU', NULL, NULL, NULL, 'Saudi Riyal', 'SAR', 'SR', 0, 1, 0, '2026-11-04 02:44:59', '2026-11-04 02:44:59'),
+(6, 'Albania', 'AL', 'ALB', 'Balkans', NULL, NULL, NULL, NULL, NULL, 20, 1, 0, '2026-11-04 09:23:12', '2026-11-04 09:23:12'),
+(7, 'Algeria', 'DZ', 'DZA', 'North Africa', NULL, NULL, NULL, NULL, NULL, 19, 1, 0, '2026-11-04 09:23:12', '2026-11-04 09:23:12'),
+(8, 'Argentina', 'AR', 'ARG', 'South America', NULL, NULL, NULL, NULL, NULL, 21, 1, 0, '2026-11-04 09:23:12', '2026-11-04 09:23:12'),
+(9, 'Australia', 'AU', 'AUS', 'Oceania', NULL, NULL, NULL, NULL, NULL, 10, 1, 0, '2026-11-04 09:23:12', '2026-11-04 09:23:12'),
+(10, 'Austria', 'AT', 'AUT', 'Europe', NULL, NULL, NULL, NULL, NULL, 20, 1, 0, '2026-11-04 09:23:12', '2026-11-04 09:23:12'),
+(11, 'Bahrain', 'BH', 'BHR', 'Middle East', NULL, NULL, NULL, NULL, NULL, 10, 1, 0, '2026-11-04 09:23:12', '2026-11-04 09:23:12'),
+(12, 'Testland', 'TL', 'TLS', 'Europe', NULL, NULL, NULL, NULL, NULL, 20, 1, 0, '2026-11-04 09:29:10', '2026-11-04 09:29:10'),
+(13, 'Testland', 'TL', 'TLS', 'Europe', NULL, NULL, NULL, NULL, NULL, 20, 1, 0, '2026-11-04 09:44:57', '2026-11-04 09:44:57'),
+(14, 'Testland', 'TL', 'TLS', 'Europe', NULL, NULL, NULL, NULL, NULL, 20, 1, 0, '2026-11-04 09:56:47', '2026-11-04 09:56:47'),
+(15, 'Testland', 'TL', 'TLS', 'Europe', NULL, NULL, NULL, NULL, NULL, 20, 1, 0, '2026-11-04 10:06:41', '2026-11-04 10:06:41'),
+(16, 'Testland', 'TL', 'TLS', 'Europe', NULL, NULL, NULL, NULL, NULL, 20, 1, 0, '2026-11-04 10:09:13', '2026-11-04 10:09:13');
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `creditdebittype`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `creditdebittype`;
-CREATE TABLE IF NOT EXISTS `creditdebittype` (
+CREATE TABLE `creditdebittype` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `description` varchar(255) NULL,
+  `description` varchar(191) NOT NULL,
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
@@ -586,22 +668,31 @@ CREATE TABLE IF NOT EXISTS `creditdebittype` (
 --
 
 INSERT INTO `creditdebittype` (`id`, `description`, `version`, `created_at`, `updated_at`) VALUES
-(1, 'Price Adjustment', 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12'),
-(2, 'Quality Discrepancy', 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12'),
-(3, 'Weight Difference', 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12');
+(1, 'Delay', 0, '2026-11-04 09:41:35', '2026-11-04 09:41:35'),
+(2, 'Container Damage', 0, '2026-11-04 09:41:35', '2026-11-04 09:41:35'),
+(3, 'Free Time Not applied from Shipping Line', 0, '2026-11-04 09:41:35', '2026-11-04 09:41:35'),
+(4, 'Test Fee Discrepancy', 0, '2026-11-04 09:44:57', '2026-11-04 09:44:57'),
+(5, 'Test Fee Discrepancy', 0, '2026-11-04 09:56:47', '2026-11-04 09:56:47'),
+(6, 'Test Fee Discrepancy', 0, '2026-11-04 10:06:41', '2026-11-04 10:06:41'),
+(7, 'Test Fee Discrepancy', 0, '2026-11-04 10:09:13', '2026-11-04 10:09:13');
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `currency`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `currency`;
-CREATE TABLE IF NOT EXISTS `currency` (
+CREATE TABLE `currency` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `description` varchar(255) NULL,
-  `symbol` varchar(255) NULL,
-  `rate` double(12,4) NULL DEFAULT '0.0000',
+  `description` varchar(191) NOT NULL,
+  `symbol` varchar(191) NULL DEFAULT NULL,
+  `rate` double NOT NULL DEFAULT '1',
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
+  `name` varchar(191) NULL DEFAULT NULL,
+  `abbreviation` varchar(191) NULL DEFAULT NULL,
+  `htmlEncodeSymbol` varchar(191) NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -609,40 +700,49 @@ CREATE TABLE IF NOT EXISTS `currency` (
 -- Dumping data for table `currency`
 --
 
-INSERT INTO `currency` (`id`, `description`, `symbol`, `rate`, `version`, `created_at`, `updated_at`) VALUES
-(1, 'USD', '$', 1.25, 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12'),
-(2, 'GBP', '£', 1, 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12'),
-(3, 'EUR', '€', 1.15, 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12');
+INSERT INTO `currency` (`id`, `description`, `symbol`, `rate`, `version`, `created_at`, `updated_at`, `name`, `abbreviation`, `htmlEncodeSymbol`) VALUES
+(1, 'USD', '$', 1.25, 0, '2026-11-04 09:41:35', '2026-11-04 09:41:35', 'United States Dollar', 'USD', '&#36;'),
+(2, 'SAR', 'R', 3.75, 0, '2026-11-04 09:41:35', '2026-11-04 09:41:35', 'Saudi Riyal', 'SAR', 'R'),
+(3, 'EUR', '€', 1.15, 0, '2026-11-04 09:41:35', '2026-11-04 09:41:35', 'Euro', 'EUR', '&euro;'),
+(4, 'GBP', '£', 1, 0, '2026-11-04 09:41:35', '2026-11-04 09:41:35', 'Sterling', 'GBP', '&pound;'),
+(5, 'AUD', '$', 1.85, 0, '2026-11-04 09:41:35', '2026-11-04 09:41:35', 'Australian Dollar', 'AUD', '&#36;'),
+(6, 'CAD', '$', 1.7, 0, '2026-11-04 09:41:35', '2026-11-04 09:41:35', 'Canadian Dollar', 'CAD', '&#36;'),
+(7, 'JPY', '¥', 1, 0, '2026-11-04 09:44:58', '2026-11-04 09:44:58', 'Japanese Yen', 'JPY', '&yen;'),
+(8, 'JPY', '¥', 1, 0, '2026-11-04 09:56:47', '2026-11-04 09:56:47', 'Japanese Yen', 'JPY', '&yen;'),
+(9, 'JPY', '¥', 1, 0, '2026-11-04 10:06:41', '2026-11-04 10:06:41', 'Japanese Yen', 'JPY', '&yen;'),
+(10, 'JPY', '¥', 1, 0, '2026-11-04 10:09:13', '2026-11-04 10:09:13', 'Japanese Yen', 'JPY', '&yen;');
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `deal`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `deal`;
-CREATE TABLE IF NOT EXISTS `deal` (
+CREATE TABLE `deal` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `meta_company_id` bigint(20) UNSIGNED NULL,
-  `contact_id` bigint(20) UNSIGNED NULL,
-  `contact_representative_id` bigint(20) UNSIGNED NULL,
-  `meta_representative_id` bigint(20) UNSIGNED NULL,
-  `address_id` bigint(20) UNSIGNED NULL,
-  `destination_address_id` bigint(20) UNSIGNED NULL,
-  `currency_id` bigint(20) UNSIGNED NULL,
-  `payment_type_id` bigint(20) UNSIGNED NULL,
-  `payment_terms_type_id` bigint(20) UNSIGNED NULL,
-  `bank_account_id` bigint(20) UNSIGNED NULL,
-  `dollarConvertionRate` double(12,4) NULL DEFAULT '0.0000',
-  `total` double(12,4) NULL DEFAULT '0.0000',
-  `netTotal` double(12,4) NULL DEFAULT '0.0000',
-  `dealPaymentStatus` varchar(255) NULL,
+  `meta_company_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `contact_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `contact_representative_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `meta_representative_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `address_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `destination_address_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `currency_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `payment_type_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `payment_terms_type_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `bank_account_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `dollarConvertionRate` double NOT NULL DEFAULT '1',
+  `total` double NOT NULL DEFAULT '0',
+  `netTotal` double NOT NULL DEFAULT '0',
+  `dealPaymentStatus` varchar(191) NULL DEFAULT NULL,
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
-  `paymentDate` date NULL DEFAULT NULL,
-  `incoterms` varchar(255) NULL,
-  `customerOrderNumber` varchar(255) NULL,
-  `paymentTerms` varchar(255) NULL,
-  `advancedPayment` varchar(255) NULL,
-  `notes` text NULL,
+  `paymentDate` datetime NULL DEFAULT NULL,
+  `incoterms` varchar(191) NULL DEFAULT NULL,
+  `customerOrderNumber` varchar(191) NULL DEFAULT NULL,
+  `paymentTerms` varchar(191) NULL DEFAULT NULL,
+  `advancedPayment` varchar(191) NULL DEFAULT NULL,
+  `notes` longtext NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -651,29 +751,29 @@ CREATE TABLE IF NOT EXISTS `deal` (
 --
 
 INSERT INTO `deal` (`id`, `meta_company_id`, `contact_id`, `contact_representative_id`, `meta_representative_id`, `address_id`, `destination_address_id`, `currency_id`, `payment_type_id`, `payment_terms_type_id`, `bank_account_id`, `dollarConvertionRate`, `total`, `netTotal`, `dealPaymentStatus`, `version`, `created_at`, `updated_at`, `paymentDate`, `incoterms`, `customerOrderNumber`, `paymentTerms`, `advancedPayment`, `notes`) VALUES
-(1, 1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 450000, 450000, 'PENDING', 0, '2026-10-29 15:21:13', '2026-10-29 15:21:13', NULL, NULL, NULL, NULL, NULL, NULL),
-(2, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 368725, 368725, 'PENDING', 0, '2026-10-29 15:36:09', '2026-10-29 15:36:09', NULL, NULL, NULL, NULL, NULL, NULL),
-(3, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 60000, 60000, 'PENDING', 0, '2026-10-29 15:36:09', '2026-10-29 15:36:09', NULL, NULL, NULL, NULL, NULL, NULL),
-(4, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 368725, 368725, 'PENDING', 0, '2026-10-29 15:37:14', '2026-10-29 15:37:14', NULL, NULL, NULL, NULL, NULL, NULL),
-(5, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 60000, 60000, 'PENDING', 0, '2026-10-29 15:37:14', '2026-10-29 15:37:14', NULL, NULL, NULL, NULL, NULL, NULL),
-(6, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 368725, 368725, 'PENDING', 0, '2026-10-29 15:37:55', '2026-10-29 15:37:55', NULL, NULL, NULL, NULL, NULL, NULL),
-(7, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 60000, 60000, 'PENDING', 0, '2026-10-29 15:37:55', '2026-10-29 15:37:55', NULL, NULL, NULL, NULL, NULL, NULL),
-(8, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 368725, 368725, 'PENDING', 0, '2026-10-29 15:42:42', '2026-10-29 15:42:42', NULL, NULL, NULL, NULL, NULL, NULL),
-(9, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 60000, 60000, 'PENDING', 0, '2026-10-29 15:42:43', '2026-10-29 15:42:43', NULL, NULL, NULL, NULL, NULL, NULL),
-(10, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 368725, 368725, 'PENDING', 0, '2026-10-29 15:43:59', '2026-10-29 15:43:59', NULL, NULL, NULL, NULL, NULL, NULL),
-(11, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 60000, 60000, 'PENDING', 0, '2026-10-29 15:43:59', '2026-10-29 15:43:59', NULL, NULL, NULL, NULL, NULL, NULL),
-(12, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 368725, 368725, 'PENDING', 0, '2026-11-03 13:27:49', '2026-11-03 13:27:49', NULL, NULL, NULL, NULL, NULL, NULL),
-(13, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 60000, 60000, 'PENDING', 0, '2026-11-03 13:27:50', '2026-11-03 13:27:50', NULL, NULL, NULL, NULL, NULL, NULL),
-(14, 5, 22, 3, NULL, 4, NULL, 1, 4, 5, 3, 1, 371000, 371000, NULL, 0, '2026-11-04 03:22:02', '2026-11-04 03:22:02', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
-(15, 5, 23, 4, NULL, 5, NULL, 1, 4, 5, 3, 1, 371000, 371000, NULL, 0, '2026-11-04 03:22:02', '2026-11-04 03:22:02', NULL, NULL, NULL, '100%', NULL, NULL),
-(16, 5, 24, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 0, 0, NULL, 0, '2026-11-04 03:22:02', '2026-11-04 03:22:02', NULL, NULL, NULL, NULL, NULL, NULL),
-(17, 1, 22, 3, NULL, 4, NULL, 1, 4, 5, 3, 1, 371000, 371000, NULL, 0, '2026-11-04 03:22:21', '2026-11-04 03:49:39', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
-(18, 1, 23, 4, NULL, 5, NULL, 1, 4, 5, 3, 1, 371000, 371000, NULL, 0, '2026-11-04 03:22:21', '2026-11-04 03:49:39', NULL, NULL, NULL, '100%', NULL, NULL),
-(19, 3, 24, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 0, 0, NULL, 0, '2026-11-04 03:22:21', '2026-11-04 03:49:39', NULL, NULL, NULL, NULL, NULL, NULL),
-(20, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 368725, 368725, 'PENDING', 0, '2026-11-04 03:34:53', '2026-11-04 03:34:53', NULL, NULL, NULL, NULL, NULL, NULL),
-(21, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 60000, 60000, 'PENDING', 0, '2026-11-04 03:34:53', '2026-11-04 03:34:53', NULL, NULL, NULL, NULL, NULL, NULL),
-(22, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 368725, 368725, 'PENDING', 0, '2026-11-04 03:40:34', '2026-11-04 03:40:34', NULL, NULL, NULL, NULL, NULL, NULL),
-(23, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 60000, 60000, 'PENDING', 0, '2026-11-04 03:40:34', '2026-11-04 03:40:34', NULL, NULL, NULL, NULL, NULL, NULL),
+(1, 1, 1, 2, 1, 2, 1, NULL, NULL, NULL, 1, 1, 450000, 450000, 'PENDING', 0, '2026-10-29 15:21:13', '2026-10-29 15:21:13', NULL, NULL, NULL, NULL, NULL, NULL),
+(2, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 368725, 368725, 'PENDING', 0, '2026-10-29 15:36:09', '2026-10-29 15:36:09', NULL, NULL, NULL, NULL, NULL, NULL),
+(3, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 60000, 60000, 'PENDING', 0, '2026-10-29 15:36:09', '2026-10-29 15:36:09', NULL, NULL, NULL, NULL, NULL, NULL),
+(4, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 368725, 368725, 'PENDING', 0, '2026-10-29 15:37:14', '2026-10-29 15:37:14', NULL, NULL, NULL, NULL, NULL, NULL),
+(5, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 60000, 60000, 'PENDING', 0, '2026-10-29 15:37:14', '2026-10-29 15:37:14', NULL, NULL, NULL, NULL, NULL, NULL),
+(6, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 368725, 368725, 'PENDING', 0, '2026-10-29 15:37:55', '2026-10-29 15:37:55', NULL, NULL, NULL, NULL, NULL, NULL),
+(7, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 60000, 60000, 'PENDING', 0, '2026-10-29 15:37:55', '2026-10-29 15:37:55', NULL, NULL, NULL, NULL, NULL, NULL),
+(8, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 368725, 368725, 'PENDING', 0, '2026-10-29 15:42:42', '2026-10-29 15:42:42', NULL, NULL, NULL, NULL, NULL, NULL),
+(9, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 60000, 60000, 'PENDING', 0, '2026-10-29 15:42:43', '2026-10-29 15:42:43', NULL, NULL, NULL, NULL, NULL, NULL),
+(10, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 368725, 368725, 'PENDING', 0, '2026-10-29 15:43:59', '2026-10-29 15:43:59', NULL, NULL, NULL, NULL, NULL, NULL),
+(11, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 60000, 60000, 'PENDING', 0, '2026-10-29 15:43:59', '2026-10-29 15:43:59', NULL, NULL, NULL, NULL, NULL, NULL),
+(12, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 368725, 368725, 'PENDING', 0, '2026-11-03 13:27:49', '2026-11-03 13:27:49', NULL, NULL, NULL, NULL, NULL, NULL),
+(13, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 60000, 60000, 'PENDING', 0, '2026-11-03 13:27:50', '2026-11-03 13:27:50', NULL, NULL, NULL, NULL, NULL, NULL),
+(14, 5, 22, 3, NULL, 4, NULL, NULL, NULL, NULL, 3, 1, 371000, 371000, NULL, 0, '2026-11-04 03:22:02', '2026-11-04 03:22:02', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(15, 5, 23, 4, NULL, 5, NULL, NULL, NULL, NULL, 3, 1, 371000, 371000, NULL, 0, '2026-11-04 03:22:02', '2026-11-04 03:22:02', NULL, NULL, NULL, '100%', NULL, NULL),
+(16, 5, 24, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, NULL, 0, '2026-11-04 03:22:02', '2026-11-04 03:22:02', NULL, NULL, NULL, NULL, NULL, NULL),
+(17, 1, 22, 3, NULL, 4, NULL, NULL, NULL, NULL, 3, 1, 371000, 371000, NULL, 0, '2026-11-04 03:22:21', '2026-11-04 03:49:39', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(18, 1, 23, 4, NULL, 5, NULL, NULL, NULL, NULL, 3, 1, 371000, 371000, NULL, 0, '2026-11-04 03:22:21', '2026-11-04 03:49:39', NULL, NULL, NULL, '100%', NULL, NULL),
+(19, 3, 24, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, NULL, 0, '2026-11-04 03:22:21', '2026-11-04 03:49:39', NULL, NULL, NULL, NULL, NULL, NULL),
+(20, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 368725, 368725, 'PENDING', 0, '2026-11-04 03:34:53', '2026-11-04 03:34:53', NULL, NULL, NULL, NULL, NULL, NULL),
+(21, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 60000, 60000, 'PENDING', 0, '2026-11-04 03:34:53', '2026-11-04 03:34:53', NULL, NULL, NULL, NULL, NULL, NULL),
+(22, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 368725, 368725, 'PENDING', 0, '2026-11-04 03:40:34', '2026-11-04 03:40:34', NULL, NULL, NULL, NULL, NULL, NULL),
+(23, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 60000, 60000, 'PENDING', 0, '2026-11-04 03:40:34', '2026-11-04 03:40:34', NULL, NULL, NULL, NULL, NULL, NULL),
 (24, 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 'OPEN', 0, '2026-11-04 03:49:39', '2026-11-04 03:49:39', NULL, NULL, NULL, NULL, NULL, NULL),
 (25, 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 'OPEN', 0, '2026-11-04 03:49:39', '2026-11-04 03:49:39', NULL, NULL, NULL, NULL, NULL, NULL),
 (26, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 'OPEN', 0, '2026-11-04 03:49:39', '2026-11-04 03:49:39', NULL, NULL, NULL, NULL, NULL, NULL),
@@ -689,43 +789,63 @@ INSERT INTO `deal` (`id`, `meta_company_id`, `contact_id`, `contact_representati
 (36, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 'OPEN', 0, '2026-11-04 03:49:39', '2026-11-04 03:49:39', NULL, NULL, NULL, NULL, NULL, NULL),
 (37, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 'OPEN', 0, '2026-11-04 03:49:39', '2026-11-04 03:49:39', NULL, NULL, NULL, NULL, NULL, NULL),
 (38, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 0, 0, 'OPEN', 0, '2026-11-04 03:49:39', '2026-11-04 03:49:39', NULL, NULL, NULL, NULL, NULL, NULL),
-(39, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 368725, 368725, 'PENDING', 0, '2026-11-04 03:52:04', '2026-11-04 03:52:04', NULL, NULL, NULL, NULL, NULL, NULL),
-(40, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 60000, 60000, 'PENDING', 0, '2026-11-04 03:52:05', '2026-11-04 03:52:05', NULL, NULL, NULL, NULL, NULL, NULL),
-(41, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 368725, 368725, 'OPEN', 0, '2026-11-04 03:58:52', '2026-11-04 03:58:52', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
-(42, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 60000, 60000, 'OPEN', 0, '2026-11-04 03:58:52', '2026-11-04 03:58:52', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
-(43, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 368725, 368725, 'OPEN', 0, '2026-11-04 03:59:28', '2026-11-04 03:59:28', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
-(44, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 60000, 60000, 'OPEN', 0, '2026-11-04 03:59:28', '2026-11-04 03:59:28', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
-(45, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 368725, 368725, 'OPEN', 0, '2026-11-04 03:59:58', '2026-11-04 03:59:58', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
-(46, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 60000, 60000, 'OPEN', 0, '2026-11-04 03:59:58', '2026-11-04 03:59:58', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
-(47, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 368725, 368725, 'OPEN', 0, '2026-11-04 04:02:02', '2026-11-04 04:02:02', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
-(48, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 60000, 60000, 'OPEN', 0, '2026-11-04 04:02:03', '2026-11-04 04:02:03', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
-(49, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 368725, 368725, 'OPEN', 0, '2026-11-04 07:21:15', '2026-11-04 07:21:15', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
-(50, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 60000, 60000, 'OPEN', 0, '2026-11-04 07:21:15', '2026-11-04 07:21:15', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL);
-
-INSERT INTO `deal` (`id`, `meta_company_id`, `contact_id`, `contact_representative_id`, `meta_representative_id`, `address_id`, `destination_address_id`, `currency_id`, `payment_type_id`, `payment_terms_type_id`, `bank_account_id`, `dollarConvertionRate`, `total`, `netTotal`, `dealPaymentStatus`, `version`, `created_at`, `updated_at`, `paymentDate`, `incoterms`, `customerOrderNumber`, `paymentTerms`, `advancedPayment`, `notes`) VALUES
-(51, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 368725, 368725, 'OPEN', 0, '2026-11-04 07:52:26', '2026-11-04 07:52:26', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
-(52, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 60000, 60000, 'OPEN', 0, '2026-11-04 07:52:26', '2026-11-04 07:52:26', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
-(53, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 368725, 368725, 'OPEN', 0, '2026-11-04 07:57:30', '2026-11-04 07:57:30', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
-(54, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 60000, 60000, 'OPEN', 0, '2026-11-04 07:57:30', '2026-11-04 07:57:30', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL);
+(39, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 368725, 368725, 'PENDING', 0, '2026-11-04 03:52:04', '2026-11-04 03:52:04', NULL, NULL, NULL, NULL, NULL, NULL),
+(40, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 60000, 60000, 'PENDING', 0, '2026-11-04 03:52:05', '2026-11-04 03:52:05', NULL, NULL, NULL, NULL, NULL, NULL),
+(41, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 368725, 368725, 'OPEN', 0, '2026-11-04 03:58:52', '2026-11-04 03:58:52', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(42, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 60000, 60000, 'OPEN', 0, '2026-11-04 03:58:52', '2026-11-04 03:58:52', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(43, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 368725, 368725, 'OPEN', 0, '2026-11-04 03:59:28', '2026-11-04 03:59:28', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(44, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 60000, 60000, 'OPEN', 0, '2026-11-04 03:59:28', '2026-11-04 03:59:28', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(45, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 368725, 368725, 'OPEN', 0, '2026-11-04 03:59:58', '2026-11-04 03:59:58', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(46, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 60000, 60000, 'OPEN', 0, '2026-11-04 03:59:58', '2026-11-04 03:59:58', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(47, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 368725, 368725, 'OPEN', 0, '2026-11-04 04:02:02', '2026-11-04 04:02:02', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(48, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 60000, 60000, 'OPEN', 0, '2026-11-04 04:02:03', '2026-11-04 04:02:03', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(49, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 368725, 368725, 'OPEN', 0, '2026-11-04 07:21:15', '2026-11-04 07:21:15', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(50, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 60000, 60000, 'OPEN', 0, '2026-11-04 07:21:15', '2026-11-04 07:21:15', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(51, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 368725, 368725, 'OPEN', 0, '2026-11-04 07:52:26', '2026-11-04 07:52:26', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(52, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 60000, 60000, 'OPEN', 0, '2026-11-04 07:52:26', '2026-11-04 07:52:26', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(53, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 368725, 368725, 'OPEN', 0, '2026-11-04 07:57:30', '2026-11-04 07:57:30', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(54, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 60000, 60000, 'OPEN', 0, '2026-11-04 07:57:30', '2026-11-04 07:57:30', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(55, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 368725, 368725, 'OPEN', 0, '2026-11-04 08:33:06', '2026-11-04 08:33:06', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(56, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 60000, 60000, 'OPEN', 0, '2026-11-04 08:33:06', '2026-11-04 08:33:06', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(57, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 368725, 368725, 'OPEN', 0, '2026-11-04 08:48:16', '2026-11-04 08:48:16', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(58, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 60000, 60000, 'OPEN', 0, '2026-11-04 08:48:16', '2026-11-04 08:48:16', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(59, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 368725, 368725, 'OPEN', 0, '2026-11-04 08:48:45', '2026-11-04 08:48:45', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(60, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 60000, 60000, 'OPEN', 0, '2026-11-04 08:48:45', '2026-11-04 08:48:45', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(61, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 368725, 368725, 'OPEN', 0, '2026-11-04 09:09:21', '2026-11-04 09:09:21', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(62, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 60000, 60000, 'OPEN', 0, '2026-11-04 09:09:21', '2026-11-04 09:09:21', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(63, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 368725, 368725, 'OPEN', 0, '2026-11-04 09:11:18', '2026-11-04 09:11:18', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(64, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 60000, 60000, 'OPEN', 0, '2026-11-04 09:11:18', '2026-11-04 09:11:18', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(65, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 368725, 368725, 'OPEN', 0, '2026-11-04 09:29:07', '2026-11-04 09:29:07', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(66, 2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1, 60000, 60000, 'OPEN', 0, '2026-11-04 09:29:07', '2026-11-04 09:29:07', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(67, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 368725, 368725, 'OPEN', 0, '2026-11-04 09:44:55', '2026-11-04 09:44:55', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(68, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 60000, 60000, 'OPEN', 0, '2026-11-04 09:44:55', '2026-11-04 09:44:55', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(69, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 368725, 368725, 'OPEN', 0, '2026-11-04 09:56:43', '2026-11-04 09:56:43', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(70, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 60000, 60000, 'OPEN', 0, '2026-11-04 09:56:43', '2026-11-04 09:56:43', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(71, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 368725, 368725, 'OPEN', 0, '2026-11-04 10:06:39', '2026-11-04 10:06:39', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(72, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 60000, 60000, 'OPEN', 0, '2026-11-04 10:06:39', '2026-11-04 10:06:39', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(73, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 368725, 368725, 'OPEN', 0, '2026-11-04 10:09:06', '2026-11-04 10:09:06', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL),
+(74, 2, 2, NULL, NULL, NULL, NULL, 1, NULL, NULL, NULL, 1, 60000, 60000, 'OPEN', 0, '2026-11-04 10:09:06', '2026-11-04 10:09:06', NULL, 'CIF JEDDAH', NULL, '100%', NULL, NULL);
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `dealproduct`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `dealproduct`;
-CREATE TABLE IF NOT EXISTS `dealproduct` (
+CREATE TABLE `dealproduct` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `deal_id` bigint(20) UNSIGNED NULL,
-  `product_id` bigint(20) UNSIGNED NULL,
-  `pack_type_id` bigint(20) UNSIGNED NULL,
-  `currency_id` bigint(20) UNSIGNED NULL,
-  `quantity` double(12,4) NULL DEFAULT '0.0000',
-  `unitPrice` double(12,4) NULL DEFAULT '0.0000',
-  `pricingType` varchar(255) NULL,
-  `vat` double(12,4) NULL DEFAULT '0.0000',
-  `total` double(12,4) NULL DEFAULT '0.0000',
-  `associatedContractId` bigint(20) UNSIGNED NULL,
-  `associatedProductId` bigint(20) UNSIGNED NULL,
-  `status` varchar(255) NULL,
+  `deal_id` bigint(20) UNSIGNED NOT NULL,
+  `product_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `pack_type_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `currency_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `quantity` double NOT NULL DEFAULT '0',
+  `unitPrice` double NOT NULL DEFAULT '0',
+  `pricingType` varchar(191) NULL DEFAULT NULL,
+  `vat` double NOT NULL DEFAULT '0',
+  `total` double NOT NULL DEFAULT '0',
+  `associatedContractId` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `associatedProductId` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `status` varchar(191) NULL DEFAULT NULL,
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
@@ -737,54 +857,77 @@ CREATE TABLE IF NOT EXISTS `dealproduct` (
 --
 
 INSERT INTO `dealproduct` (`id`, `deal_id`, `product_id`, `pack_type_id`, `currency_id`, `quantity`, `unitPrice`, `pricingType`, `vat`, `total`, `associatedContractId`, `associatedProductId`, `status`, `version`, `created_at`, `updated_at`) VALUES
-(1, 1, 1, 3, 1, 50, 9000, 'FIXED', 0, 450000, NULL, NULL, 'PENDING', 0, '2026-10-29 15:21:13', '2026-10-29 15:21:13'),
-(2, 2, 4, NULL, 1, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-10-29 15:36:09', '2026-10-29 15:36:09'),
-(3, 3, 4, NULL, 1, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-10-29 15:36:09', '2026-10-29 15:36:09'),
-(4, 4, 4, NULL, 1, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-10-29 15:37:14', '2026-10-29 15:37:14'),
-(5, 5, 4, NULL, 1, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-10-29 15:37:14', '2026-10-29 15:37:14'),
-(6, 6, 4, NULL, 1, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-10-29 15:37:55', '2026-10-29 15:37:55'),
-(7, 7, 4, NULL, 1, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-10-29 15:37:55', '2026-10-29 15:37:55'),
-(8, 8, 4, NULL, 1, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-10-29 15:42:42', '2026-10-29 15:42:42'),
-(9, 9, 4, NULL, 1, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-10-29 15:42:43', '2026-10-29 15:42:43'),
-(10, 10, 4, NULL, 1, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-10-29 15:43:59', '2026-10-29 15:43:59'),
-(11, 11, 4, NULL, 1, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-10-29 15:43:59', '2026-10-29 15:43:59'),
-(12, 12, 4, NULL, 1, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-11-03 13:27:49', '2026-11-03 13:27:49'),
-(13, 13, 4, NULL, 1, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-11-03 13:27:50', '2026-11-03 13:27:50'),
-(14, 14, 11, NULL, 1, 100, 3710, NULL, 0, 371000, NULL, NULL, NULL, 0, '2026-11-04 03:22:02', '2026-11-04 03:22:02'),
-(15, 15, 11, NULL, 1, 100, 3710, NULL, 0, 371000, NULL, NULL, NULL, 0, '2026-11-04 03:22:02', '2026-11-04 03:22:02'),
-(16, 17, 11, NULL, 1, 100, 3710, NULL, 0, 371000, NULL, NULL, NULL, 0, '2026-11-04 03:22:21', '2026-11-04 03:22:21'),
-(17, 18, 11, NULL, 1, 100, 3710, NULL, 0, 371000, NULL, NULL, NULL, 0, '2026-11-04 03:22:21', '2026-11-04 03:22:21'),
-(18, 20, 4, NULL, 1, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-11-04 03:34:53', '2026-11-04 03:34:53'),
-(19, 21, 4, NULL, 1, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-11-04 03:34:53', '2026-11-04 03:34:53'),
-(20, 22, 4, NULL, 1, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-11-04 03:40:34', '2026-11-04 03:40:34'),
-(21, 23, 4, NULL, 1, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-11-04 03:40:34', '2026-11-04 03:40:34'),
-(22, 39, 4, NULL, 1, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-11-04 03:52:04', '2026-11-04 03:52:04'),
-(23, 40, 4, NULL, 1, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-11-04 03:52:05', '2026-11-04 03:52:05'),
-(24, 41, 4, NULL, 1, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-11-04 03:58:52', '2026-11-04 03:58:52'),
-(25, 42, 4, NULL, 1, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-11-04 03:58:52', '2026-11-04 03:58:52'),
-(26, 43, 4, NULL, 1, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-11-04 03:59:28', '2026-11-04 03:59:28'),
-(27, 44, 4, NULL, 1, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-11-04 03:59:28', '2026-11-04 03:59:28'),
-(28, 45, 4, NULL, 1, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-11-04 03:59:58', '2026-11-04 03:59:58'),
-(29, 46, 4, NULL, 1, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-11-04 03:59:58', '2026-11-04 03:59:58'),
-(30, 47, 4, NULL, 1, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-11-04 04:02:02', '2026-11-04 04:02:02'),
-(31, 48, 4, NULL, 1, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-11-04 04:02:03', '2026-11-04 04:02:03'),
-(32, 49, 4, NULL, 1, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-11-04 07:21:15', '2026-11-04 07:21:15'),
-(33, 50, 4, NULL, 1, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-11-04 07:21:15', '2026-11-04 07:21:15'),
-(34, 51, 4, NULL, 1, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-11-04 07:52:26', '2026-11-04 07:52:26'),
-(35, 52, 4, NULL, 1, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-11-04 07:52:26', '2026-11-04 07:52:26'),
-(36, 53, 4, NULL, 1, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-11-04 07:57:30', '2026-11-04 07:57:30'),
-(37, 54, 4, NULL, 1, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-11-04 07:57:30', '2026-11-04 07:57:30');
+(1, 1, 1, NULL, NULL, 50, 9000, 'FIXED', 0, 450000, NULL, NULL, 'PENDING', 0, '2026-10-29 15:21:13', '2026-10-29 15:21:13'),
+(2, 2, 4, NULL, NULL, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-10-29 15:36:09', '2026-10-29 15:36:09'),
+(3, 3, 4, NULL, NULL, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-10-29 15:36:09', '2026-10-29 15:36:09'),
+(4, 4, 4, NULL, NULL, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-10-29 15:37:14', '2026-10-29 15:37:14'),
+(5, 5, 4, NULL, NULL, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-10-29 15:37:14', '2026-10-29 15:37:14'),
+(6, 6, 4, NULL, NULL, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-10-29 15:37:55', '2026-10-29 15:37:55'),
+(7, 7, 4, NULL, NULL, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-10-29 15:37:55', '2026-10-29 15:37:55'),
+(8, 8, 4, NULL, NULL, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-10-29 15:42:42', '2026-10-29 15:42:42'),
+(9, 9, 4, NULL, NULL, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-10-29 15:42:43', '2026-10-29 15:42:43'),
+(10, 10, 4, NULL, NULL, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-10-29 15:43:59', '2026-10-29 15:43:59'),
+(11, 11, 4, NULL, NULL, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-10-29 15:43:59', '2026-10-29 15:43:59'),
+(12, 12, 4, NULL, NULL, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-11-03 13:27:49', '2026-11-03 13:27:49'),
+(13, 13, 4, NULL, NULL, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-11-03 13:27:50', '2026-11-03 13:27:50'),
+(14, 14, 11, NULL, NULL, 100, 3710, NULL, 0, 371000, NULL, NULL, NULL, 0, '2026-11-04 03:22:02', '2026-11-04 03:22:02'),
+(15, 15, 11, NULL, NULL, 100, 3710, NULL, 0, 371000, NULL, NULL, NULL, 0, '2026-11-04 03:22:02', '2026-11-04 03:22:02'),
+(16, 17, 11, NULL, NULL, 100, 3710, NULL, 0, 371000, NULL, NULL, NULL, 0, '2026-11-04 03:22:21', '2026-11-04 03:22:21'),
+(17, 18, 11, NULL, NULL, 100, 3710, NULL, 0, 371000, NULL, NULL, NULL, 0, '2026-11-04 03:22:21', '2026-11-04 03:22:21'),
+(18, 20, 4, NULL, NULL, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-11-04 03:34:53', '2026-11-04 03:34:53'),
+(19, 21, 4, NULL, NULL, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-11-04 03:34:53', '2026-11-04 03:34:53'),
+(20, 22, 4, NULL, NULL, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-11-04 03:40:34', '2026-11-04 03:40:34'),
+(21, 23, 4, NULL, NULL, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-11-04 03:40:34', '2026-11-04 03:40:34'),
+(22, 39, 4, NULL, NULL, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-11-04 03:52:04', '2026-11-04 03:52:04'),
+(23, 40, 4, NULL, NULL, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-11-04 03:52:05', '2026-11-04 03:52:05'),
+(24, 41, 4, NULL, NULL, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-11-04 03:58:52', '2026-11-04 03:58:52'),
+(25, 42, 4, NULL, NULL, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-11-04 03:58:52', '2026-11-04 03:58:52'),
+(26, 43, 4, NULL, NULL, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-11-04 03:59:28', '2026-11-04 03:59:28'),
+(27, 44, 4, NULL, NULL, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-11-04 03:59:28', '2026-11-04 03:59:28'),
+(28, 45, 4, NULL, NULL, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-11-04 03:59:58', '2026-11-04 03:59:58'),
+(29, 46, 4, NULL, NULL, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-11-04 03:59:58', '2026-11-04 03:59:58'),
+(30, 47, 4, NULL, NULL, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-11-04 04:02:02', '2026-11-04 04:02:02'),
+(31, 48, 4, NULL, NULL, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-11-04 04:02:03', '2026-11-04 04:02:03'),
+(32, 49, 4, NULL, NULL, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-11-04 07:21:15', '2026-11-04 07:21:15'),
+(33, 50, 4, NULL, NULL, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-11-04 07:21:15', '2026-11-04 07:21:15'),
+(34, 51, 4, NULL, NULL, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-11-04 07:52:26', '2026-11-04 07:52:26'),
+(35, 52, 4, NULL, NULL, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-11-04 07:52:26', '2026-11-04 07:52:26'),
+(36, 53, 4, NULL, NULL, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-11-04 07:57:30', '2026-11-04 07:57:30'),
+(37, 54, 4, NULL, NULL, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-11-04 07:57:30', '2026-11-04 07:57:30'),
+(38, 55, 4, NULL, NULL, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-11-04 08:33:06', '2026-11-04 08:33:06'),
+(39, 56, 4, NULL, NULL, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-11-04 08:33:06', '2026-11-04 08:33:06'),
+(40, 57, 4, NULL, NULL, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-11-04 08:48:16', '2026-11-04 08:48:16'),
+(41, 58, 4, NULL, NULL, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-11-04 08:48:16', '2026-11-04 08:48:16'),
+(42, 59, 4, NULL, NULL, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-11-04 08:48:45', '2026-11-04 08:48:45'),
+(43, 60, 4, NULL, NULL, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-11-04 08:48:45', '2026-11-04 08:48:45'),
+(44, 61, 4, NULL, NULL, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-11-04 09:09:21', '2026-11-04 09:09:21'),
+(45, 62, 4, NULL, NULL, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-11-04 09:09:21', '2026-11-04 09:09:21'),
+(46, 63, 4, NULL, NULL, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-11-04 09:11:18', '2026-11-04 09:11:18'),
+(47, 64, 4, NULL, NULL, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-11-04 09:11:18', '2026-11-04 09:11:18'),
+(48, 65, 4, NULL, NULL, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-11-04 09:29:07', '2026-11-04 09:29:07'),
+(49, 66, 4, NULL, NULL, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-11-04 09:29:07', '2026-11-04 09:29:07'),
+(50, 67, 4, NULL, 1, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-11-04 09:44:55', '2026-11-04 09:44:55'),
+(51, 68, 4, NULL, 1, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-11-04 09:44:55', '2026-11-04 09:44:55'),
+(52, 69, 4, NULL, 1, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-11-04 09:56:43', '2026-11-04 09:56:43'),
+(53, 70, 4, NULL, 1, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-11-04 09:56:43', '2026-11-04 09:56:43'),
+(54, 71, 4, NULL, 1, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-11-04 10:06:39', '2026-11-04 10:06:39'),
+(55, 72, 4, NULL, 1, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-11-04 10:06:39', '2026-11-04 10:06:39'),
+(56, 73, 4, NULL, 1, 150.5, 2450, NULL, 0, 368725, NULL, NULL, 'PENDING', 0, '2026-11-04 10:09:06', '2026-11-04 10:09:06'),
+(57, 74, 4, NULL, 1, 50, 1200, NULL, 0, 60000, NULL, NULL, 'PENDING', 0, '2026-11-04 10:09:06', '2026-11-04 10:09:06');
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `department`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `department`;
-CREATE TABLE IF NOT EXISTS `department` (
+CREATE TABLE `department` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NULL,
+  `name` varchar(191) NOT NULL,
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
+  `description` varchar(191) NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -792,25 +935,32 @@ CREATE TABLE IF NOT EXISTS `department` (
 -- Dumping data for table `department`
 --
 
-INSERT INTO `department` (`id`, `name`, `version`, `created_at`, `updated_at`) VALUES
-(1, 'Trading & Procurement', 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12'),
-(2, 'Logistics & Shipping', 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12'),
-(3, 'Finance & Accounting', 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12'),
-(4, 'Quality Control', 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12');
+INSERT INTO `department` (`id`, `name`, `version`, `created_at`, `updated_at`, `description`) VALUES
+(1, 'Sales', 0, '2026-11-04 09:53:30', '2026-11-04 09:53:30', 'Sales'),
+(2, 'Marketing', 0, '2026-11-04 09:53:30', '2026-11-04 09:53:30', 'Marketing'),
+(3, 'Finance', 0, '2026-11-04 09:53:30', '2026-11-04 09:53:30', 'Finance'),
+(4, 'Purchase', 0, '2026-11-04 09:53:30', '2026-11-04 09:53:30', 'Purchase'),
+(5, 'Technology', 0, '2026-11-04 09:53:30', '2026-11-04 09:53:30', 'Technology'),
+(6, 'Accountant', 0, '2026-11-04 09:53:30', '2026-11-04 09:53:30', 'Accountant'),
+(7, 'Human Resources', 0, '2026-11-04 09:56:47', '2026-11-04 09:56:47', 'Human Resources'),
+(8, 'Human Resources', 0, '2026-11-04 10:06:41', '2026-11-04 10:06:41', 'Human Resources'),
+(9, 'Human Resources', 0, '2026-11-04 10:09:13', '2026-11-04 10:09:13', 'Human Resources');
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `detachednote`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `detachednote`;
-CREATE TABLE IF NOT EXISTS `detachednote` (
+CREATE TABLE `detachednote` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `kind` varchar(255) NULL,
-  `number` varchar(255) NULL,
+  `kind` varchar(191) NOT NULL,
+  `number` varchar(191) NULL DEFAULT NULL,
   `date` datetime NULL DEFAULT NULL,
-  `meta_company_id` bigint(20) UNSIGNED NULL,
-  `contact_id` bigint(20) UNSIGNED NULL,
-  `currency_id` bigint(20) UNSIGNED NULL,
-  `total` double(12,4) NULL DEFAULT '0.0000',
+  `meta_company_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `contact_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `currency_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `total` double NOT NULL DEFAULT '0',
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
@@ -818,16 +968,18 @@ CREATE TABLE IF NOT EXISTS `detachednote` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `detachednotedetail`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `detachednotedetail`;
-CREATE TABLE IF NOT EXISTS `detachednotedetail` (
+CREATE TABLE `detachednotedetail` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `detached_note_id` bigint(20) UNSIGNED NULL,
-  `description` varchar(255) NULL,
-  `quantity` double(12,4) NULL DEFAULT '0.0000',
-  `unitPrice` double(12,4) NULL DEFAULT '0.0000',
-  `total` double(12,4) NULL DEFAULT '0.0000',
+  `detached_note_id` bigint(20) UNSIGNED NOT NULL,
+  `description` varchar(191) NOT NULL,
+  `quantity` double NOT NULL DEFAULT '0',
+  `unitPrice` double NOT NULL DEFAULT '0',
+  `total` double NOT NULL DEFAULT '0',
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
@@ -835,33 +987,36 @@ CREATE TABLE IF NOT EXISTS `detachednotedetail` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `failed_jobs`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `failed_jobs`;
-CREATE TABLE IF NOT EXISTS `failed_jobs` (
+CREATE TABLE `failed_jobs` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `uuid` varchar(255) NOT NULL,
-  `connection` text NULL,
-  `queue` text NULL,
-  `payload` longtext NULL,
-  `exception` longtext NULL,
-  `failed_at` datetime NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`)
+  `uuid` varchar(191) NOT NULL,
+  `connection` longtext NOT NULL,
+  `queue` longtext NOT NULL,
+  `payload` longtext NOT NULL,
+  `exception` longtext NOT NULL,
+  `failed_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `generatedfiles`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `generatedfiles`;
-CREATE TABLE IF NOT EXISTS `generatedfiles` (
+CREATE TABLE `generatedfiles` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `contract_id` bigint(20) UNSIGNED NULL,
-  `template_id` bigint(20) UNSIGNED NULL,
-  `fileName` varchar(255) NULL,
-  `html` longtext NULL,
-  `fileType` varchar(255) NULL,
-  `user_id` bigint(20) UNSIGNED NULL,
+  `contract_id` bigint(20) UNSIGNED NOT NULL,
+  `template_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `fileName` varchar(191) NOT NULL,
+  `html` longtext NOT NULL,
+  `fileType` varchar(191) NOT NULL DEFAULT 'HTML',
+  `user_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
@@ -911,16 +1066,38 @@ INSERT INTO `generatedfiles` (`id`, `contract_id`, `template_id`, `fileName`, `h
 (36, 1, 5, 'CONTRACT_MENON_FERROUS26-001_20261104075227.html', '<html><body><h1>Contract MENON_FERROUS26-001</h1><p>Supplier: Metaenterprices Ltd</p><p>Total: 450,000.00 USD</p></body></html>', 'HTML', 1, 0, '2026-11-04 07:52:27', '2026-11-04 07:52:27'),
 (37, 1, 5, 'CONTRACT_MENON_FERROUS26-001_20261104075227.html', '<html><body><h1>Contract MENON_FERROUS26-001</h1><p>Supplier: Metaenterprices Ltd</p><p>Total: 450,000.00 USD</p></body></html>', 'HTML', 1, 0, '2026-11-04 07:52:27', '2026-11-04 07:52:27'),
 (38, 1, 5, 'CONTRACT_MENON_FERROUS26-001_20261104075730.html', '<html><body><h1>Contract MENON_FERROUS26-001</h1><p>Supplier: Metaenterprices Ltd</p><p>Total: 450,000.00 USD</p></body></html>', 'HTML', 1, 0, '2026-11-04 07:57:30', '2026-11-04 07:57:30'),
-(39, 1, 5, 'CONTRACT_MENON_FERROUS26-001_20261104075730.html', '<html><body><h1>Contract MENON_FERROUS26-001</h1><p>Supplier: Metaenterprices Ltd</p><p>Total: 450,000.00 USD</p></body></html>', 'HTML', 1, 0, '2026-11-04 07:57:30', '2026-11-04 07:57:30');
+(39, 1, 5, 'CONTRACT_MENON_FERROUS26-001_20261104075730.html', '<html><body><h1>Contract MENON_FERROUS26-001</h1><p>Supplier: Metaenterprices Ltd</p><p>Total: 450,000.00 USD</p></body></html>', 'HTML', 1, 0, '2026-11-04 07:57:30', '2026-11-04 07:57:30'),
+(40, 1, 5, 'CONTRACT_MENON_FERROUS26-001_20261104083306.html', '<html><body><h1>Contract MENON_FERROUS26-001</h1><p>Supplier: Metaenterprices Ltd</p><p>Total: 450,000.00 USD</p></body></html>', 'HTML', 1, 0, '2026-11-04 08:33:06', '2026-11-04 08:33:06'),
+(41, 1, 5, 'CONTRACT_MENON_FERROUS26-001_20261104083307.html', '<html><body><h1>Contract MENON_FERROUS26-001</h1><p>Supplier: Metaenterprices Ltd</p><p>Total: 450,000.00 USD</p></body></html>', 'HTML', 1, 0, '2026-11-04 08:33:07', '2026-11-04 08:33:07'),
+(42, 1, 5, 'CONTRACT_MENON_FERROUS26-001_20261104084816.html', '<html><body><h1>Contract MENON_FERROUS26-001</h1><p>Supplier: Metaenterprices Ltd</p><p>Total: 450,000.00 USD</p></body></html>', 'HTML', 1, 0, '2026-11-04 08:48:16', '2026-11-04 08:48:16'),
+(43, 1, 5, 'CONTRACT_MENON_FERROUS26-001_20261104084817.html', '<html><body><h1>Contract MENON_FERROUS26-001</h1><p>Supplier: Metaenterprices Ltd</p><p>Total: 450,000.00 USD</p></body></html>', 'HTML', 1, 0, '2026-11-04 08:48:17', '2026-11-04 08:48:17'),
+(44, 1, 5, 'CONTRACT_MENON_FERROUS26-001_20261104084845.html', '<html><body><h1>Contract MENON_FERROUS26-001</h1><p>Supplier: Metaenterprices Ltd</p><p>Total: 450,000.00 USD</p></body></html>', 'HTML', 1, 0, '2026-11-04 08:48:45', '2026-11-04 08:48:45'),
+(45, 1, 5, 'CONTRACT_MENON_FERROUS26-001_20261104084846.html', '<html><body><h1>Contract MENON_FERROUS26-001</h1><p>Supplier: Metaenterprices Ltd</p><p>Total: 450,000.00 USD</p></body></html>', 'HTML', 1, 0, '2026-11-04 08:48:46', '2026-11-04 08:48:46'),
+(46, 1, 5, 'CONTRACT_MENON_FERROUS26-001_20261104090921.html', '<html><body><h1>Contract MENON_FERROUS26-001</h1><p>Supplier: Metaenterprices Ltd</p><p>Total: 450,000.00 USD</p></body></html>', 'HTML', 1, 0, '2026-11-04 09:09:21', '2026-11-04 09:09:21'),
+(47, 1, 5, 'CONTRACT_MENON_FERROUS26-001_20261104090921.html', '<html><body><h1>Contract MENON_FERROUS26-001</h1><p>Supplier: Metaenterprices Ltd</p><p>Total: 450,000.00 USD</p></body></html>', 'HTML', 1, 0, '2026-11-04 09:09:21', '2026-11-04 09:09:21'),
+(48, 1, 5, 'CONTRACT_MENON_FERROUS26-001_20261104091119.html', '<html><body><h1>Contract MENON_FERROUS26-001</h1><p>Supplier: Metaenterprices Ltd</p><p>Total: 450,000.00 USD</p></body></html>', 'HTML', 1, 0, '2026-11-04 09:11:19', '2026-11-04 09:11:19'),
+(49, 1, 5, 'CONTRACT_MENON_FERROUS26-001_20261104091119.html', '<html><body><h1>Contract MENON_FERROUS26-001</h1><p>Supplier: Metaenterprices Ltd</p><p>Total: 450,000.00 USD</p></body></html>', 'HTML', 1, 0, '2026-11-04 09:11:19', '2026-11-04 09:11:19'),
+(50, 1, 5, 'CONTRACT_MENON_FERROUS26-001_20261104092907.html', '<html><body><h1>Contract MENON_FERROUS26-001</h1><p>Supplier: Metaenterprices Ltd</p><p>Total: 450,000.00 USD</p></body></html>', 'HTML', 1, 0, '2026-11-04 09:29:07', '2026-11-04 09:29:07'),
+(51, 1, 5, 'CONTRACT_MENON_FERROUS26-001_20261104092907.html', '<html><body><h1>Contract MENON_FERROUS26-001</h1><p>Supplier: Metaenterprices Ltd</p><p>Total: 450,000.00 USD</p></body></html>', 'HTML', 1, 0, '2026-11-04 09:29:07', '2026-11-04 09:29:07'),
+(52, 1, 5, 'CONTRACT_MENON_FERROUS26-001_20261104094455.html', '<html><body><h1>Contract MENON_FERROUS26-001</h1><p>Supplier: Metaenterprices Ltd</p><p>Total: 450,000.00 USD</p></body></html>', 'HTML', 1, 0, '2026-11-04 09:44:55', '2026-11-04 09:44:55'),
+(53, 1, 5, 'CONTRACT_MENON_FERROUS26-001_20261104094455.html', '<html><body><h1>Contract MENON_FERROUS26-001</h1><p>Supplier: Metaenterprices Ltd</p><p>Total: 450,000.00 USD</p></body></html>', 'HTML', 1, 0, '2026-11-04 09:44:55', '2026-11-04 09:44:55'),
+(54, 1, 5, 'CONTRACT_MENON_FERROUS26-001_20261104095643.html', '<html><body><h1>Contract MENON_FERROUS26-001</h1><p>Supplier: Metaenterprices Ltd</p><p>Total: 450,000.00 USD</p></body></html>', 'HTML', 1, 0, '2026-11-04 09:56:43', '2026-11-04 09:56:43'),
+(55, 1, 5, 'CONTRACT_MENON_FERROUS26-001_20261104095643.html', '<html><body><h1>Contract MENON_FERROUS26-001</h1><p>Supplier: Metaenterprices Ltd</p><p>Total: 450,000.00 USD</p></body></html>', 'HTML', 1, 0, '2026-11-04 09:56:43', '2026-11-04 09:56:43'),
+(56, 1, 5, 'CONTRACT_MENON_FERROUS26-001_20261104100639.html', '<html><body><h1>Contract MENON_FERROUS26-001</h1><p>Supplier: Metaenterprices Ltd</p><p>Total: 450,000.00 USD</p></body></html>', 'HTML', 1, 0, '2026-11-04 10:06:39', '2026-11-04 10:06:39'),
+(57, 1, 5, 'CONTRACT_MENON_FERROUS26-001_20261104100639.html', '<html><body><h1>Contract MENON_FERROUS26-001</h1><p>Supplier: Metaenterprices Ltd</p><p>Total: 450,000.00 USD</p></body></html>', 'HTML', 1, 0, '2026-11-04 10:06:39', '2026-11-04 10:06:39'),
+(58, 1, 5, 'CONTRACT_MENON_FERROUS26-001_20261104100906.html', '<html><body><h1>Contract MENON_FERROUS26-001</h1><p>Supplier: Metaenterprices Ltd</p><p>Total: 450,000.00 USD</p></body></html>', 'HTML', 1, 0, '2026-11-04 10:09:06', '2026-11-04 10:09:06'),
+(59, 1, 5, 'CONTRACT_MENON_FERROUS26-001_20261104100907.html', '<html><body><h1>Contract MENON_FERROUS26-001</h1><p>Supplier: Metaenterprices Ltd</p><p>Total: 450,000.00 USD</p></body></html>', 'HTML', 1, 0, '2026-11-04 10:09:07', '2026-11-04 10:09:07');
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `languages`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `languages`;
-CREATE TABLE IF NOT EXISTS `languages` (
+CREATE TABLE `languages` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NULL,
-  `code` varchar(255) NULL,
+  `name` varchar(191) NOT NULL,
+  `code` varchar(191) NOT NULL,
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
@@ -934,20 +1111,29 @@ CREATE TABLE IF NOT EXISTS `languages` (
 INSERT INTO `languages` (`id`, `name`, `code`, `version`, `created_at`, `updated_at`) VALUES
 (1, 'English', 'en', 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12'),
 (2, 'Spanish', 'es', 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12'),
-(3, 'Portuguese', 'pt', 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12');
+(3, 'Portuguese', 'pt', 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12'),
+(4, 'English (United Kingdom)', 'en-GB', 0, '2026-11-04 09:06:44', '2026-11-04 09:06:44'),
+(5, 'Serbian', 'sr', 0, '2026-11-04 09:06:44', '2026-11-04 09:06:44'),
+(6, 'Polish', 'pl', 0, '2026-11-04 09:06:44', '2026-11-04 09:06:44'),
+(7, 'Arabic', 'ar', 0, '2026-11-04 09:06:44', '2026-11-04 09:06:44'),
+(8, 'English 1', 'en-1', 0, '2026-11-04 09:06:44', '2026-11-04 09:06:44'),
+(9, 'English 2', 'en-2', 0, '2026-11-04 09:06:44', '2026-11-04 09:06:44'),
+(10, 'English 3', 'en-3', 0, '2026-11-04 09:06:44', '2026-11-04 09:06:44');
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `logs`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `logs`;
-CREATE TABLE IF NOT EXISTS `logs` (
+CREATE TABLE `logs` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `module` varchar(255) NULL,
-  `dataId` bigint(20) UNSIGNED NULL,
-  `dateTime` datetime NULL DEFAULT NULL,
-  `userId` bigint(20) UNSIGNED NULL,
-  `action` varchar(255) NULL,
-  `history` text NULL,
+  `module` varchar(191) NOT NULL,
+  `dataId` bigint(20) UNSIGNED NOT NULL,
+  `dateTime` datetime NOT NULL,
+  `userId` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `action` varchar(191) NOT NULL,
+  `history` longtext NULL DEFAULT NULL,
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -1007,9 +1193,7 @@ INSERT INTO `logs` (`id`, `module`, `dataId`, `dateTime`, `userId`, `action`, `h
 (51, 'CONTRACT', 49, '2026-11-04 03:59:28', 1, 'CREATE', '{"date":"2026-11-04T03:59:28.000000Z","type":"BUY","stage_id":2,"purchase_id":44,"sale_id":null,"contractStatus":"OPEN","orderDescription":null,"active":true,"loadingDate":"2026-11-18T03:59:28.000000Z","deliveryTerms":"CIF","modeOfPayment":"100%","updated_at":"2026-11-04T03:59:28.000000Z","created_at":"2026-11-04T03:59:28.000000Z","id":49,"orderCode":"MENONFERROUS26-23","purchase":{"id":44,"meta_company_id":2,"contact_id":2,"contact_representative_id":null,"meta_representative_id":null,"address_id":null,"destination_address_id":null,"currency_id":1,"payment_type_id":null,"payment_terms_type_id":null,"bank_account_id":null,"dollarConvertionRate":1,"total":60000,"netTotal":60000,"dealPaymentStatus":"OPEN","version":0,"created_at":"2026-11-04T03:59:28.000000Z","updated_at":"2026-11-04T03:59:28.000000Z","paymentDate":null,"incoterms":"CIF JEDDAH","customerOrderNumber":null,"paymentTerms":"100%","advancedPayment":null,"notes":null,"meta_company":{"id":2,"name":"Menon Trading LLC","code":"MENON","countryId":null,"logoUrl":null,"companyNumber":null,"vatNumber":null,"phoneNumber":null,"faxNumber":null,"email":null,"webSite":null,"footer":null,"eoriNumber":null,"address_id":null,"archiveLogoId":null,"archiveFooterId":null,"archiveStampId":null,"active":false,"version":0,"created_at":"2026-10-29T15:34:17.000000Z","updated_at":"2026-11-03T13:37:42.000000Z","domain":null,"stampUrl":null},"products":[{"id":27,"deal_id":44,"product_id":4,"pack_type_id":null,"currency_id":1,"quantity":50,"unitPrice":1200,"pricingType":null,"vat":0,"total":60000,"associatedContractId":null,"associatedProductId":null,"status":"PENDING","version":0,"created_at":"2026-11-04T03:59:28.000000Z","updated_at":"2026-11-04T03:59:28.000000Z","product":{"id":4,"name":"Ferrous Scrap Metal","description":null,"code":"FERROUS","productCategory":"FERROUS","chemicalFormula":null,"unitOfMeasurement":null,"hsCode":null,"active":false,"version":0,"created_at":"2026-10-29T15:35:36.000000Z","updated_at":"2026-11-03T13:24:23.000000Z","basel_code":null,"ec_waste_code":null}}]}}', '2026-11-04 03:59:28', '2026-11-04 03:59:28'),
 (52, 'CONTRACT', 50, '2026-11-04 03:59:28', 1, 'CANCEL', NULL, '2026-11-04 03:59:28', '2026-11-04 03:59:28'),
 (53, 'CONTRACT', 51, '2026-11-04 03:59:58', 1, 'CREATE', '{"date":"2026-11-04T03:59:58.000000Z","type":"BUY","stage_id":2,"purchase_id":45,"sale_id":null,"contractStatus":"ACTIVE","orderDescription":null,"active":true,"loadingDate":"2026-11-18T03:59:58.000000Z","deliveryTerms":"CIF","modeOfPayment":"100%","updated_at":"2026-11-04T03:59:58.000000Z","created_at":"2026-11-04T03:59:58.000000Z","id":51,"orderCode":"MENONFERROUS26-24","purchase":{"id":45,"meta_company_id":2,"contact_id":2,"contact_representative_id":null,"meta_representative_id":null,"address_id":null,"destination_address_id":null,"currency_id":1,"payment_type_id":null,"payment_terms_type_id":null,"bank_account_id":null,"dollarConvertionRate":1,"total":368725,"netTotal":368725,"dealPaymentStatus":"OPEN","version":0,"created_at":"2026-11-04T03:59:58.000000Z","updated_at":"2026-11-04T03:59:58.000000Z","paymentDate":null,"incoterms":"CIF JEDDAH","customerOrderNumber":null,"paymentTerms":"100%","advancedPayment":null,"notes":null,"meta_company":{"id":2,"name":"Menon Trading LLC","code":"MENON","countryId":null,"logoUrl":null,"companyNumber":null,"vatNumber":null,"phoneNumber":null,"faxNumber":null,"email":null,"webSite":null,"footer":null,"eoriNumber":null,"address_id":null,"archiveLogoId":null,"archiveFooterId":null,"archiveStampId":null,"active":false,"version":0,"created_at":"2026-10-29T15:34:17.000000Z","updated_at":"2026-11-03T13:37:42.000000Z","domain":null,"stampUrl":null},"products":[{"id":28,"deal_id":45,"product_id":4,"pack_type_id":null,"currency_id":1,"quantity":150.5,"unitPrice":2450,"pricingType":null,"vat":0,"total":368725,"associatedContractId":null,"associatedProductId":null,"status":"PENDING","version":0,"created_at":"2026-11-04T03:59:58.000000Z","updated_at":"2026-11-04T03:59:58.000000Z","product":{"id":4,"name":"Ferrous Scrap Metal","description":null,"code":"FERROUS","productCategory":"FERROUS","chemicalFormula":null,"unitOfMeasurement":null,"hsCode":null,"active":false,"version":0,"created_at":"2026-10-29T15:35:36.000000Z","updated_at":"2026-11-03T13:24:23.000000Z","basel_code":null,"ec_waste_code":null}}]}}', '2026-11-04 03:59:58', '2026-11-04 03:59:58'),
-(54, 'CONTRACT', 1, '2026-11-04 03:59:58', 1, 'STAGE_TRANSITION', '{"stage":{"from":"Draft","to":"DRAFT"}}', '2026-11-04 03:59:58', '2026-11-04 03:59:58');
-
-INSERT INTO `logs` (`id`, `module`, `dataId`, `dateTime`, `userId`, `action`, `history`, `created_at`, `updated_at`) VALUES
+(54, 'CONTRACT', 1, '2026-11-04 03:59:58', 1, 'STAGE_TRANSITION', '{"stage":{"from":"Draft","to":"DRAFT"}}', '2026-11-04 03:59:58', '2026-11-04 03:59:58'),
 (55, 'CONTRACT', 52, '2026-11-04 03:59:59', 1, 'CREATE', '{"date":"2026-11-04T03:59:58.000000Z","type":"BUY","stage_id":2,"purchase_id":46,"sale_id":null,"contractStatus":"ACTIVE","orderDescription":null,"active":true,"loadingDate":"2026-11-18T03:59:58.000000Z","deliveryTerms":"CIF","modeOfPayment":"100%","updated_at":"2026-11-04T03:59:59.000000Z","created_at":"2026-11-04T03:59:58.000000Z","id":52,"orderCode":"MENONFERROUS26-25","purchase":{"id":46,"meta_company_id":2,"contact_id":2,"contact_representative_id":null,"meta_representative_id":null,"address_id":null,"destination_address_id":null,"currency_id":1,"payment_type_id":null,"payment_terms_type_id":null,"bank_account_id":null,"dollarConvertionRate":1,"total":60000,"netTotal":60000,"dealPaymentStatus":"OPEN","version":0,"created_at":"2026-11-04T03:59:58.000000Z","updated_at":"2026-11-04T03:59:58.000000Z","paymentDate":null,"incoterms":"CIF JEDDAH","customerOrderNumber":null,"paymentTerms":"100%","advancedPayment":null,"notes":null,"meta_company":{"id":2,"name":"Menon Trading LLC","code":"MENON","countryId":null,"logoUrl":null,"companyNumber":null,"vatNumber":null,"phoneNumber":null,"faxNumber":null,"email":null,"webSite":null,"footer":null,"eoriNumber":null,"address_id":null,"archiveLogoId":null,"archiveFooterId":null,"archiveStampId":null,"active":false,"version":0,"created_at":"2026-10-29T15:34:17.000000Z","updated_at":"2026-11-03T13:37:42.000000Z","domain":null,"stampUrl":null},"products":[{"id":29,"deal_id":46,"product_id":4,"pack_type_id":null,"currency_id":1,"quantity":50,"unitPrice":1200,"pricingType":null,"vat":0,"total":60000,"associatedContractId":null,"associatedProductId":null,"status":"PENDING","version":0,"created_at":"2026-11-04T03:59:58.000000Z","updated_at":"2026-11-04T03:59:58.000000Z","product":{"id":4,"name":"Ferrous Scrap Metal","description":null,"code":"FERROUS","productCategory":"FERROUS","chemicalFormula":null,"unitOfMeasurement":null,"hsCode":null,"active":false,"version":0,"created_at":"2026-10-29T15:35:36.000000Z","updated_at":"2026-11-03T13:24:23.000000Z","basel_code":null,"ec_waste_code":null}}]}}', '2026-11-04 03:59:59', '2026-11-04 03:59:59'),
 (56, 'CONTRACT', 53, '2026-11-04 03:59:59', 1, 'CANCEL', NULL, '2026-11-04 03:59:59', '2026-11-04 03:59:59'),
 (57, 'CONTRACT', 54, '2026-11-04 04:02:02', 1, 'CREATE', '{"date":"2026-11-04T04:02:02.000000Z","type":"BUY","stage_id":2,"purchase_id":47,"sale_id":null,"contractStatus":"ACTIVE","orderDescription":null,"active":true,"loadingDate":"2026-11-18T04:02:02.000000Z","deliveryTerms":"CIF","modeOfPayment":"100%","updated_at":"2026-11-04T04:02:02.000000Z","created_at":"2026-11-04T04:02:02.000000Z","id":54,"orderCode":"MENONFERROUS26-26","purchase":{"id":47,"meta_company_id":2,"contact_id":2,"contact_representative_id":null,"meta_representative_id":null,"address_id":null,"destination_address_id":null,"currency_id":1,"payment_type_id":null,"payment_terms_type_id":null,"bank_account_id":null,"dollarConvertionRate":1,"total":368725,"netTotal":368725,"dealPaymentStatus":"OPEN","version":0,"created_at":"2026-11-04T04:02:02.000000Z","updated_at":"2026-11-04T04:02:02.000000Z","paymentDate":null,"incoterms":"CIF JEDDAH","customerOrderNumber":null,"paymentTerms":"100%","advancedPayment":null,"notes":null,"meta_company":{"id":2,"name":"Menon Trading LLC","code":"MENON","countryId":null,"logoUrl":null,"companyNumber":null,"vatNumber":null,"phoneNumber":null,"faxNumber":null,"email":null,"webSite":null,"footer":null,"eoriNumber":null,"address_id":null,"archiveLogoId":null,"archiveFooterId":null,"archiveStampId":null,"active":false,"version":0,"created_at":"2026-10-29T15:34:17.000000Z","updated_at":"2026-11-03T13:37:42.000000Z","domain":null,"stampUrl":null},"products":[{"id":30,"deal_id":47,"product_id":4,"pack_type_id":null,"currency_id":1,"quantity":150.5,"unitPrice":2450,"pricingType":null,"vat":0,"total":368725,"associatedContractId":null,"associatedProductId":null,"status":"PENDING","version":0,"created_at":"2026-11-04T04:02:02.000000Z","updated_at":"2026-11-04T04:02:02.000000Z","product":{"id":4,"name":"Ferrous Scrap Metal","description":null,"code":"FERROUS","productCategory":"FERROUS","chemicalFormula":null,"unitOfMeasurement":null,"hsCode":null,"active":false,"version":0,"created_at":"2026-10-29T15:35:36.000000Z","updated_at":"2026-11-03T13:24:23.000000Z","basel_code":null,"ec_waste_code":null}}]}}', '2026-11-04 04:02:02', '2026-11-04 04:02:02'),
@@ -1027,16 +1211,58 @@ INSERT INTO `logs` (`id`, `module`, `dataId`, `dateTime`, `userId`, `action`, `h
 (69, 'CONTRACT', 63, '2026-11-04 07:57:30', 1, 'CREATE', '{"date":"2026-11-04T07:57:30.000000Z","type":"BUY","stage_id":2,"purchase_id":53,"sale_id":null,"contractStatus":"ACTIVE","orderDescription":null,"active":true,"loadingDate":"2026-11-18T07:57:30.000000Z","deliveryTerms":"CIF","modeOfPayment":"100%","updated_at":"2026-11-04T07:57:30.000000Z","created_at":"2026-11-04T07:57:30.000000Z","id":63,"orderCode":"MENONFERROUS26-32","purchase":{"id":53,"meta_company_id":2,"contact_id":2,"contact_representative_id":null,"meta_representative_id":null,"address_id":null,"destination_address_id":null,"currency_id":1,"payment_type_id":null,"payment_terms_type_id":null,"bank_account_id":null,"dollarConvertionRate":1,"total":368725,"netTotal":368725,"dealPaymentStatus":"OPEN","version":0,"created_at":"2026-11-04T07:57:30.000000Z","updated_at":"2026-11-04T07:57:30.000000Z","paymentDate":null,"incoterms":"CIF JEDDAH","customerOrderNumber":null,"paymentTerms":"100%","advancedPayment":null,"notes":null,"meta_company":{"id":2,"name":"Menon Trading LLC","code":"MENON","countryId":null,"logoUrl":null,"companyNumber":null,"vatNumber":null,"phoneNumber":null,"faxNumber":null,"email":null,"webSite":null,"footer":null,"eoriNumber":null,"address_id":null,"archiveLogoId":null,"archiveFooterId":null,"archiveStampId":null,"active":false,"version":0,"created_at":"2026-10-29T15:34:17.000000Z","updated_at":"2026-11-03T13:37:42.000000Z","domain":null,"stampUrl":null},"products":[{"id":36,"deal_id":53,"product_id":4,"pack_type_id":null,"currency_id":1,"quantity":150.5,"unitPrice":2450,"pricingType":null,"vat":0,"total":368725,"associatedContractId":null,"associatedProductId":null,"status":"PENDING","version":0,"created_at":"2026-11-04T07:57:30.000000Z","updated_at":"2026-11-04T07:57:30.000000Z","product":{"id":4,"name":"Ferrous Scrap Metal","description":null,"code":"FERROUS","productCategory":"FERROUS","chemicalFormula":null,"unitOfMeasurement":null,"hsCode":null,"active":false,"version":0,"created_at":"2026-10-29T15:35:36.000000Z","updated_at":"2026-11-03T13:24:23.000000Z","basel_code":null,"ec_waste_code":null}}]}}', '2026-11-04 07:57:30', '2026-11-04 07:57:30'),
 (70, 'CONTRACT', 1, '2026-11-04 07:57:30', 1, 'STAGE_TRANSITION', '{"stage":{"from":"Draft","to":"DRAFT"}}', '2026-11-04 07:57:30', '2026-11-04 07:57:30'),
 (71, 'CONTRACT', 64, '2026-11-04 07:57:30', 1, 'CREATE', '{"date":"2026-11-04T07:57:30.000000Z","type":"BUY","stage_id":2,"purchase_id":54,"sale_id":null,"contractStatus":"ACTIVE","orderDescription":null,"active":true,"loadingDate":"2026-11-18T07:57:30.000000Z","deliveryTerms":"CIF","modeOfPayment":"100%","updated_at":"2026-11-04T07:57:30.000000Z","created_at":"2026-11-04T07:57:30.000000Z","id":64,"orderCode":"MENONFERROUS26-33","purchase":{"id":54,"meta_company_id":2,"contact_id":2,"contact_representative_id":null,"meta_representative_id":null,"address_id":null,"destination_address_id":null,"currency_id":1,"payment_type_id":null,"payment_terms_type_id":null,"bank_account_id":null,"dollarConvertionRate":1,"total":60000,"netTotal":60000,"dealPaymentStatus":"OPEN","version":0,"created_at":"2026-11-04T07:57:30.000000Z","updated_at":"2026-11-04T07:57:30.000000Z","paymentDate":null,"incoterms":"CIF JEDDAH","customerOrderNumber":null,"paymentTerms":"100%","advancedPayment":null,"notes":null,"meta_company":{"id":2,"name":"Menon Trading LLC","code":"MENON","countryId":null,"logoUrl":null,"companyNumber":null,"vatNumber":null,"phoneNumber":null,"faxNumber":null,"email":null,"webSite":null,"footer":null,"eoriNumber":null,"address_id":null,"archiveLogoId":null,"archiveFooterId":null,"archiveStampId":null,"active":false,"version":0,"created_at":"2026-10-29T15:34:17.000000Z","updated_at":"2026-11-03T13:37:42.000000Z","domain":null,"stampUrl":null},"products":[{"id":37,"deal_id":54,"product_id":4,"pack_type_id":null,"currency_id":1,"quantity":50,"unitPrice":1200,"pricingType":null,"vat":0,"total":60000,"associatedContractId":null,"associatedProductId":null,"status":"PENDING","version":0,"created_at":"2026-11-04T07:57:30.000000Z","updated_at":"2026-11-04T07:57:30.000000Z","product":{"id":4,"name":"Ferrous Scrap Metal","description":null,"code":"FERROUS","productCategory":"FERROUS","chemicalFormula":null,"unitOfMeasurement":null,"hsCode":null,"active":false,"version":0,"created_at":"2026-10-29T15:35:36.000000Z","updated_at":"2026-11-03T13:24:23.000000Z","basel_code":null,"ec_waste_code":null}}]}}', '2026-11-04 07:57:30', '2026-11-04 07:57:30'),
-(72, 'CONTRACT', 65, '2026-11-04 07:57:30', 1, 'CANCEL', NULL, '2026-11-04 07:57:30', '2026-11-04 07:57:30');
+(72, 'CONTRACT', 65, '2026-11-04 07:57:30', 1, 'CANCEL', NULL, '2026-11-04 07:57:30', '2026-11-04 07:57:30'),
+(73, 'CONTRACT', 66, '2026-11-04 08:33:06', 1, 'CREATE', '{"date":"2026-11-04T08:33:06.000000Z","type":"BUY","stage_id":2,"purchase_id":55,"sale_id":null,"contractStatus":"ACTIVE","orderDescription":null,"active":true,"loadingDate":"2026-11-18T08:33:06.000000Z","deliveryTerms":"CIF","modeOfPayment":"100%","updated_at":"2026-11-04T08:33:06.000000Z","created_at":"2026-11-04T08:33:06.000000Z","id":66,"orderCode":"MENONFERROUS26-34","purchase":{"id":55,"meta_company_id":2,"contact_id":2,"contact_representative_id":null,"meta_representative_id":null,"address_id":null,"destination_address_id":null,"currency_id":1,"payment_type_id":null,"payment_terms_type_id":null,"bank_account_id":null,"dollarConvertionRate":1,"total":368725,"netTotal":368725,"dealPaymentStatus":"OPEN","version":0,"created_at":"2026-11-04T08:33:06.000000Z","updated_at":"2026-11-04T08:33:06.000000Z","paymentDate":null,"incoterms":"CIF JEDDAH","customerOrderNumber":null,"paymentTerms":"100%","advancedPayment":null,"notes":null,"meta_company":{"id":2,"name":"Menon Trading LLC","code":"MENON","countryId":null,"logoUrl":null,"companyNumber":null,"vatNumber":null,"phoneNumber":null,"faxNumber":null,"email":null,"webSite":null,"footer":null,"eoriNumber":null,"address_id":null,"archiveLogoId":null,"archiveFooterId":null,"archiveStampId":null,"active":false,"version":0,"created_at":"2026-10-29T15:34:17.000000Z","updated_at":"2026-11-03T13:37:42.000000Z","domain":null,"stampUrl":null},"products":[{"id":38,"deal_id":55,"product_id":4,"pack_type_id":null,"currency_id":1,"quantity":150.5,"unitPrice":2450,"pricingType":null,"vat":0,"total":368725,"associatedContractId":null,"associatedProductId":null,"status":"PENDING","version":0,"created_at":"2026-11-04T08:33:06.000000Z","updated_at":"2026-11-04T08:33:06.000000Z","product":{"id":4,"name":"Ferrous Scrap Metal","description":null,"code":"FERROUS","productCategory":"FERROUS","chemicalFormula":null,"unitOfMeasurement":null,"hsCode":null,"active":false,"version":0,"created_at":"2026-10-29T15:35:36.000000Z","updated_at":"2026-11-03T13:24:23.000000Z","basel_code":null,"ec_waste_code":null}}]}}', '2026-11-04 08:33:06', '2026-11-04 08:33:06'),
+(74, 'CONTRACT', 1, '2026-11-04 08:33:06', 1, 'STAGE_TRANSITION', '{"stage":{"from":"DRAFT","to":"Draft"}}', '2026-11-04 08:33:06', '2026-11-04 08:33:06'),
+(75, 'CONTRACT', 67, '2026-11-04 08:33:06', 1, 'CREATE', '{"date":"2026-11-04T08:33:06.000000Z","type":"BUY","stage_id":2,"purchase_id":56,"sale_id":null,"contractStatus":"ACTIVE","orderDescription":null,"active":true,"loadingDate":"2026-11-18T08:33:06.000000Z","deliveryTerms":"CIF","modeOfPayment":"100%","updated_at":"2026-11-04T08:33:06.000000Z","created_at":"2026-11-04T08:33:06.000000Z","id":67,"orderCode":"MENONFERROUS26-35","purchase":{"id":56,"meta_company_id":2,"contact_id":2,"contact_representative_id":null,"meta_representative_id":null,"address_id":null,"destination_address_id":null,"currency_id":1,"payment_type_id":null,"payment_terms_type_id":null,"bank_account_id":null,"dollarConvertionRate":1,"total":60000,"netTotal":60000,"dealPaymentStatus":"OPEN","version":0,"created_at":"2026-11-04T08:33:06.000000Z","updated_at":"2026-11-04T08:33:06.000000Z","paymentDate":null,"incoterms":"CIF JEDDAH","customerOrderNumber":null,"paymentTerms":"100%","advancedPayment":null,"notes":null,"meta_company":{"id":2,"name":"Menon Trading LLC","code":"MENON","countryId":null,"logoUrl":null,"companyNumber":null,"vatNumber":null,"phoneNumber":null,"faxNumber":null,"email":null,"webSite":null,"footer":null,"eoriNumber":null,"address_id":null,"archiveLogoId":null,"archiveFooterId":null,"archiveStampId":null,"active":false,"version":0,"created_at":"2026-10-29T15:34:17.000000Z","updated_at":"2026-11-03T13:37:42.000000Z","domain":null,"stampUrl":null},"products":[{"id":39,"deal_id":56,"product_id":4,"pack_type_id":null,"currency_id":1,"quantity":50,"unitPrice":1200,"pricingType":null,"vat":0,"total":60000,"associatedContractId":null,"associatedProductId":null,"status":"PENDING","version":0,"created_at":"2026-11-04T08:33:06.000000Z","updated_at":"2026-11-04T08:33:06.000000Z","product":{"id":4,"name":"Ferrous Scrap Metal","description":null,"code":"FERROUS","productCategory":"FERROUS","chemicalFormula":null,"unitOfMeasurement":null,"hsCode":null,"active":false,"version":0,"created_at":"2026-10-29T15:35:36.000000Z","updated_at":"2026-11-03T13:24:23.000000Z","basel_code":null,"ec_waste_code":null}}]}}', '2026-11-04 08:33:06', '2026-11-04 08:33:06'),
+(76, 'CONTRACT', 68, '2026-11-04 08:33:06', 1, 'CANCEL', NULL, '2026-11-04 08:33:06', '2026-11-04 08:33:06'),
+(77, 'CONTRACT', 69, '2026-11-04 08:48:16', 1, 'CREATE', '{"date":"2026-11-04T08:48:16.000000Z","type":"BUY","stage_id":2,"purchase_id":57,"sale_id":null,"contractStatus":"ACTIVE","orderDescription":null,"active":true,"loadingDate":"2026-11-18T08:48:16.000000Z","deliveryTerms":"CIF","modeOfPayment":"100%","updated_at":"2026-11-04T08:48:16.000000Z","created_at":"2026-11-04T08:48:16.000000Z","id":69,"orderCode":"MENONFERROUS26-36","purchase":{"id":57,"meta_company_id":2,"contact_id":2,"contact_representative_id":null,"meta_representative_id":null,"address_id":null,"destination_address_id":null,"currency_id":1,"payment_type_id":null,"payment_terms_type_id":null,"bank_account_id":null,"dollarConvertionRate":1,"total":368725,"netTotal":368725,"dealPaymentStatus":"OPEN","version":0,"created_at":"2026-11-04T08:48:16.000000Z","updated_at":"2026-11-04T08:48:16.000000Z","paymentDate":null,"incoterms":"CIF JEDDAH","customerOrderNumber":null,"paymentTerms":"100%","advancedPayment":null,"notes":null,"meta_company":{"id":2,"name":"Menon Trading LLC","code":"MENON","countryId":null,"logoUrl":null,"companyNumber":null,"vatNumber":null,"phoneNumber":null,"faxNumber":null,"email":null,"webSite":null,"footer":null,"eoriNumber":null,"address_id":null,"archiveLogoId":null,"archiveFooterId":null,"archiveStampId":null,"active":false,"version":0,"created_at":"2026-10-29T15:34:17.000000Z","updated_at":"2026-11-03T13:37:42.000000Z","domain":null,"stampUrl":null},"products":[{"id":40,"deal_id":57,"product_id":4,"pack_type_id":null,"currency_id":1,"quantity":150.5,"unitPrice":2450,"pricingType":null,"vat":0,"total":368725,"associatedContractId":null,"associatedProductId":null,"status":"PENDING","version":0,"created_at":"2026-11-04T08:48:16.000000Z","updated_at":"2026-11-04T08:48:16.000000Z","product":{"id":4,"name":"Ferrous Scrap Metal","description":null,"code":"FERROUS","productCategory":"FERROUS","chemicalFormula":null,"unitOfMeasurement":null,"hsCode":null,"active":false,"version":0,"created_at":"2026-10-29T15:35:36.000000Z","updated_at":"2026-11-03T13:24:23.000000Z","basel_code":null,"ec_waste_code":null}}]}}', '2026-11-04 08:48:16', '2026-11-04 08:48:16'),
+(78, 'CONTRACT', 1, '2026-11-04 08:48:16', 1, 'STAGE_TRANSITION', '{"stage":{"from":"Draft","to":"DRAFT"}}', '2026-11-04 08:48:16', '2026-11-04 08:48:16'),
+(79, 'CONTRACT', 70, '2026-11-04 08:48:16', 1, 'CREATE', '{"date":"2026-11-04T08:48:16.000000Z","type":"BUY","stage_id":2,"purchase_id":58,"sale_id":null,"contractStatus":"ACTIVE","orderDescription":null,"active":true,"loadingDate":"2026-11-18T08:48:16.000000Z","deliveryTerms":"CIF","modeOfPayment":"100%","updated_at":"2026-11-04T08:48:16.000000Z","created_at":"2026-11-04T08:48:16.000000Z","id":70,"orderCode":"MENONFERROUS26-37","purchase":{"id":58,"meta_company_id":2,"contact_id":2,"contact_representative_id":null,"meta_representative_id":null,"address_id":null,"destination_address_id":null,"currency_id":1,"payment_type_id":null,"payment_terms_type_id":null,"bank_account_id":null,"dollarConvertionRate":1,"total":60000,"netTotal":60000,"dealPaymentStatus":"OPEN","version":0,"created_at":"2026-11-04T08:48:16.000000Z","updated_at":"2026-11-04T08:48:16.000000Z","paymentDate":null,"incoterms":"CIF JEDDAH","customerOrderNumber":null,"paymentTerms":"100%","advancedPayment":null,"notes":null,"meta_company":{"id":2,"name":"Menon Trading LLC","code":"MENON","countryId":null,"logoUrl":null,"companyNumber":null,"vatNumber":null,"phoneNumber":null,"faxNumber":null,"email":null,"webSite":null,"footer":null,"eoriNumber":null,"address_id":null,"archiveLogoId":null,"archiveFooterId":null,"archiveStampId":null,"active":false,"version":0,"created_at":"2026-10-29T15:34:17.000000Z","updated_at":"2026-11-03T13:37:42.000000Z","domain":null,"stampUrl":null},"products":[{"id":41,"deal_id":58,"product_id":4,"pack_type_id":null,"currency_id":1,"quantity":50,"unitPrice":1200,"pricingType":null,"vat":0,"total":60000,"associatedContractId":null,"associatedProductId":null,"status":"PENDING","version":0,"created_at":"2026-11-04T08:48:16.000000Z","updated_at":"2026-11-04T08:48:16.000000Z","product":{"id":4,"name":"Ferrous Scrap Metal","description":null,"code":"FERROUS","productCategory":"FERROUS","chemicalFormula":null,"unitOfMeasurement":null,"hsCode":null,"active":false,"version":0,"created_at":"2026-10-29T15:35:36.000000Z","updated_at":"2026-11-03T13:24:23.000000Z","basel_code":null,"ec_waste_code":null}}]}}', '2026-11-04 08:48:16', '2026-11-04 08:48:16'),
+(80, 'CONTRACT', 71, '2026-11-04 08:48:16', 1, 'CANCEL', NULL, '2026-11-04 08:48:16', '2026-11-04 08:48:16'),
+(81, 'CONTRACT', 72, '2026-11-04 08:48:45', 1, 'CREATE', '{"date":"2026-11-04T08:48:45.000000Z","type":"BUY","stage_id":2,"purchase_id":59,"sale_id":null,"contractStatus":"ACTIVE","orderDescription":null,"active":true,"loadingDate":"2026-11-18T08:48:45.000000Z","deliveryTerms":"CIF","modeOfPayment":"100%","updated_at":"2026-11-04T08:48:45.000000Z","created_at":"2026-11-04T08:48:45.000000Z","id":72,"orderCode":"MENONFERROUS26-38","purchase":{"id":59,"meta_company_id":2,"contact_id":2,"contact_representative_id":null,"meta_representative_id":null,"address_id":null,"destination_address_id":null,"currency_id":1,"payment_type_id":null,"payment_terms_type_id":null,"bank_account_id":null,"dollarConvertionRate":1,"total":368725,"netTotal":368725,"dealPaymentStatus":"OPEN","version":0,"created_at":"2026-11-04T08:48:45.000000Z","updated_at":"2026-11-04T08:48:45.000000Z","paymentDate":null,"incoterms":"CIF JEDDAH","customerOrderNumber":null,"paymentTerms":"100%","advancedPayment":null,"notes":null,"meta_company":{"id":2,"name":"Menon Trading LLC","code":"MENON","countryId":null,"logoUrl":null,"companyNumber":null,"vatNumber":null,"phoneNumber":null,"faxNumber":null,"email":null,"webSite":null,"footer":null,"eoriNumber":null,"address_id":null,"archiveLogoId":null,"archiveFooterId":null,"archiveStampId":null,"active":false,"version":0,"created_at":"2026-10-29T15:34:17.000000Z","updated_at":"2026-11-03T13:37:42.000000Z","domain":null,"stampUrl":null},"products":[{"id":42,"deal_id":59,"product_id":4,"pack_type_id":null,"currency_id":1,"quantity":150.5,"unitPrice":2450,"pricingType":null,"vat":0,"total":368725,"associatedContractId":null,"associatedProductId":null,"status":"PENDING","version":0,"created_at":"2026-11-04T08:48:45.000000Z","updated_at":"2026-11-04T08:48:45.000000Z","product":{"id":4,"name":"Ferrous Scrap Metal","description":null,"code":"FERROUS","productCategory":"FERROUS","chemicalFormula":null,"unitOfMeasurement":null,"hsCode":null,"active":false,"version":0,"created_at":"2026-10-29T15:35:36.000000Z","updated_at":"2026-11-03T13:24:23.000000Z","basel_code":null,"ec_waste_code":null}}]}}', '2026-11-04 08:48:45', '2026-11-04 08:48:45'),
+(82, 'CONTRACT', 1, '2026-11-04 08:48:45', 1, 'STAGE_TRANSITION', '{"stage":{"from":"DRAFT","to":"Draft"}}', '2026-11-04 08:48:45', '2026-11-04 08:48:45'),
+(83, 'CONTRACT', 73, '2026-11-04 08:48:45', 1, 'CREATE', '{"date":"2026-11-04T08:48:45.000000Z","type":"BUY","stage_id":2,"purchase_id":60,"sale_id":null,"contractStatus":"ACTIVE","orderDescription":null,"active":true,"loadingDate":"2026-11-18T08:48:45.000000Z","deliveryTerms":"CIF","modeOfPayment":"100%","updated_at":"2026-11-04T08:48:45.000000Z","created_at":"2026-11-04T08:48:45.000000Z","id":73,"orderCode":"MENONFERROUS26-39","purchase":{"id":60,"meta_company_id":2,"contact_id":2,"contact_representative_id":null,"meta_representative_id":null,"address_id":null,"destination_address_id":null,"currency_id":1,"payment_type_id":null,"payment_terms_type_id":null,"bank_account_id":null,"dollarConvertionRate":1,"total":60000,"netTotal":60000,"dealPaymentStatus":"OPEN","version":0,"created_at":"2026-11-04T08:48:45.000000Z","updated_at":"2026-11-04T08:48:45.000000Z","paymentDate":null,"incoterms":"CIF JEDDAH","customerOrderNumber":null,"paymentTerms":"100%","advancedPayment":null,"notes":null,"meta_company":{"id":2,"name":"Menon Trading LLC","code":"MENON","countryId":null,"logoUrl":null,"companyNumber":null,"vatNumber":null,"phoneNumber":null,"faxNumber":null,"email":null,"webSite":null,"footer":null,"eoriNumber":null,"address_id":null,"archiveLogoId":null,"archiveFooterId":null,"archiveStampId":null,"active":false,"version":0,"created_at":"2026-10-29T15:34:17.000000Z","updated_at":"2026-11-03T13:37:42.000000Z","domain":null,"stampUrl":null},"products":[{"id":43,"deal_id":60,"product_id":4,"pack_type_id":null,"currency_id":1,"quantity":50,"unitPrice":1200,"pricingType":null,"vat":0,"total":60000,"associatedContractId":null,"associatedProductId":null,"status":"PENDING","version":0,"created_at":"2026-11-04T08:48:45.000000Z","updated_at":"2026-11-04T08:48:45.000000Z","product":{"id":4,"name":"Ferrous Scrap Metal","description":null,"code":"FERROUS","productCategory":"FERROUS","chemicalFormula":null,"unitOfMeasurement":null,"hsCode":null,"active":false,"version":0,"created_at":"2026-10-29T15:35:36.000000Z","updated_at":"2026-11-03T13:24:23.000000Z","basel_code":null,"ec_waste_code":null}}]}}', '2026-11-04 08:48:45', '2026-11-04 08:48:45'),
+(84, 'CONTRACT', 74, '2026-11-04 08:48:45', 1, 'CANCEL', NULL, '2026-11-04 08:48:45', '2026-11-04 08:48:45'),
+(85, 'CONTRACT', 75, '2026-11-04 09:09:21', 1, 'CREATE', '{"date":"2026-11-04T09:09:21.000000Z","type":"BUY","stage_id":2,"purchase_id":61,"sale_id":null,"contractStatus":"ACTIVE","orderDescription":null,"active":true,"loadingDate":"2026-11-18T09:09:21.000000Z","deliveryTerms":"CIF","modeOfPayment":"100%","updated_at":"2026-11-04T09:09:21.000000Z","created_at":"2026-11-04T09:09:21.000000Z","id":75,"orderCode":"MENONFERROUS26-40","purchase":{"id":61,"meta_company_id":2,"contact_id":2,"contact_representative_id":null,"meta_representative_id":null,"address_id":null,"destination_address_id":null,"currency_id":1,"payment_type_id":null,"payment_terms_type_id":null,"bank_account_id":null,"dollarConvertionRate":1,"total":368725,"netTotal":368725,"dealPaymentStatus":"OPEN","version":0,"created_at":"2026-11-04T09:09:21.000000Z","updated_at":"2026-11-04T09:09:21.000000Z","paymentDate":null,"incoterms":"CIF JEDDAH","customerOrderNumber":null,"paymentTerms":"100%","advancedPayment":null,"notes":null,"meta_company":{"id":2,"name":"Menon Trading LLC","code":"MENON","countryId":null,"logoUrl":null,"companyNumber":null,"vatNumber":null,"phoneNumber":null,"faxNumber":null,"email":null,"webSite":null,"footer":null,"eoriNumber":null,"address_id":null,"archiveLogoId":null,"archiveFooterId":null,"archiveStampId":null,"active":false,"version":0,"created_at":"2026-10-29T15:34:17.000000Z","updated_at":"2026-11-03T13:37:42.000000Z","domain":null,"stampUrl":null},"products":[{"id":44,"deal_id":61,"product_id":4,"pack_type_id":null,"currency_id":1,"quantity":150.5,"unitPrice":2450,"pricingType":null,"vat":0,"total":368725,"associatedContractId":null,"associatedProductId":null,"status":"PENDING","version":0,"created_at":"2026-11-04T09:09:21.000000Z","updated_at":"2026-11-04T09:09:21.000000Z","product":{"id":4,"name":"Ferrous Scrap Metal","description":null,"code":"FERROUS","productCategory":"FERROUS","chemicalFormula":null,"unitOfMeasurement":null,"hsCode":null,"active":false,"version":0,"created_at":"2026-10-29T15:35:36.000000Z","updated_at":"2026-11-03T13:24:23.000000Z","basel_code":null,"ec_waste_code":null}}]}}', '2026-11-04 09:09:21', '2026-11-04 09:09:21'),
+(86, 'CONTRACT', 1, '2026-11-04 09:09:21', 1, 'STAGE_TRANSITION', '{"stage":{"from":"Draft","to":"DRAFT"}}', '2026-11-04 09:09:21', '2026-11-04 09:09:21'),
+(87, 'CONTRACT', 76, '2026-11-04 09:09:21', 1, 'CREATE', '{"date":"2026-11-04T09:09:21.000000Z","type":"BUY","stage_id":2,"purchase_id":62,"sale_id":null,"contractStatus":"ACTIVE","orderDescription":null,"active":true,"loadingDate":"2026-11-18T09:09:21.000000Z","deliveryTerms":"CIF","modeOfPayment":"100%","updated_at":"2026-11-04T09:09:21.000000Z","created_at":"2026-11-04T09:09:21.000000Z","id":76,"orderCode":"MENONFERROUS26-41","purchase":{"id":62,"meta_company_id":2,"contact_id":2,"contact_representative_id":null,"meta_representative_id":null,"address_id":null,"destination_address_id":null,"currency_id":1,"payment_type_id":null,"payment_terms_type_id":null,"bank_account_id":null,"dollarConvertionRate":1,"total":60000,"netTotal":60000,"dealPaymentStatus":"OPEN","version":0,"created_at":"2026-11-04T09:09:21.000000Z","updated_at":"2026-11-04T09:09:21.000000Z","paymentDate":null,"incoterms":"CIF JEDDAH","customerOrderNumber":null,"paymentTerms":"100%","advancedPayment":null,"notes":null,"meta_company":{"id":2,"name":"Menon Trading LLC","code":"MENON","countryId":null,"logoUrl":null,"companyNumber":null,"vatNumber":null,"phoneNumber":null,"faxNumber":null,"email":null,"webSite":null,"footer":null,"eoriNumber":null,"address_id":null,"archiveLogoId":null,"archiveFooterId":null,"archiveStampId":null,"active":false,"version":0,"created_at":"2026-10-29T15:34:17.000000Z","updated_at":"2026-11-03T13:37:42.000000Z","domain":null,"stampUrl":null},"products":[{"id":45,"deal_id":62,"product_id":4,"pack_type_id":null,"currency_id":1,"quantity":50,"unitPrice":1200,"pricingType":null,"vat":0,"total":60000,"associatedContractId":null,"associatedProductId":null,"status":"PENDING","version":0,"created_at":"2026-11-04T09:09:21.000000Z","updated_at":"2026-11-04T09:09:21.000000Z","product":{"id":4,"name":"Ferrous Scrap Metal","description":null,"code":"FERROUS","productCategory":"FERROUS","chemicalFormula":null,"unitOfMeasurement":null,"hsCode":null,"active":false,"version":0,"created_at":"2026-10-29T15:35:36.000000Z","updated_at":"2026-11-03T13:24:23.000000Z","basel_code":null,"ec_waste_code":null}}]}}', '2026-11-04 09:09:21', '2026-11-04 09:09:21'),
+(88, 'CONTRACT', 77, '2026-11-04 09:09:21', 1, 'CANCEL', NULL, '2026-11-04 09:09:21', '2026-11-04 09:09:21'),
+(89, 'CONTRACT', 78, '2026-11-04 09:11:18', 1, 'CREATE', '{"date":"2026-11-04T09:11:18.000000Z","type":"BUY","stage_id":2,"purchase_id":63,"sale_id":null,"contractStatus":"ACTIVE","orderDescription":null,"active":true,"loadingDate":"2026-11-18T09:11:18.000000Z","deliveryTerms":"CIF","modeOfPayment":"100%","updated_at":"2026-11-04T09:11:18.000000Z","created_at":"2026-11-04T09:11:18.000000Z","id":78,"orderCode":"MENONFERROUS26-42","purchase":{"id":63,"meta_company_id":2,"contact_id":2,"contact_representative_id":null,"meta_representative_id":null,"address_id":null,"destination_address_id":null,"currency_id":1,"payment_type_id":null,"payment_terms_type_id":null,"bank_account_id":null,"dollarConvertionRate":1,"total":368725,"netTotal":368725,"dealPaymentStatus":"OPEN","version":0,"created_at":"2026-11-04T09:11:18.000000Z","updated_at":"2026-11-04T09:11:18.000000Z","paymentDate":null,"incoterms":"CIF JEDDAH","customerOrderNumber":null,"paymentTerms":"100%","advancedPayment":null,"notes":null,"meta_company":{"id":2,"name":"Menon Trading LLC","code":"MENON","countryId":null,"logoUrl":null,"companyNumber":null,"vatNumber":null,"phoneNumber":null,"faxNumber":null,"email":null,"webSite":null,"footer":null,"eoriNumber":null,"address_id":null,"archiveLogoId":null,"archiveFooterId":null,"archiveStampId":null,"active":false,"version":0,"created_at":"2026-10-29T15:34:17.000000Z","updated_at":"2026-11-03T13:37:42.000000Z","domain":null,"stampUrl":null},"products":[{"id":46,"deal_id":63,"product_id":4,"pack_type_id":null,"currency_id":1,"quantity":150.5,"unitPrice":2450,"pricingType":null,"vat":0,"total":368725,"associatedContractId":null,"associatedProductId":null,"status":"PENDING","version":0,"created_at":"2026-11-04T09:11:18.000000Z","updated_at":"2026-11-04T09:11:18.000000Z","product":{"id":4,"name":"Ferrous Scrap Metal","description":null,"code":"FERROUS","productCategory":"FERROUS","chemicalFormula":null,"unitOfMeasurement":null,"hsCode":null,"active":false,"version":0,"created_at":"2026-10-29T15:35:36.000000Z","updated_at":"2026-11-03T13:24:23.000000Z","basel_code":null,"ec_waste_code":null}}]}}', '2026-11-04 09:11:18', '2026-11-04 09:11:18'),
+(90, 'CONTRACT', 1, '2026-11-04 09:11:18', 1, 'STAGE_TRANSITION', '{"stage":{"from":"DRAFT","to":"Draft"}}', '2026-11-04 09:11:18', '2026-11-04 09:11:18'),
+(91, 'CONTRACT', 79, '2026-11-04 09:11:18', 1, 'CREATE', '{"date":"2026-11-04T09:11:18.000000Z","type":"BUY","stage_id":2,"purchase_id":64,"sale_id":null,"contractStatus":"ACTIVE","orderDescription":null,"active":true,"loadingDate":"2026-11-18T09:11:18.000000Z","deliveryTerms":"CIF","modeOfPayment":"100%","updated_at":"2026-11-04T09:11:18.000000Z","created_at":"2026-11-04T09:11:18.000000Z","id":79,"orderCode":"MENONFERROUS26-43","purchase":{"id":64,"meta_company_id":2,"contact_id":2,"contact_representative_id":null,"meta_representative_id":null,"address_id":null,"destination_address_id":null,"currency_id":1,"payment_type_id":null,"payment_terms_type_id":null,"bank_account_id":null,"dollarConvertionRate":1,"total":60000,"netTotal":60000,"dealPaymentStatus":"OPEN","version":0,"created_at":"2026-11-04T09:11:18.000000Z","updated_at":"2026-11-04T09:11:18.000000Z","paymentDate":null,"incoterms":"CIF JEDDAH","customerOrderNumber":null,"paymentTerms":"100%","advancedPayment":null,"notes":null,"meta_company":{"id":2,"name":"Menon Trading LLC","code":"MENON","countryId":null,"logoUrl":null,"companyNumber":null,"vatNumber":null,"phoneNumber":null,"faxNumber":null,"email":null,"webSite":null,"footer":null,"eoriNumber":null,"address_id":null,"archiveLogoId":null,"archiveFooterId":null,"archiveStampId":null,"active":false,"version":0,"created_at":"2026-10-29T15:34:17.000000Z","updated_at":"2026-11-03T13:37:42.000000Z","domain":null,"stampUrl":null},"products":[{"id":47,"deal_id":64,"product_id":4,"pack_type_id":null,"currency_id":1,"quantity":50,"unitPrice":1200,"pricingType":null,"vat":0,"total":60000,"associatedContractId":null,"associatedProductId":null,"status":"PENDING","version":0,"created_at":"2026-11-04T09:11:18.000000Z","updated_at":"2026-11-04T09:11:18.000000Z","product":{"id":4,"name":"Ferrous Scrap Metal","description":null,"code":"FERROUS","productCategory":"FERROUS","chemicalFormula":null,"unitOfMeasurement":null,"hsCode":null,"active":false,"version":0,"created_at":"2026-10-29T15:35:36.000000Z","updated_at":"2026-11-03T13:24:23.000000Z","basel_code":null,"ec_waste_code":null}}]}}', '2026-11-04 09:11:18', '2026-11-04 09:11:18'),
+(92, 'CONTRACT', 80, '2026-11-04 09:11:19', 1, 'CANCEL', NULL, '2026-11-04 09:11:19', '2026-11-04 09:11:19'),
+(93, 'CONTRACT', 81, '2026-11-04 09:29:07', 1, 'CREATE', '{"date":"2026-11-04T09:29:07.000000Z","type":"BUY","stage_id":2,"purchase_id":65,"sale_id":null,"contractStatus":"ACTIVE","orderDescription":null,"active":true,"loadingDate":"2026-11-18T09:29:07.000000Z","deliveryTerms":"CIF","modeOfPayment":"100%","updated_at":"2026-11-04T09:29:07.000000Z","created_at":"2026-11-04T09:29:07.000000Z","id":81,"orderCode":"MENONFERROUS26-44","purchase":{"id":65,"meta_company_id":2,"contact_id":2,"contact_representative_id":null,"meta_representative_id":null,"address_id":null,"destination_address_id":null,"currency_id":1,"payment_type_id":null,"payment_terms_type_id":null,"bank_account_id":null,"dollarConvertionRate":1,"total":368725,"netTotal":368725,"dealPaymentStatus":"OPEN","version":0,"created_at":"2026-11-04T09:29:07.000000Z","updated_at":"2026-11-04T09:29:07.000000Z","paymentDate":null,"incoterms":"CIF JEDDAH","customerOrderNumber":null,"paymentTerms":"100%","advancedPayment":null,"notes":null,"meta_company":{"id":2,"name":"Menon Trading LLC","code":"MENON","countryId":null,"logoUrl":null,"companyNumber":null,"vatNumber":null,"phoneNumber":null,"faxNumber":null,"email":null,"webSite":null,"footer":null,"eoriNumber":null,"address_id":null,"archiveLogoId":null,"archiveFooterId":null,"archiveStampId":null,"active":false,"version":0,"created_at":"2026-10-29T15:34:17.000000Z","updated_at":"2026-11-03T13:37:42.000000Z","domain":null,"stampUrl":null},"products":[{"id":48,"deal_id":65,"product_id":4,"pack_type_id":null,"currency_id":1,"quantity":150.5,"unitPrice":2450,"pricingType":null,"vat":0,"total":368725,"associatedContractId":null,"associatedProductId":null,"status":"PENDING","version":0,"created_at":"2026-11-04T09:29:07.000000Z","updated_at":"2026-11-04T09:29:07.000000Z","product":{"id":4,"name":"Ferrous Scrap Metal","description":null,"code":"FERROUS","productCategory":"FERROUS","chemicalFormula":null,"unitOfMeasurement":null,"hsCode":null,"active":false,"version":0,"created_at":"2026-10-29T15:35:36.000000Z","updated_at":"2026-11-03T13:24:23.000000Z","basel_code":null,"ec_waste_code":null}}]}}', '2026-11-04 09:29:07', '2026-11-04 09:29:07'),
+(94, 'CONTRACT', 1, '2026-11-04 09:29:07', 1, 'STAGE_TRANSITION', '{"stage":{"from":"Draft","to":"DRAFT"}}', '2026-11-04 09:29:07', '2026-11-04 09:29:07'),
+(95, 'CONTRACT', 82, '2026-11-04 09:29:07', 1, 'CREATE', '{"date":"2026-11-04T09:29:07.000000Z","type":"BUY","stage_id":2,"purchase_id":66,"sale_id":null,"contractStatus":"ACTIVE","orderDescription":null,"active":true,"loadingDate":"2026-11-18T09:29:07.000000Z","deliveryTerms":"CIF","modeOfPayment":"100%","updated_at":"2026-11-04T09:29:07.000000Z","created_at":"2026-11-04T09:29:07.000000Z","id":82,"orderCode":"MENONFERROUS26-45","purchase":{"id":66,"meta_company_id":2,"contact_id":2,"contact_representative_id":null,"meta_representative_id":null,"address_id":null,"destination_address_id":null,"currency_id":1,"payment_type_id":null,"payment_terms_type_id":null,"bank_account_id":null,"dollarConvertionRate":1,"total":60000,"netTotal":60000,"dealPaymentStatus":"OPEN","version":0,"created_at":"2026-11-04T09:29:07.000000Z","updated_at":"2026-11-04T09:29:07.000000Z","paymentDate":null,"incoterms":"CIF JEDDAH","customerOrderNumber":null,"paymentTerms":"100%","advancedPayment":null,"notes":null,"meta_company":{"id":2,"name":"Menon Trading LLC","code":"MENON","countryId":null,"logoUrl":null,"companyNumber":null,"vatNumber":null,"phoneNumber":null,"faxNumber":null,"email":null,"webSite":null,"footer":null,"eoriNumber":null,"address_id":null,"archiveLogoId":null,"archiveFooterId":null,"archiveStampId":null,"active":false,"version":0,"created_at":"2026-10-29T15:34:17.000000Z","updated_at":"2026-11-03T13:37:42.000000Z","domain":null,"stampUrl":null},"products":[{"id":49,"deal_id":66,"product_id":4,"pack_type_id":null,"currency_id":1,"quantity":50,"unitPrice":1200,"pricingType":null,"vat":0,"total":60000,"associatedContractId":null,"associatedProductId":null,"status":"PENDING","version":0,"created_at":"2026-11-04T09:29:07.000000Z","updated_at":"2026-11-04T09:29:07.000000Z","product":{"id":4,"name":"Ferrous Scrap Metal","description":null,"code":"FERROUS","productCategory":"FERROUS","chemicalFormula":null,"unitOfMeasurement":null,"hsCode":null,"active":false,"version":0,"created_at":"2026-10-29T15:35:36.000000Z","updated_at":"2026-11-03T13:24:23.000000Z","basel_code":null,"ec_waste_code":null}}]}}', '2026-11-04 09:29:07', '2026-11-04 09:29:07'),
+(96, 'CONTRACT', 83, '2026-11-04 09:29:07', 1, 'CANCEL', NULL, '2026-11-04 09:29:07', '2026-11-04 09:29:07'),
+(97, 'CONTRACT', 84, '2026-11-04 09:44:55', 1, 'CREATE', '{"date":"2026-11-04T09:44:55.000000Z","type":"BUY","stage_id":2,"purchase_id":67,"sale_id":null,"contractStatus":"ACTIVE","orderDescription":null,"active":true,"loadingDate":"2026-11-18T09:44:55.000000Z","deliveryTerms":"CIF","modeOfPayment":"100%","updated_at":"2026-11-04T09:44:55.000000Z","created_at":"2026-11-04T09:44:55.000000Z","id":84,"orderCode":"MENONFERROUS26-46","purchase":{"id":67,"meta_company_id":2,"contact_id":2,"contact_representative_id":null,"meta_representative_id":null,"address_id":null,"destination_address_id":null,"currency_id":1,"payment_type_id":null,"payment_terms_type_id":null,"bank_account_id":null,"dollarConvertionRate":1,"total":368725,"netTotal":368725,"dealPaymentStatus":"OPEN","version":0,"created_at":"2026-11-04T09:44:55.000000Z","updated_at":"2026-11-04T09:44:55.000000Z","paymentDate":null,"incoterms":"CIF JEDDAH","customerOrderNumber":null,"paymentTerms":"100%","advancedPayment":null,"notes":null,"meta_company":{"id":2,"name":"Menon Trading LLC","code":"MENON","countryId":null,"logoUrl":null,"companyNumber":null,"vatNumber":null,"phoneNumber":null,"faxNumber":null,"email":null,"webSite":null,"footer":null,"eoriNumber":null,"address_id":null,"archiveLogoId":null,"archiveFooterId":null,"archiveStampId":null,"active":false,"version":0,"created_at":"2026-10-29T15:34:17.000000Z","updated_at":"2026-11-03T13:37:42.000000Z","domain":null,"stampUrl":null},"products":[{"id":50,"deal_id":67,"product_id":4,"pack_type_id":null,"currency_id":1,"quantity":150.5,"unitPrice":2450,"pricingType":null,"vat":0,"total":368725,"associatedContractId":null,"associatedProductId":null,"status":"PENDING","version":0,"created_at":"2026-11-04T09:44:55.000000Z","updated_at":"2026-11-04T09:44:55.000000Z","product":{"id":4,"name":"Ferrous Scrap Metal","description":null,"code":"FERROUS","productCategory":"FERROUS","chemicalFormula":null,"unitOfMeasurement":null,"hsCode":null,"active":false,"version":0,"created_at":"2026-10-29T15:35:36.000000Z","updated_at":"2026-11-03T13:24:23.000000Z","basel_code":null,"ec_waste_code":null}}]}}', '2026-11-04 09:44:55', '2026-11-04 09:44:55'),
+(98, 'CONTRACT', 1, '2026-11-04 09:44:55', 1, 'STAGE_TRANSITION', '{"stage":{"from":"DRAFT","to":"Draft"}}', '2026-11-04 09:44:55', '2026-11-04 09:44:55'),
+(99, 'CONTRACT', 85, '2026-11-04 09:44:55', 1, 'CREATE', '{"date":"2026-11-04T09:44:55.000000Z","type":"BUY","stage_id":2,"purchase_id":68,"sale_id":null,"contractStatus":"ACTIVE","orderDescription":null,"active":true,"loadingDate":"2026-11-18T09:44:55.000000Z","deliveryTerms":"CIF","modeOfPayment":"100%","updated_at":"2026-11-04T09:44:55.000000Z","created_at":"2026-11-04T09:44:55.000000Z","id":85,"orderCode":"MENONFERROUS26-47","purchase":{"id":68,"meta_company_id":2,"contact_id":2,"contact_representative_id":null,"meta_representative_id":null,"address_id":null,"destination_address_id":null,"currency_id":1,"payment_type_id":null,"payment_terms_type_id":null,"bank_account_id":null,"dollarConvertionRate":1,"total":60000,"netTotal":60000,"dealPaymentStatus":"OPEN","version":0,"created_at":"2026-11-04T09:44:55.000000Z","updated_at":"2026-11-04T09:44:55.000000Z","paymentDate":null,"incoterms":"CIF JEDDAH","customerOrderNumber":null,"paymentTerms":"100%","advancedPayment":null,"notes":null,"meta_company":{"id":2,"name":"Menon Trading LLC","code":"MENON","countryId":null,"logoUrl":null,"companyNumber":null,"vatNumber":null,"phoneNumber":null,"faxNumber":null,"email":null,"webSite":null,"footer":null,"eoriNumber":null,"address_id":null,"archiveLogoId":null,"archiveFooterId":null,"archiveStampId":null,"active":false,"version":0,"created_at":"2026-10-29T15:34:17.000000Z","updated_at":"2026-11-03T13:37:42.000000Z","domain":null,"stampUrl":null},"products":[{"id":51,"deal_id":68,"product_id":4,"pack_type_id":null,"currency_id":1,"quantity":50,"unitPrice":1200,"pricingType":null,"vat":0,"total":60000,"associatedContractId":null,"associatedProductId":null,"status":"PENDING","version":0,"created_at":"2026-11-04T09:44:55.000000Z","updated_at":"2026-11-04T09:44:55.000000Z","product":{"id":4,"name":"Ferrous Scrap Metal","description":null,"code":"FERROUS","productCategory":"FERROUS","chemicalFormula":null,"unitOfMeasurement":null,"hsCode":null,"active":false,"version":0,"created_at":"2026-10-29T15:35:36.000000Z","updated_at":"2026-11-03T13:24:23.000000Z","basel_code":null,"ec_waste_code":null}}]}}', '2026-11-04 09:44:55', '2026-11-04 09:44:55'),
+(100, 'CONTRACT', 86, '2026-11-04 09:44:55', 1, 'CANCEL', NULL, '2026-11-04 09:44:55', '2026-11-04 09:44:55'),
+(101, 'CONTRACT', 87, '2026-11-04 09:56:43', 1, 'CREATE', '{"date":"2026-11-04T09:56:43.000000Z","type":"BUY","stage_id":2,"purchase_id":69,"sale_id":null,"contractStatus":"ACTIVE","orderDescription":null,"active":true,"loadingDate":"2026-11-18T09:56:43.000000Z","deliveryTerms":"CIF","modeOfPayment":"100%","updated_at":"2026-11-04T09:56:43.000000Z","created_at":"2026-11-04T09:56:43.000000Z","id":87,"orderCode":"MENONFERROUS26-48","purchase":{"id":69,"meta_company_id":2,"contact_id":2,"contact_representative_id":null,"meta_representative_id":null,"address_id":null,"destination_address_id":null,"currency_id":1,"payment_type_id":null,"payment_terms_type_id":null,"bank_account_id":null,"dollarConvertionRate":1,"total":368725,"netTotal":368725,"dealPaymentStatus":"OPEN","version":0,"created_at":"2026-11-04T09:56:43.000000Z","updated_at":"2026-11-04T09:56:43.000000Z","paymentDate":null,"incoterms":"CIF JEDDAH","customerOrderNumber":null,"paymentTerms":"100%","advancedPayment":null,"notes":null,"meta_company":{"id":2,"name":"Menon Trading LLC","code":"MENON","countryId":null,"logoUrl":null,"companyNumber":null,"vatNumber":null,"phoneNumber":null,"faxNumber":null,"email":null,"webSite":null,"footer":null,"eoriNumber":null,"address_id":null,"archiveLogoId":null,"archiveFooterId":null,"archiveStampId":null,"active":false,"version":0,"created_at":"2026-10-29T15:34:17.000000Z","updated_at":"2026-11-03T13:37:42.000000Z","domain":null,"stampUrl":null},"products":[{"id":52,"deal_id":69,"product_id":4,"pack_type_id":null,"currency_id":1,"quantity":150.5,"unitPrice":2450,"pricingType":null,"vat":0,"total":368725,"associatedContractId":null,"associatedProductId":null,"status":"PENDING","version":0,"created_at":"2026-11-04T09:56:43.000000Z","updated_at":"2026-11-04T09:56:43.000000Z","product":{"id":4,"name":"Ferrous Scrap Metal","description":null,"code":"FERROUS","productCategory":"FERROUS","chemicalFormula":null,"unitOfMeasurement":null,"hsCode":null,"active":false,"version":0,"created_at":"2026-10-29T15:35:36.000000Z","updated_at":"2026-11-03T13:24:23.000000Z","basel_code":null,"ec_waste_code":null}}]}}', '2026-11-04 09:56:43', '2026-11-04 09:56:43'),
+(102, 'CONTRACT', 1, '2026-11-04 09:56:43', 1, 'STAGE_TRANSITION', '{"stage":{"from":"Draft","to":"DRAFT"}}', '2026-11-04 09:56:43', '2026-11-04 09:56:43'),
+(103, 'CONTRACT', 88, '2026-11-04 09:56:43', 1, 'CREATE', '{"date":"2026-11-04T09:56:43.000000Z","type":"BUY","stage_id":2,"purchase_id":70,"sale_id":null,"contractStatus":"ACTIVE","orderDescription":null,"active":true,"loadingDate":"2026-11-18T09:56:43.000000Z","deliveryTerms":"CIF","modeOfPayment":"100%","updated_at":"2026-11-04T09:56:43.000000Z","created_at":"2026-11-04T09:56:43.000000Z","id":88,"orderCode":"MENONFERROUS26-49","purchase":{"id":70,"meta_company_id":2,"contact_id":2,"contact_representative_id":null,"meta_representative_id":null,"address_id":null,"destination_address_id":null,"currency_id":1,"payment_type_id":null,"payment_terms_type_id":null,"bank_account_id":null,"dollarConvertionRate":1,"total":60000,"netTotal":60000,"dealPaymentStatus":"OPEN","version":0,"created_at":"2026-11-04T09:56:43.000000Z","updated_at":"2026-11-04T09:56:43.000000Z","paymentDate":null,"incoterms":"CIF JEDDAH","customerOrderNumber":null,"paymentTerms":"100%","advancedPayment":null,"notes":null,"meta_company":{"id":2,"name":"Menon Trading LLC","code":"MENON","countryId":null,"logoUrl":null,"companyNumber":null,"vatNumber":null,"phoneNumber":null,"faxNumber":null,"email":null,"webSite":null,"footer":null,"eoriNumber":null,"address_id":null,"archiveLogoId":null,"archiveFooterId":null,"archiveStampId":null,"active":false,"version":0,"created_at":"2026-10-29T15:34:17.000000Z","updated_at":"2026-11-03T13:37:42.000000Z","domain":null,"stampUrl":null},"products":[{"id":53,"deal_id":70,"product_id":4,"pack_type_id":null,"currency_id":1,"quantity":50,"unitPrice":1200,"pricingType":null,"vat":0,"total":60000,"associatedContractId":null,"associatedProductId":null,"status":"PENDING","version":0,"created_at":"2026-11-04T09:56:43.000000Z","updated_at":"2026-11-04T09:56:43.000000Z","product":{"id":4,"name":"Ferrous Scrap Metal","description":null,"code":"FERROUS","productCategory":"FERROUS","chemicalFormula":null,"unitOfMeasurement":null,"hsCode":null,"active":false,"version":0,"created_at":"2026-10-29T15:35:36.000000Z","updated_at":"2026-11-03T13:24:23.000000Z","basel_code":null,"ec_waste_code":null}}]}}', '2026-11-04 09:56:43', '2026-11-04 09:56:43'),
+(104, 'CONTRACT', 89, '2026-11-04 09:56:43', 1, 'CANCEL', NULL, '2026-11-04 09:56:43', '2026-11-04 09:56:43'),
+(105, 'CONTRACT', 90, '2026-11-04 10:06:39', 1, 'CREATE', '{"date":"2026-11-04T10:06:39.000000Z","type":"BUY","stage_id":2,"purchase_id":71,"sale_id":null,"contractStatus":"ACTIVE","orderDescription":null,"active":true,"loadingDate":"2026-11-18T10:06:39.000000Z","deliveryTerms":"CIF","modeOfPayment":"100%","updated_at":"2026-11-04T10:06:39.000000Z","created_at":"2026-11-04T10:06:39.000000Z","id":90,"orderCode":"MENONFERROUS26-50","purchase":{"id":71,"meta_company_id":2,"contact_id":2,"contact_representative_id":null,"meta_representative_id":null,"address_id":null,"destination_address_id":null,"currency_id":1,"payment_type_id":null,"payment_terms_type_id":null,"bank_account_id":null,"dollarConvertionRate":1,"total":368725,"netTotal":368725,"dealPaymentStatus":"OPEN","version":0,"created_at":"2026-11-04T10:06:39.000000Z","updated_at":"2026-11-04T10:06:39.000000Z","paymentDate":null,"incoterms":"CIF JEDDAH","customerOrderNumber":null,"paymentTerms":"100%","advancedPayment":null,"notes":null,"meta_company":{"id":2,"name":"Menon Trading LLC","code":"MENON","countryId":null,"logoUrl":null,"companyNumber":null,"vatNumber":null,"phoneNumber":null,"faxNumber":null,"email":null,"webSite":null,"footer":null,"eoriNumber":null,"address_id":null,"archiveLogoId":null,"archiveFooterId":null,"archiveStampId":null,"active":false,"version":0,"created_at":"2026-10-29T15:34:17.000000Z","updated_at":"2026-11-03T13:37:42.000000Z","domain":null,"stampUrl":null},"products":[{"id":54,"deal_id":71,"product_id":4,"pack_type_id":null,"currency_id":1,"quantity":150.5,"unitPrice":2450,"pricingType":null,"vat":0,"total":368725,"associatedContractId":null,"associatedProductId":null,"status":"PENDING","version":0,"created_at":"2026-11-04T10:06:39.000000Z","updated_at":"2026-11-04T10:06:39.000000Z","product":{"id":4,"name":"Ferrous Scrap Metal","description":null,"code":"FERROUS","productCategory":"FERROUS","chemicalFormula":null,"unitOfMeasurement":null,"hsCode":null,"active":false,"version":0,"created_at":"2026-10-29T15:35:36.000000Z","updated_at":"2026-11-03T13:24:23.000000Z","basel_code":null,"ec_waste_code":null}}]}}', '2026-11-04 10:06:39', '2026-11-04 10:06:39'),
+(106, 'CONTRACT', 1, '2026-11-04 10:06:39', 1, 'STAGE_TRANSITION', '{"stage":{"from":"DRAFT","to":"Draft"}}', '2026-11-04 10:06:39', '2026-11-04 10:06:39'),
+(107, 'CONTRACT', 91, '2026-11-04 10:06:39', 1, 'CREATE', '{"date":"2026-11-04T10:06:39.000000Z","type":"BUY","stage_id":2,"purchase_id":72,"sale_id":null,"contractStatus":"ACTIVE","orderDescription":null,"active":true,"loadingDate":"2026-11-18T10:06:39.000000Z","deliveryTerms":"CIF","modeOfPayment":"100%","updated_at":"2026-11-04T10:06:39.000000Z","created_at":"2026-11-04T10:06:39.000000Z","id":91,"orderCode":"MENONFERROUS26-51","purchase":{"id":72,"meta_company_id":2,"contact_id":2,"contact_representative_id":null,"meta_representative_id":null,"address_id":null,"destination_address_id":null,"currency_id":1,"payment_type_id":null,"payment_terms_type_id":null,"bank_account_id":null,"dollarConvertionRate":1,"total":60000,"netTotal":60000,"dealPaymentStatus":"OPEN","version":0,"created_at":"2026-11-04T10:06:39.000000Z","updated_at":"2026-11-04T10:06:39.000000Z","paymentDate":null,"incoterms":"CIF JEDDAH","customerOrderNumber":null,"paymentTerms":"100%","advancedPayment":null,"notes":null,"meta_company":{"id":2,"name":"Menon Trading LLC","code":"MENON","countryId":null,"logoUrl":null,"companyNumber":null,"vatNumber":null,"phoneNumber":null,"faxNumber":null,"email":null,"webSite":null,"footer":null,"eoriNumber":null,"address_id":null,"archiveLogoId":null,"archiveFooterId":null,"archiveStampId":null,"active":false,"version":0,"created_at":"2026-10-29T15:34:17.000000Z","updated_at":"2026-11-03T13:37:42.000000Z","domain":null,"stampUrl":null},"products":[{"id":55,"deal_id":72,"product_id":4,"pack_type_id":null,"currency_id":1,"quantity":50,"unitPrice":1200,"pricingType":null,"vat":0,"total":60000,"associatedContractId":null,"associatedProductId":null,"status":"PENDING","version":0,"created_at":"2026-11-04T10:06:39.000000Z","updated_at":"2026-11-04T10:06:39.000000Z","product":{"id":4,"name":"Ferrous Scrap Metal","description":null,"code":"FERROUS","productCategory":"FERROUS","chemicalFormula":null,"unitOfMeasurement":null,"hsCode":null,"active":false,"version":0,"created_at":"2026-10-29T15:35:36.000000Z","updated_at":"2026-11-03T13:24:23.000000Z","basel_code":null,"ec_waste_code":null}}]}}', '2026-11-04 10:06:39', '2026-11-04 10:06:39'),
+(108, 'CONTRACT', 92, '2026-11-04 10:06:39', 1, 'CANCEL', NULL, '2026-11-04 10:06:39', '2026-11-04 10:06:39'),
+(109, 'CONTRACT', 93, '2026-11-04 10:09:06', 1, 'CREATE', '{"date":"2026-11-04T10:09:06.000000Z","type":"BUY","stage_id":2,"purchase_id":73,"sale_id":null,"contractStatus":"ACTIVE","orderDescription":null,"active":true,"loadingDate":"2026-11-18T10:09:06.000000Z","deliveryTerms":"CIF","modeOfPayment":"100%","updated_at":"2026-11-04T10:09:06.000000Z","created_at":"2026-11-04T10:09:06.000000Z","id":93,"orderCode":"MENONFERROUS26-52","purchase":{"id":73,"meta_company_id":2,"contact_id":2,"contact_representative_id":null,"meta_representative_id":null,"address_id":null,"destination_address_id":null,"currency_id":1,"payment_type_id":null,"payment_terms_type_id":null,"bank_account_id":null,"dollarConvertionRate":1,"total":368725,"netTotal":368725,"dealPaymentStatus":"OPEN","version":0,"created_at":"2026-11-04T10:09:06.000000Z","updated_at":"2026-11-04T10:09:06.000000Z","paymentDate":null,"incoterms":"CIF JEDDAH","customerOrderNumber":null,"paymentTerms":"100%","advancedPayment":null,"notes":null,"meta_company":{"id":2,"name":"Menon Trading LLC","code":"MENON","countryId":null,"logoUrl":null,"companyNumber":null,"vatNumber":null,"phoneNumber":null,"faxNumber":null,"email":null,"webSite":null,"footer":null,"eoriNumber":null,"address_id":null,"archiveLogoId":null,"archiveFooterId":null,"archiveStampId":null,"active":false,"version":0,"created_at":"2026-10-29T15:34:17.000000Z","updated_at":"2026-11-03T13:37:42.000000Z","domain":null,"stampUrl":null},"products":[{"id":56,"deal_id":73,"product_id":4,"pack_type_id":null,"currency_id":1,"quantity":150.5,"unitPrice":2450,"pricingType":null,"vat":0,"total":368725,"associatedContractId":null,"associatedProductId":null,"status":"PENDING","version":0,"created_at":"2026-11-04T10:09:06.000000Z","updated_at":"2026-11-04T10:09:06.000000Z","product":{"id":4,"name":"Ferrous Scrap Metal","description":null,"code":"FERROUS","productCategory":"FERROUS","chemicalFormula":null,"unitOfMeasurement":null,"hsCode":null,"active":false,"version":0,"created_at":"2026-10-29T15:35:36.000000Z","updated_at":"2026-11-03T13:24:23.000000Z","basel_code":null,"ec_waste_code":null}}]}}', '2026-11-04 10:09:06', '2026-11-04 10:09:06'),
+(110, 'CONTRACT', 1, '2026-11-04 10:09:06', 1, 'STAGE_TRANSITION', '{"stage":{"from":"Draft","to":"DRAFT"}}', '2026-11-04 10:09:06', '2026-11-04 10:09:06'),
+(111, 'CONTRACT', 94, '2026-11-04 10:09:06', 1, 'CREATE', '{"date":"2026-11-04T10:09:06.000000Z","type":"BUY","stage_id":2,"purchase_id":74,"sale_id":null,"contractStatus":"ACTIVE","orderDescription":null,"active":true,"loadingDate":"2026-11-18T10:09:06.000000Z","deliveryTerms":"CIF","modeOfPayment":"100%","updated_at":"2026-11-04T10:09:06.000000Z","created_at":"2026-11-04T10:09:06.000000Z","id":94,"orderCode":"MENONFERROUS26-53","purchase":{"id":74,"meta_company_id":2,"contact_id":2,"contact_representative_id":null,"meta_representative_id":null,"address_id":null,"destination_address_id":null,"currency_id":1,"payment_type_id":null,"payment_terms_type_id":null,"bank_account_id":null,"dollarConvertionRate":1,"total":60000,"netTotal":60000,"dealPaymentStatus":"OPEN","version":0,"created_at":"2026-11-04T10:09:06.000000Z","updated_at":"2026-11-04T10:09:06.000000Z","paymentDate":null,"incoterms":"CIF JEDDAH","customerOrderNumber":null,"paymentTerms":"100%","advancedPayment":null,"notes":null,"meta_company":{"id":2,"name":"Menon Trading LLC","code":"MENON","countryId":null,"logoUrl":null,"companyNumber":null,"vatNumber":null,"phoneNumber":null,"faxNumber":null,"email":null,"webSite":null,"footer":null,"eoriNumber":null,"address_id":null,"archiveLogoId":null,"archiveFooterId":null,"archiveStampId":null,"active":false,"version":0,"created_at":"2026-10-29T15:34:17.000000Z","updated_at":"2026-11-03T13:37:42.000000Z","domain":null,"stampUrl":null},"products":[{"id":57,"deal_id":74,"product_id":4,"pack_type_id":null,"currency_id":1,"quantity":50,"unitPrice":1200,"pricingType":null,"vat":0,"total":60000,"associatedContractId":null,"associatedProductId":null,"status":"PENDING","version":0,"created_at":"2026-11-04T10:09:06.000000Z","updated_at":"2026-11-04T10:09:06.000000Z","product":{"id":4,"name":"Ferrous Scrap Metal","description":null,"code":"FERROUS","productCategory":"FERROUS","chemicalFormula":null,"unitOfMeasurement":null,"hsCode":null,"active":false,"version":0,"created_at":"2026-10-29T15:35:36.000000Z","updated_at":"2026-11-03T13:24:23.000000Z","basel_code":null,"ec_waste_code":null}}]}}', '2026-11-04 10:09:06', '2026-11-04 10:09:06'),
+(112, 'CONTRACT', 95, '2026-11-04 10:09:06', 1, 'CANCEL', NULL, '2026-11-04 10:09:06', '2026-11-04 10:09:06');
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `migrations`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `migrations`;
-CREATE TABLE IF NOT EXISTS `migrations` (
+CREATE TABLE `migrations` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `migration` varchar(255) NOT NULL,
-  `batch` int(11) NOT NULL,
+  `migration` varchar(191) NOT NULL,
+  `batch` bigint(20) UNSIGNED NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -1065,17 +1291,21 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
 (18, '2026_11_04_030619_add_details_to_offer_table', 7),
 (19, '2026_11_04_040000_add_fields_to_contracts_and_deals_tables', 8),
 (20, '2026_11_04_043000_add_transport_fields_to_contracts_and_packing', 9),
-(21, '2026_11_04_050000_add_email_to_users_table', 10);
+(21, '2026_11_04_050000_add_email_to_users_table', 10),
+(22, '2026_11_04_060000_add_name_and_abbreviation_to_currency_table', 11),
+(23, '2026_11_04_070000_add_description_to_department_table', 12);
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `models`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `models`;
-CREATE TABLE IF NOT EXISTS `models` (
+CREATE TABLE `models` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NULL,
-  `description` varchar(255) NULL,
-  `active` tinyint(1) NOT NULL DEFAULT '0',
+  `name` varchar(191) NOT NULL,
+  `description` varchar(191) NULL DEFAULT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
@@ -1091,38 +1321,40 @@ INSERT INTO `models` (`id`, `name`, `description`, `active`, `version`, `created
 (2, 'Fast-Track Spot Trading Pipeline', 'Spot market deals pipeline', 1, 0, '2026-10-29 15:21:13', '2026-10-29 15:21:13');
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `offer`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `offer`;
-CREATE TABLE IF NOT EXISTS `offer` (
+CREATE TABLE `offer` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `orderCode` varchar(255) NULL,
-  `type` varchar(255) NULL,
-  `meta_company_id` bigint(20) UNSIGNED NULL,
-  `contact_id` bigint(20) UNSIGNED NULL,
-  `product_id` bigint(20) UNSIGNED NULL,
-  `quantity` double(12,4) NULL DEFAULT '0.0000',
-  `unitPrice` double(12,4) NULL DEFAULT '0.0000',
-  `total` double(12,4) NULL DEFAULT '0.0000',
-  `currency_id` bigint(20) UNSIGNED NULL,
-  `status` varchar(255) NULL,
+  `orderCode` varchar(191) NULL DEFAULT NULL,
+  `type` varchar(191) NOT NULL,
+  `meta_company_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `contact_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `product_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `quantity` double NOT NULL DEFAULT '0',
+  `unitPrice` double NOT NULL DEFAULT '0',
+  `total` double NOT NULL DEFAULT '0',
+  `currency_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `status` varchar(191) NOT NULL DEFAULT 'OPEN',
   `validUntil` datetime NULL DEFAULT NULL,
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
-  `subject` varchar(255) NULL,
-  `code` varchar(255) NULL,
-  `contract_code` varchar(255) NULL,
+  `subject` varchar(191) NULL DEFAULT NULL,
+  `code` varchar(191) NULL DEFAULT NULL,
+  `contract_code` varchar(191) NULL DEFAULT NULL,
   `offer_date` datetime NULL DEFAULT NULL,
   `accepted_at` datetime NULL DEFAULT NULL,
-  `description` text NULL,
-  `internal_notes` text NULL,
-  `delivery_plan` varchar(255) NULL,
-  `quotational_period` varchar(255) NULL,
-  `weights` varchar(255) NULL,
-  `payment_description` varchar(255) NULL,
-  `terms` varchar(255) NULL,
-  `extra_information` text NULL,
+  `description` longtext NULL DEFAULT NULL,
+  `internal_notes` longtext NULL DEFAULT NULL,
+  `delivery_plan` varchar(191) NULL DEFAULT NULL,
+  `quotational_period` varchar(191) NULL DEFAULT NULL,
+  `weights` varchar(191) NULL DEFAULT NULL,
+  `payment_description` varchar(191) NULL DEFAULT NULL,
+  `terms` varchar(191) NULL DEFAULT NULL,
+  `extra_information` longtext NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -1135,24 +1367,26 @@ INSERT INTO `offer` (`id`, `orderCode`, `type`, `meta_company_id`, `contact_id`,
 (21, 'OFFER-00021', 'SELL', NULL, NULL, NULL, 0, 0, 0, NULL, 'OPEN', NULL, 0, '2026-11-04 08:00:00', '2026-11-04 08:00:00', '125 MT ZINC SHG 99.995%', 'OFFER-00021', NULL, '2026-11-04 08:00:00', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `packinglists`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `packinglists`;
-CREATE TABLE IF NOT EXISTS `packinglists` (
+CREATE TABLE `packinglists` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `contract_id` bigint(20) UNSIGNED NULL,
-  `vesselName` varchar(255) NULL,
-  `shippingLine` varchar(255) NULL,
-  `blNumber` varchar(255) NULL,
-  `portOfLoading` varchar(255) NULL,
-  `portOfDischarge` varchar(255) NULL,
-  `status` varchar(255) NULL,
+  `contract_id` bigint(20) UNSIGNED NOT NULL,
+  `vesselName` varchar(191) NULL DEFAULT NULL,
+  `shippingLine` varchar(191) NULL DEFAULT NULL,
+  `blNumber` varchar(191) NULL DEFAULT NULL,
+  `portOfLoading` varchar(191) NULL DEFAULT NULL,
+  `portOfDischarge` varchar(191) NULL DEFAULT NULL,
+  `status` varchar(191) NOT NULL DEFAULT 'ACTIVE',
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
-  `packingListCode` varchar(255) NULL,
-  `deliveryNote` varchar(255) NULL,
-  `date` date NULL DEFAULT NULL,
+  `packingListCode` varchar(191) NULL DEFAULT NULL,
+  `deliveryNote` varchar(191) NULL DEFAULT NULL,
+  `date` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -1165,23 +1399,25 @@ INSERT INTO `packinglists` (`id`, `contract_id`, `vesselName`, `shippingLine`, `
 (2, 20, NULL, NULL, 'MEDUDV499790', NULL, NULL, 'ACTIVE', 0, '2026-11-04 03:38:57', '2026-11-04 03:38:57', 'ME-CI26-437', NULL, '2026-09-23');
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `packs`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `packs`;
-CREATE TABLE IF NOT EXISTS `packs` (
+CREATE TABLE `packs` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `packing_list_id` bigint(20) UNSIGNED NULL,
-  `pack_type_id` bigint(20) UNSIGNED NULL,
-  `containerNumber` varchar(255) NULL,
-  `sealNumber` varchar(255) NULL,
-  `grossWeight` double(12,4) NULL DEFAULT '0.0000',
-  `netWeight` double(12,4) NULL DEFAULT '0.0000',
-  `tareWeight` double(12,4) NULL DEFAULT '0.0000',
-  `quantity` int(11) NULL DEFAULT '0',
+  `packing_list_id` bigint(20) UNSIGNED NOT NULL,
+  `pack_type_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `containerNumber` varchar(191) NULL DEFAULT NULL,
+  `sealNumber` varchar(191) NULL DEFAULT NULL,
+  `grossWeight` double NOT NULL DEFAULT '0',
+  `netWeight` double NOT NULL DEFAULT '0',
+  `tareWeight` double NOT NULL DEFAULT '0',
+  `quantity` bigint(20) UNSIGNED NOT NULL DEFAULT '1',
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
-  `product_id` bigint(20) UNSIGNED NULL,
+  `product_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -1190,17 +1426,19 @@ CREATE TABLE IF NOT EXISTS `packs` (
 --
 
 INSERT INTO `packs` (`id`, `packing_list_id`, `pack_type_id`, `containerNumber`, `sealNumber`, `grossWeight`, `netWeight`, `tareWeight`, `quantity`, `version`, `created_at`, `updated_at`, `product_id`) VALUES
-(1, 1, 3, 'MSCU1234567', 'SL-998877', 25200, 25000, 200, 25, 0, '2026-10-29 15:21:13', '2026-10-29 15:21:13', NULL),
-(2, 1, 3, 'MSCU7654321', 'SL-998878', 25200, 25000, 200, 25, 0, '2026-10-29 15:21:13', '2026-10-29 15:21:13', NULL),
-(3, 2, 5, 'TCLU7531178', NULL, 101, 99.5, 0, 25, 0, '2026-11-04 03:38:57', '2026-11-04 03:38:57', 11);
+(1, 1, NULL, 'MSCU1234567', 'SL-998877', 25200, 25000, 200, 25, 0, '2026-10-29 15:21:13', '2026-10-29 15:21:13', NULL),
+(2, 1, NULL, 'MSCU7654321', 'SL-998878', 25200, 25000, 200, 25, 0, '2026-10-29 15:21:13', '2026-10-29 15:21:13', NULL),
+(3, 2, NULL, 'TCLU7531178', NULL, 101, 99.5, 0, 25, 0, '2026-11-04 03:38:57', '2026-11-04 03:38:57', 11);
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `packtype`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `packtype`;
-CREATE TABLE IF NOT EXISTS `packtype` (
+CREATE TABLE `packtype` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `description` varchar(255) NULL,
+  `description` varchar(191) NOT NULL,
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
@@ -1212,30 +1450,45 @@ CREATE TABLE IF NOT EXISTS `packtype` (
 --
 
 INSERT INTO `packtype` (`id`, `description`, `version`, `created_at`, `updated_at`) VALUES
-(1, 'Bags', 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12'),
-(2, 'Drums', 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12'),
-(3, 'Pallets', 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12'),
-(4, 'Bulk', 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12'),
-(5, 'Bundle', 0, '2026-11-04 03:38:57', '2026-11-04 03:38:57');
+(1, 'Big Bags', 0, '2026-11-04 09:53:30', '2026-11-04 09:53:30'),
+(2, 'Pallets', 0, '2026-11-04 09:53:30', '2026-11-04 09:53:30'),
+(3, 'Drums', 0, '2026-11-04 09:53:30', '2026-11-04 09:53:30'),
+(4, 'Wooden Boxes', 0, '2026-11-04 09:53:30', '2026-11-04 09:53:30'),
+(5, 'Metal Boxes', 0, '2026-11-04 09:53:30', '2026-11-04 09:53:30'),
+(6, 'Half Drums', 0, '2026-11-04 09:53:30', '2026-11-04 09:53:30'),
+(7, 'Loose', 0, '2026-11-04 09:53:30', '2026-11-04 09:53:30'),
+(8, 'Bundle', 0, '2026-11-04 09:53:30', '2026-11-04 09:53:30'),
+(9, 'Boxes', 0, '2026-11-04 09:53:30', '2026-11-04 09:53:30'),
+(10, 'Packages', 0, '2026-11-04 09:53:30', '2026-11-04 09:53:30'),
+(11, 'Bags', 0, '2026-11-04 09:53:30', '2026-11-04 09:53:30'),
+(12, 'Bulk', 0, '2026-11-04 09:53:30', '2026-11-04 09:53:30'),
+(13, 'Cartons', 0, '2026-11-04 09:53:30', '2026-11-04 09:53:30'),
+(14, 'Wooden Crates', 0, '2026-11-04 09:56:47', '2026-11-04 09:56:47'),
+(15, 'Wooden Crates', 0, '2026-11-04 10:06:41', '2026-11-04 10:06:41'),
+(16, 'Wooden Crates', 0, '2026-11-04 10:09:14', '2026-11-04 10:09:14');
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `password_reset_tokens`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `password_reset_tokens`;
-CREATE TABLE IF NOT EXISTS `password_reset_tokens` (
-  `email` varchar(255) NOT NULL,
-  `token` varchar(255) NOT NULL,
+CREATE TABLE `password_reset_tokens` (
+  `email` varchar(191) NOT NULL,
+  `token` varchar(191) NOT NULL,
   `created_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `paymenttermstype`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `paymenttermstype`;
-CREATE TABLE IF NOT EXISTS `paymenttermstype` (
+CREATE TABLE `paymenttermstype` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `description` varchar(255) NULL,
+  `description` varchar(191) NOT NULL,
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
@@ -1247,19 +1500,27 @@ CREATE TABLE IF NOT EXISTS `paymenttermstype` (
 --
 
 INSERT INTO `paymenttermstype` (`id`, `description`, `version`, `created_at`, `updated_at`) VALUES
-(1, 'CAD (Cash Against Documents)', 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12'),
-(2, 'Letter of Credit (LC)', 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12'),
-(3, 'Net 30 Days', 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12'),
-(4, '100% TT in Advance', 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12'),
-(5, '%', 0, '2026-11-04 03:22:02', '2026-11-04 03:22:02');
+(1, 'Days', 0, '2026-11-04 10:01:21', '2026-11-04 10:01:21'),
+(2, 'Months', 0, '2026-11-04 10:01:21', '2026-11-04 10:01:21'),
+(3, 'Yearly', 0, '2026-11-04 10:01:21', '2026-11-04 10:01:21'),
+(4, 'Quarter', 0, '2026-11-04 10:01:21', '2026-11-04 10:01:21'),
+(5, 'Weeks', 0, '2026-11-04 10:01:21', '2026-11-04 10:01:21'),
+(6, 'Days after BL', 0, '2026-11-04 10:01:21', '2026-11-04 10:01:21'),
+(7, '%', 0, '2026-11-04 10:01:21', '2026-11-04 10:01:21'),
+(8, '..', 0, '2026-11-04 10:01:21', '2026-11-04 10:01:21'),
+(9, 'Against', 0, '2026-11-04 10:01:21', '2026-11-04 10:01:21'),
+(10, 'Fortnightly', 0, '2026-11-04 10:06:42', '2026-11-04 10:06:42'),
+(11, 'Fortnightly', 0, '2026-11-04 10:09:14', '2026-11-04 10:09:14');
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `paymenttype`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `paymenttype`;
-CREATE TABLE IF NOT EXISTS `paymenttype` (
+CREATE TABLE `paymenttype` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `description` varchar(255) NULL,
+  `description` varchar(191) NOT NULL,
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
@@ -1271,20 +1532,34 @@ CREATE TABLE IF NOT EXISTS `paymenttype` (
 --
 
 INSERT INTO `paymenttype` (`id`, `description`, `version`, `created_at`, `updated_at`) VALUES
-(1, 'Wire Transfer (Swift)', 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12'),
-(2, 'Telegraphic Transfer (TT)', 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12'),
-(3, 'Bank Cheque', 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12'),
-(4, 'Upfront', 0, '2026-11-04 03:22:02', '2026-11-04 03:22:02');
+(1, 'Sight LC', 0, '2026-11-04 10:01:21', '2026-11-04 10:01:21'),
+(2, 'Deferred LC', 0, '2026-11-04 10:01:21', '2026-11-04 10:01:21'),
+(3, 'CAD', 0, '2026-11-04 10:01:21', '2026-11-04 10:01:21'),
+(4, 'Barter', 0, '2026-11-04 10:01:21', '2026-11-04 10:01:21'),
+(5, 'Part Payment', 0, '2026-11-04 10:01:21', '2026-11-04 10:01:21'),
+(6, 'International Payment', 0, '2026-11-04 10:01:21', '2026-11-04 10:01:21'),
+(7, 'Swift', 0, '2026-11-04 10:01:21', '2026-11-04 10:01:21'),
+(8, 'Bacs', 0, '2026-11-04 10:01:21', '2026-11-04 10:01:21'),
+(9, 'Advance', 0, '2026-11-04 10:01:21', '2026-11-04 10:01:21'),
+(10, 'Credit', 0, '2026-11-04 10:01:21', '2026-11-04 10:01:21'),
+(11, 'Bank Cheque', 0, '2026-11-04 10:01:21', '2026-11-04 10:01:21'),
+(12, 'Wire Transfer', 0, '2026-11-04 10:01:21', '2026-11-04 10:01:21'),
+(13, 'Telegraphic Transfer (TT)', 0, '2026-11-04 10:01:21', '2026-11-04 10:01:21'),
+(14, 'Cash', 0, '2026-11-04 10:01:21', '2026-11-04 10:01:21'),
+(15, 'Escrow Payment', 0, '2026-11-04 10:06:42', '2026-11-04 10:06:42'),
+(16, 'Escrow Payment', 0, '2026-11-04 10:09:14', '2026-11-04 10:09:14');
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `permissions`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `permissions`;
-CREATE TABLE IF NOT EXISTS `permissions` (
+CREATE TABLE `permissions` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `user_id` bigint(20) UNSIGNED NULL,
-  `company_id` bigint(20) UNSIGNED NULL,
-  `accessgroup_id` bigint(20) UNSIGNED NULL,
+  `user_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `company_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `accessgroup_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -1298,22 +1573,23 @@ INSERT INTO `permissions` (`id`, `user_id`, `company_id`, `accessgroup_id`, `cre
 (1, 1, 1, 1, '2026-10-29 15:21:13', '2026-10-29 15:21:13');
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `personal_access_tokens`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `personal_access_tokens`;
-CREATE TABLE IF NOT EXISTS `personal_access_tokens` (
+CREATE TABLE `personal_access_tokens` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `tokenable_type` varchar(255) NULL,
-  `tokenable_id` bigint(20) UNSIGNED NULL,
-  `name` varchar(255) NULL,
-  `token` varchar(64) NOT NULL,
-  `abilities` text NULL,
+  `tokenable_type` varchar(191) NOT NULL,
+  `tokenable_id` bigint(20) UNSIGNED NOT NULL,
+  `name` varchar(191) NOT NULL,
+  `token` varchar(191) NOT NULL,
+  `abilities` longtext NULL DEFAULT NULL,
   `last_used_at` datetime NULL DEFAULT NULL,
   `expires_at` datetime NULL DEFAULT NULL,
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `personal_access_tokens_token_unique` (`token`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -1335,19 +1611,31 @@ INSERT INTO `personal_access_tokens` (`id`, `tokenable_type`, `tokenable_id`, `n
 (12, 'App\\Models\\User', 1, 'META_ERP_TOKEN', '7a279194d25ce3c854dd43efbb34c793edfad9460e37a595f1a5b7786ae85fc9', '["*"]', NULL, NULL, '2026-11-04 04:02:02', '2026-11-04 04:02:02'),
 (13, 'App\\Models\\User', 1, 'META_ERP_TOKEN', '88e013e135d6ea755073acb969caba6ba18354f4f71ccb4d7741fb4030150bf0', '["*"]', NULL, NULL, '2026-11-04 07:21:13', '2026-11-04 07:21:13'),
 (14, 'App\\Models\\User', 1, 'META_ERP_TOKEN', 'cf70a7b0f420a1b760a1f5a05c472d0d0a491196b0e8119e934634fff944bc65', '["*"]', NULL, NULL, '2026-11-04 07:52:26', '2026-11-04 07:52:26'),
-(15, 'App\\Models\\User', 1, 'META_ERP_TOKEN', 'bccc81e78832ee8c9777d56b95cbe9edef953d19ed43f8005c9d197205d41ab4', '["*"]', NULL, NULL, '2026-11-04 07:57:29', '2026-11-04 07:57:29');
+(15, 'App\\Models\\User', 1, 'META_ERP_TOKEN', 'bccc81e78832ee8c9777d56b95cbe9edef953d19ed43f8005c9d197205d41ab4', '["*"]', NULL, NULL, '2026-11-04 07:57:29', '2026-11-04 07:57:29'),
+(16, 'App\\Models\\User', 1, 'META_ERP_TOKEN', 'c77e5fbcdc4f2be140c921d8b7a01e627a4fd4821bcceadb1049ffe7245f6580', '["*"]', NULL, NULL, '2026-11-04 08:33:05', '2026-11-04 08:33:05'),
+(17, 'App\\Models\\User', 1, 'META_ERP_TOKEN', '974d246fbbe0b753c46ddb8323f9d5bafe785760b9c923cc6cbb0b68579529f6', '["*"]', NULL, NULL, '2026-11-04 08:48:15', '2026-11-04 08:48:15'),
+(18, 'App\\Models\\User', 1, 'META_ERP_TOKEN', '6ab2be0ef868400ae7cf9dfd684d0dc9a1469cda2fa16bda7e67d81b1b7513b0', '["*"]', NULL, NULL, '2026-11-04 08:48:44', '2026-11-04 08:48:44'),
+(19, 'App\\Models\\User', 1, 'META_ERP_TOKEN', '87fd7e20c7bdf5763ffa3b521da895cf03ffda629db87f446f58527a03d85191', '["*"]', NULL, NULL, '2026-11-04 09:09:16', '2026-11-04 09:09:16'),
+(20, 'App\\Models\\User', 1, 'META_ERP_TOKEN', '5a07b8fbc173fcfa7c3252ec209a3e00dc0b8a3d7c25de8be1b74967f837ee71', '["*"]', NULL, NULL, '2026-11-04 09:11:17', '2026-11-04 09:11:17'),
+(21, 'App\\Models\\User', 1, 'META_ERP_TOKEN', '549065b1bedc8b7cef0713fa41a64f01acbb9714d198e4f4fc6de651c3e0a4c4', '["*"]', NULL, NULL, '2026-11-04 09:29:06', '2026-11-04 09:29:06'),
+(22, 'App\\Models\\User', 1, 'META_ERP_TOKEN', 'e82a5b513b6882d34e083aa2915813ed86816a3355c8a642d30001aee5a86e2b', '["*"]', NULL, NULL, '2026-11-04 09:44:54', '2026-11-04 09:44:54'),
+(23, 'App\\Models\\User', 1, 'META_ERP_TOKEN', 'ebde0a968e193ce8f8590366c3ac6bc0db0b3cd91ad4ba512678be6257ebbb79', '["*"]', NULL, NULL, '2026-11-04 09:56:42', '2026-11-04 09:56:42'),
+(24, 'App\\Models\\User', 1, 'META_ERP_TOKEN', 'f034706884bcbe3b3f39465996bc6da155cef2ebd136e1393cda381764efc902', '["*"]', NULL, NULL, '2026-11-04 10:06:38', '2026-11-04 10:06:38'),
+(25, 'App\\Models\\User', 1, 'META_ERP_TOKEN', '75c92f531f51bc0e63351aa790033ece8cb51b3eb14ef98132d7bec3620fc54d', '["*"]', NULL, NULL, '2026-11-04 10:09:02', '2026-11-04 10:09:02');
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `productcontracts`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `productcontracts`;
-CREATE TABLE IF NOT EXISTS `productcontracts` (
+CREATE TABLE `productcontracts` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `contract_id` bigint(20) UNSIGNED NULL,
-  `product_id` bigint(20) UNSIGNED NULL,
-  `quantity` double(12,4) NULL DEFAULT '0.0000',
-  `unitPrice` double(12,4) NULL DEFAULT '0.0000',
-  `status` varchar(255) NULL,
+  `contract_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `product_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `quantity` double NOT NULL DEFAULT '0',
+  `unitPrice` double NOT NULL DEFAULT '0',
+  `status` varchar(191) NULL DEFAULT NULL,
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
@@ -1355,24 +1643,26 @@ CREATE TABLE IF NOT EXISTS `productcontracts` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `products`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `products`;
-CREATE TABLE IF NOT EXISTS `products` (
+CREATE TABLE `products` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `description` text NULL,
-  `code` varchar(255) NULL,
-  `productCategory` varchar(255) NULL,
-  `chemicalFormula` varchar(255) NULL,
-  `unitOfMeasurement` varchar(255) NULL,
-  `hsCode` varchar(255) NULL,
-  `active` tinyint(1) NOT NULL DEFAULT '0',
+  `name` varchar(191) NOT NULL,
+  `description` longtext NULL DEFAULT NULL,
+  `code` varchar(191) NULL DEFAULT NULL,
+  `productCategory` varchar(191) NULL DEFAULT NULL,
+  `chemicalFormula` varchar(191) NULL DEFAULT NULL,
+  `unitOfMeasurement` varchar(191) NULL DEFAULT NULL,
+  `hsCode` varchar(191) NULL DEFAULT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
-  `basel_code` varchar(255) NULL,
-  `ec_waste_code` varchar(255) NULL,
+  `basel_code` varchar(191) NULL DEFAULT NULL,
+  `ec_waste_code` varchar(191) NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -1394,25 +1684,27 @@ INSERT INTO `products` (`id`, `name`, `description`, `code`, `productCategory`, 
 (11, 'SHG - Special High Grade', NULL, 'SHG', NULL, NULL, NULL, NULL, 1, 0, '2026-11-04 03:22:02', '2026-11-04 03:22:02', NULL, NULL);
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `representatives`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `representatives`;
-CREATE TABLE IF NOT EXISTS `representatives` (
+CREATE TABLE `representatives` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `company_id` bigint(20) UNSIGNED NULL,
-  `contact_id` bigint(20) UNSIGNED NULL,
-  `address_id` bigint(20) UNSIGNED NULL,
-  `name` varchar(255) NULL,
-  `email` varchar(255) NULL,
-  `phone` varchar(255) NULL,
-  `type` varchar(255) NULL,
+  `company_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `contact_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `address_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `name` varchar(191) NOT NULL,
+  `email` varchar(191) NULL DEFAULT NULL,
+  `phone` varchar(191) NULL DEFAULT NULL,
+  `type` varchar(191) NULL DEFAULT NULL,
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
-  `job_title` varchar(255) NULL,
-  `phone2` varchar(255) NULL,
-  `mobile` varchar(255) NULL,
-  `department` varchar(255) NULL,
+  `job_title` varchar(191) NULL DEFAULT NULL,
+  `phone2` varchar(191) NULL DEFAULT NULL,
+  `mobile` varchar(191) NULL DEFAULT NULL,
+  `department` varchar(191) NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -1427,16 +1719,18 @@ INSERT INTO `representatives` (`id`, `company_id`, `contact_id`, `address_id`, `
 (4, NULL, 23, NULL, 'Waleed El Rass', NULL, NULL, NULL, 0, '2026-11-04 03:21:41', '2026-11-04 03:21:41', NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `stageactions`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `stageactions`;
-CREATE TABLE IF NOT EXISTS `stageactions` (
+CREATE TABLE `stageactions` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `stage_id` bigint(20) UNSIGNED NULL,
-  `action_id` bigint(20) UNSIGNED NULL,
-  `triggerType` varchar(255) NULL,
-  `priority` int(11) NULL DEFAULT '0',
-  `contractTypesNotAllowed` varchar(255) NULL,
+  `stage_id` bigint(20) UNSIGNED NOT NULL,
+  `action_id` bigint(20) UNSIGNED NOT NULL,
+  `triggerType` varchar(191) NOT NULL,
+  `priority` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
+  `contractTypesNotAllowed` varchar(191) NULL DEFAULT NULL,
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
@@ -1444,17 +1738,19 @@ CREATE TABLE IF NOT EXISTS `stageactions` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `stages`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `stages`;
-CREATE TABLE IF NOT EXISTS `stages` (
+CREATE TABLE `stages` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `model_id` bigint(20) UNSIGNED NULL,
-  `name` varchar(255) NULL,
-  `description` varchar(255) NULL,
-  `priority` int(11) NULL DEFAULT '0',
-  `stageType` varchar(255) NULL,
-  `active` tinyint(1) NOT NULL DEFAULT '0',
+  `model_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `name` varchar(191) NOT NULL,
+  `description` varchar(191) NULL DEFAULT NULL,
+  `priority` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
+  `stageType` varchar(191) NULL DEFAULT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
@@ -1478,16 +1774,18 @@ INSERT INTO `stages` (`id`, `model_id`, `name`, `description`, `priority`, `stag
 (10, 1, 'Completed', 'Discharged and payments settled', 5, 'COMPLETED', 1, 0, '2026-10-29 15:21:13', '2026-10-29 15:21:13');
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `templates`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `templates`;
-CREATE TABLE IF NOT EXISTS `templates` (
+CREATE TABLE `templates` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NULL,
-  `type` varchar(255) NULL,
-  `language_id` bigint(20) UNSIGNED NULL,
-  `html` longtext NULL,
-  `keys` text NULL,
+  `name` varchar(191) NOT NULL,
+  `type` varchar(191) NOT NULL,
+  `language_id` bigint(20) UNSIGNED NULL DEFAULT NULL,
+  `html` longtext NOT NULL,
+  `keys` longtext NULL DEFAULT NULL,
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
@@ -1518,15 +1816,34 @@ INSERT INTO `templates` (`id`, `name`, `type`, `language_id`, `html`, `keys`, `v
 (17, 'Strict Document Template 1793764923', 'INVOICE', NULL, '<div>Invoice: {missing_custom_token}</div>', '{missing_custom_token}', 0, '2026-11-04 04:02:03', '2026-11-04 04:02:03'),
 (18, 'Strict Document Template 1793776875', 'INVOICE', NULL, '<div>Invoice: {missing_custom_token}</div>', '{missing_custom_token}', 0, '2026-11-04 07:21:15', '2026-11-04 07:21:15'),
 (19, 'Strict Document Template 1793778747', 'INVOICE', NULL, '<div>Invoice: {missing_custom_token}</div>', '{missing_custom_token}', 0, '2026-11-04 07:52:27', '2026-11-04 07:52:27'),
-(20, 'Strict Document Template 1793779050', 'INVOICE', NULL, '<div>Invoice: {missing_custom_token}</div>', '{missing_custom_token}', 0, '2026-11-04 07:57:30', '2026-11-04 07:57:30');
+(20, 'Strict Document Template 1793779050', 'INVOICE', NULL, '<div>Invoice: {missing_custom_token}</div>', '{missing_custom_token}', 0, '2026-11-04 07:57:30', '2026-11-04 07:57:30'),
+(21, 'Strict Document Template 1793781186', 'INVOICE', NULL, '<div>Invoice: {missing_custom_token}</div>', '{missing_custom_token}', 0, '2026-11-04 08:33:06', '2026-11-04 08:33:06'),
+(22, 'Strict Document Template 1793782096', 'INVOICE', NULL, '<div>Invoice: {missing_custom_token}</div>', '{missing_custom_token}', 0, '2026-11-04 08:48:16', '2026-11-04 08:48:16'),
+(23, 'Strict Document Template 1793782126', 'INVOICE', NULL, '<div>Invoice: {missing_custom_token}</div>', '{missing_custom_token}', 0, '2026-11-04 08:48:46', '2026-11-04 08:48:46'),
+(24, 'ANNEX_VII', 'ANNEX_VII', 4, '<html><body>Updated Annex VII</body></html>', '', 1, '2026-11-04 09:06:44', '2026-11-04 09:09:27'),
+(25, 'ANNEX_VII', 'ANNEX_VII', 5, '<html>\n<body vlink="blue" link="blue">\n<div id="content" style="position:relative; margin:0px; padding:0px; height:267mm; width:180mm; font-family:Arial,Helvetica,sans-serif; font-size:8pt; background-color:white; color:#000000;">\n<h2 id="title" style="text-align:center; font-weight:900;">ANNEX VII</h2>\n<p style="text-align:center;">\nINFORMATION ACCOMPANYING SHIPMENTS OF WASTE AS REFERRED TO IN ARTICLE 3(2) AND (4)<br/>\n(revised version as per Official Journal of the European Union 22.12.2020 L433/13) REGULATION (EU) 2020/2174\n</p>\n<p style="text-align:center; font-weight:bold;">\nMEX2023059 - xxxxx - BL No. xxxxxxx - MSC\n</p>\n<span style="font-weight:bold;">\nConsignment Information (1)\n</span>\n<table border="0" cellpadding="0" cellspacing="0" align="center" style="border-collapse:collapse; width:100%; font:inherit;">\n<tr>\n<td style="padding:1mm; border:1px solid black; vertical-align:top; width:50%;">\n<span style="font-weight:bold;">1. Person who arranges the shipment:</span><br/>\nName: <span>METAENTERPRICES BULGARIA LTD</span><br/>\nAddress: <span>GR PLOVDIV UL. KNYAZ BOGORIDI 5 ET 2</span><br/>\nContact Person: <span>Ivena Milenovic</span><br/>\nTel: <span>+359(0) 887 931 514</span><br/>\nEmail: <span>iva@metaenterprices.co.uk</span>\n</td>\n<td style="padding:1mm; border:1px solid black; vertical-align:top; width:50%;">\n<span style="font-weight:bold;">2. Consignee:</span><br/>\nName: <span>RUBAMIN PRIVATE LIMITED</span><br/>\nAddress: <span>PLOT NO. 100, NANDESARI NOTIFIED AREA NANDESARI -391340, DIST. VADODARA GUJARAT, INDIA</span><br/>\nContact Person: <span>Akhilesh Singh</span><br/>\nTel: <span>+39069251942</span><br/>\nEMAIL: <span>akhilesh.singh@rubamin.com</span>\n</td>\n</tr>\n<tr>\n<td style="padding:1mm; border:1px solid black; vertical-align:top; width:50%;">\n3. Actual quantity: <span>XXXX</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Tonnes(Mg) m3: <span>XXXX</span>\n</td>\n<td style="padding:1mm; border:1px solid black; vertical-align:top; width:50%;">\n4. Actual date of shipment: <span>20/04/2023</span>\n</td>\n</tr>\n<tr>\n<td style="padding:1mm; border:1px solid black; vertical-align:top;">\n<span style="font-weight:bold;">5.(a) First Carrier</span><br/>\nName:<br/>\nAddress:<br/>\nContact Person:<br/>\nTel:<br/>\nFAX:<br/>\nE-mail:<br/>\nMeans of Transport:<br/>\nDate of Transfer:<br/>\nSignature:\n</td>\n<td style="padding:0; border:1px solid black; vertical-align:top;">\n<table style="width:100%; border-collapse:collapse; height:100%; font:inherit;">\n<tr>\n<td style="border-right:1px solid black; width:50%; vertical-align:top; padding:1mm;">\n<span style="font-weight:bold;">5.(b) Second carrier</span><br/>\nName:<br/>\nAddress:<br/>\nTel:<br/>\nE-mail:<br/>\nMeans of Transport:<br/>\nDate of transfer:<br/>\nSignature:\n</td>\n<td style="border:none; vertical-align:top; padding:1mm; width:50%;">\n<span style="font-weight:bold;">5.(c) Third carrier</span><br/>\nName:<br/>\nAddress:<br/>\nContact Person:<br/>\nTel:<br/>\nFAX:<br/>\nE-mail:<br/>\nMeans of Transport:<br/>\nDate of Transfer:<br/>\nSignature:\n</td>\n</tr>\n</table>\n</td>\n</tr>\n</table>\n</div>\n</body>\n</html>', '', 1, '2026-11-04 09:06:44', '2026-11-04 09:06:44'),
+(26, 'ANNEX_VII', 'ANNEX_VII', 6, '<html>\n<body vlink="blue" link="blue">\n<div id="content" style="position:relative; margin:0px; padding:0px; height:267mm; width:180mm; font-family:Arial,Helvetica,sans-serif; font-size:8pt; background-color:white; color:#000000;">\n<h2 id="title" style="text-align:center; font-weight:900;">ANNEX VII</h2>\n<p style="text-align:center;">\nINFORMATION ACCOMPANYING SHIPMENTS OF WASTE AS REFERRED TO IN ARTICLE 3(2) AND (4)<br/>\n(revised version as per Official Journal of the European Union 22.12.2020 L433/13) REGULATION (EU) 2020/2174\n</p>\n<p style="text-align:center; font-weight:bold;">\nMEX2023059 - xxxxx - BL No. xxxxxxx - MSC\n</p>\n<span style="font-weight:bold;">\nConsignment Information (1)\n</span>\n<table border="0" cellpadding="0" cellspacing="0" align="center" style="border-collapse:collapse; width:100%; font:inherit;">\n<tr>\n<td style="padding:1mm; border:1px solid black; vertical-align:top; width:50%;">\n<span style="font-weight:bold;">1. Person who arranges the shipment:</span><br/>\nName: <span>METAENTERPRICES BULGARIA LTD</span><br/>\nAddress: <span>GR PLOVDIV UL. KNYAZ BOGORIDI 5 ET 2</span><br/>\nContact Person: <span>Ivena Milenovic</span><br/>\nTel: <span>+359(0) 887 931 514</span><br/>\nEmail: <span>iva@metaenterprices.co.uk</span>\n</td>\n<td style="padding:1mm; border:1px solid black; vertical-align:top; width:50%;">\n<span style="font-weight:bold;">2. Consignee:</span><br/>\nName: <span>RUBAMIN PRIVATE LIMITED</span><br/>\nAddress: <span>PLOT NO. 100, NANDESARI NOTIFIED AREA NANDESARI -391340, DIST. VADODARA GUJARAT, INDIA</span><br/>\nContact Person: <span>Akhilesh Singh</span><br/>\nTel: <span>+39069251942</span><br/>\nEMAIL: <span>akhilesh.singh@rubamin.com</span>\n</td>\n</tr>\n<tr>\n<td style="padding:1mm; border:1px solid black; vertical-align:top; width:50%;">\n3. Actual quantity: <span>XXXX</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Tonnes(Mg) m3: <span>XXXX</span>\n</td>\n<td style="padding:1mm; border:1px solid black; vertical-align:top; width:50%;">\n4. Actual date of shipment: <span>20/04/2023</span>\n</td>\n</tr>\n<tr>\n<td style="padding:1mm; border:1px solid black; vertical-align:top;">\n<span style="font-weight:bold;">5.(a) First Carrier</span><br/>\nName:<br/>\nAddress:<br/>\nContact Person:<br/>\nTel:<br/>\nFAX:<br/>\nE-mail:<br/>\nMeans of Transport:<br/>\nDate of Transfer:<br/>\nSignature:\n</td>\n<td style="padding:0; border:1px solid black; vertical-align:top;">\n<table style="width:100%; border-collapse:collapse; height:100%; font:inherit;">\n<tr>\n<td style="border-right:1px solid black; width:50%; vertical-align:top; padding:1mm;">\n<span style="font-weight:bold;">5.(b) Second carrier</span><br/>\nName:<br/>\nAddress:<br/>\nTel:<br/>\nE-mail:<br/>\nMeans of Transport:<br/>\nDate of transfer:<br/>\nSignature:\n</td>\n<td style="border:none; vertical-align:top; padding:1mm; width:50%;">\n<span style="font-weight:bold;">5.(c) Third carrier</span><br/>\nName:<br/>\nAddress:<br/>\nContact Person:<br/>\nTel:<br/>\nFAX:<br/>\nE-mail:<br/>\nMeans of Transport:<br/>\nDate of Transfer:<br/>\nSignature:\n</td>\n</tr>\n</table>\n</td>\n</tr>\n</table>\n</div>\n</body>\n</html>', '', 1, '2026-11-04 09:06:44', '2026-11-04 09:06:44'),
+(27, 'ANNEX_VII', 'ANNEX_VII', 7, '<html>\n<body vlink="blue" link="blue">\n<div id="content" style="position:relative; margin:0px; padding:0px; height:267mm; width:180mm; font-family:Arial,Helvetica,sans-serif; font-size:8pt; background-color:white; color:#000000;">\n<h2 id="title" style="text-align:center; font-weight:900;">ANNEX VII</h2>\n<p style="text-align:center;">\nINFORMATION ACCOMPANYING SHIPMENTS OF WASTE AS REFERRED TO IN ARTICLE 3(2) AND (4)<br/>\n(revised version as per Official Journal of the European Union 22.12.2020 L433/13) REGULATION (EU) 2020/2174\n</p>\n<p style="text-align:center; font-weight:bold;">\nMEX2023059 - xxxxx - BL No. xxxxxxx - MSC\n</p>\n<span style="font-weight:bold;">\nConsignment Information (1)\n</span>\n<table border="0" cellpadding="0" cellspacing="0" align="center" style="border-collapse:collapse; width:100%; font:inherit;">\n<tr>\n<td style="padding:1mm; border:1px solid black; vertical-align:top; width:50%;">\n<span style="font-weight:bold;">1. Person who arranges the shipment:</span><br/>\nName: <span>METAENTERPRICES BULGARIA LTD</span><br/>\nAddress: <span>GR PLOVDIV UL. KNYAZ BOGORIDI 5 ET 2</span><br/>\nContact Person: <span>Ivena Milenovic</span><br/>\nTel: <span>+359(0) 887 931 514</span><br/>\nEmail: <span>iva@metaenterprices.co.uk</span>\n</td>\n<td style="padding:1mm; border:1px solid black; vertical-align:top; width:50%;">\n<span style="font-weight:bold;">2. Consignee:</span><br/>\nName: <span>RUBAMIN PRIVATE LIMITED</span><br/>\nAddress: <span>PLOT NO. 100, NANDESARI NOTIFIED AREA NANDESARI -391340, DIST. VADODARA GUJARAT, INDIA</span><br/>\nContact Person: <span>Akhilesh Singh</span><br/>\nTel: <span>+39069251942</span><br/>\nEMAIL: <span>akhilesh.singh@rubamin.com</span>\n</td>\n</tr>\n<tr>\n<td style="padding:1mm; border:1px solid black; vertical-align:top; width:50%;">\n3. Actual quantity: <span>XXXX</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Tonnes(Mg) m3: <span>XXXX</span>\n</td>\n<td style="padding:1mm; border:1px solid black; vertical-align:top; width:50%;">\n4. Actual date of shipment: <span>20/04/2023</span>\n</td>\n</tr>\n<tr>\n<td style="padding:1mm; border:1px solid black; vertical-align:top;">\n<span style="font-weight:bold;">5.(a) First Carrier</span><br/>\nName:<br/>\nAddress:<br/>\nContact Person:<br/>\nTel:<br/>\nFAX:<br/>\nE-mail:<br/>\nMeans of Transport:<br/>\nDate of Transfer:<br/>\nSignature:\n</td>\n<td style="padding:0; border:1px solid black; vertical-align:top;">\n<table style="width:100%; border-collapse:collapse; height:100%; font:inherit;">\n<tr>\n<td style="border-right:1px solid black; width:50%; vertical-align:top; padding:1mm;">\n<span style="font-weight:bold;">5.(b) Second carrier</span><br/>\nName:<br/>\nAddress:<br/>\nTel:<br/>\nE-mail:<br/>\nMeans of Transport:<br/>\nDate of transfer:<br/>\nSignature:\n</td>\n<td style="border:none; vertical-align:top; padding:1mm; width:50%;">\n<span style="font-weight:bold;">5.(c) Third carrier</span><br/>\nName:<br/>\nAddress:<br/>\nContact Person:<br/>\nTel:<br/>\nFAX:<br/>\nE-mail:<br/>\nMeans of Transport:<br/>\nDate of Transfer:<br/>\nSignature:\n</td>\n</tr>\n</table>\n</td>\n</tr>\n</table>\n</div>\n</body>\n</html>', '', 1, '2026-11-04 09:06:44', '2026-11-04 09:06:44'),
+(28, 'ANNEX_VII', 'ANNEX_VII', 8, '<html>\n<body vlink="blue" link="blue">\n<div id="content" style="position:relative; margin:0px; padding:0px; height:267mm; width:180mm; font-family:Arial,Helvetica,sans-serif; font-size:8pt; background-color:white; color:#000000;">\n<h2 id="title" style="text-align:center; font-weight:900;">ANNEX VII</h2>\n<p style="text-align:center;">\nINFORMATION ACCOMPANYING SHIPMENTS OF WASTE AS REFERRED TO IN ARTICLE 3(2) AND (4)<br/>\n(revised version as per Official Journal of the European Union 22.12.2020 L433/13) REGULATION (EU) 2020/2174\n</p>\n<p style="text-align:center; font-weight:bold;">\nMEX2023059 - xxxxx - BL No. xxxxxxx - MSC\n</p>\n<span style="font-weight:bold;">\nConsignment Information (1)\n</span>\n<table border="0" cellpadding="0" cellspacing="0" align="center" style="border-collapse:collapse; width:100%; font:inherit;">\n<tr>\n<td style="padding:1mm; border:1px solid black; vertical-align:top; width:50%;">\n<span style="font-weight:bold;">1. Person who arranges the shipment:</span><br/>\nName: <span>METAENTERPRICES BULGARIA LTD</span><br/>\nAddress: <span>GR PLOVDIV UL. KNYAZ BOGORIDI 5 ET 2</span><br/>\nContact Person: <span>Ivena Milenovic</span><br/>\nTel: <span>+359(0) 887 931 514</span><br/>\nEmail: <span>iva@metaenterprices.co.uk</span>\n</td>\n<td style="padding:1mm; border:1px solid black; vertical-align:top; width:50%;">\n<span style="font-weight:bold;">2. Consignee:</span><br/>\nName: <span>RUBAMIN PRIVATE LIMITED</span><br/>\nAddress: <span>PLOT NO. 100, NANDESARI NOTIFIED AREA NANDESARI -391340, DIST. VADODARA GUJARAT, INDIA</span><br/>\nContact Person: <span>Akhilesh Singh</span><br/>\nTel: <span>+39069251942</span><br/>\nEMAIL: <span>akhilesh.singh@rubamin.com</span>\n</td>\n</tr>\n<tr>\n<td style="padding:1mm; border:1px solid black; vertical-align:top; width:50%;">\n3. Actual quantity: <span>XXXX</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Tonnes(Mg) m3: <span>XXXX</span>\n</td>\n<td style="padding:1mm; border:1px solid black; vertical-align:top; width:50%;">\n4. Actual date of shipment: <span>20/04/2023</span>\n</td>\n</tr>\n<tr>\n<td style="padding:1mm; border:1px solid black; vertical-align:top;">\n<span style="font-weight:bold;">5.(a) First Carrier</span><br/>\nName:<br/>\nAddress:<br/>\nContact Person:<br/>\nTel:<br/>\nFAX:<br/>\nE-mail:<br/>\nMeans of Transport:<br/>\nDate of Transfer:<br/>\nSignature:\n</td>\n<td style="padding:0; border:1px solid black; vertical-align:top;">\n<table style="width:100%; border-collapse:collapse; height:100%; font:inherit;">\n<tr>\n<td style="border-right:1px solid black; width:50%; vertical-align:top; padding:1mm;">\n<span style="font-weight:bold;">5.(b) Second carrier</span><br/>\nName:<br/>\nAddress:<br/>\nTel:<br/>\nE-mail:<br/>\nMeans of Transport:<br/>\nDate of transfer:<br/>\nSignature:\n</td>\n<td style="border:none; vertical-align:top; padding:1mm; width:50%;">\n<span style="font-weight:bold;">5.(c) Third carrier</span><br/>\nName:<br/>\nAddress:<br/>\nContact Person:<br/>\nTel:<br/>\nFAX:<br/>\nE-mail:<br/>\nMeans of Transport:<br/>\nDate of Transfer:<br/>\nSignature:\n</td>\n</tr>\n</table>\n</td>\n</tr>\n</table>\n</div>\n</body>\n</html>', '', 1, '2026-11-04 09:06:44', '2026-11-04 09:06:44'),
+(29, 'ANNEX_VII', 'ANNEX_VII', 9, '<html>\n<body vlink="blue" link="blue">\n<div id="content" style="position:relative; margin:0px; padding:0px; height:267mm; width:180mm; font-family:Arial,Helvetica,sans-serif; font-size:8pt; background-color:white; color:#000000;">\n<h2 id="title" style="text-align:center; font-weight:900;">ANNEX VII</h2>\n<p style="text-align:center;">\nINFORMATION ACCOMPANYING SHIPMENTS OF WASTE AS REFERRED TO IN ARTICLE 3(2) AND (4)<br/>\n(revised version as per Official Journal of the European Union 22.12.2020 L433/13) REGULATION (EU) 2020/2174\n</p>\n<p style="text-align:center; font-weight:bold;">\nMEX2023059 - xxxxx - BL No. xxxxxxx - MSC\n</p>\n<span style="font-weight:bold;">\nConsignment Information (1)\n</span>\n<table border="0" cellpadding="0" cellspacing="0" align="center" style="border-collapse:collapse; width:100%; font:inherit;">\n<tr>\n<td style="padding:1mm; border:1px solid black; vertical-align:top; width:50%;">\n<span style="font-weight:bold;">1. Person who arranges the shipment:</span><br/>\nName: <span>METAENTERPRICES BULGARIA LTD</span><br/>\nAddress: <span>GR PLOVDIV UL. KNYAZ BOGORIDI 5 ET 2</span><br/>\nContact Person: <span>Ivena Milenovic</span><br/>\nTel: <span>+359(0) 887 931 514</span><br/>\nEmail: <span>iva@metaenterprices.co.uk</span>\n</td>\n<td style="padding:1mm; border:1px solid black; vertical-align:top; width:50%;">\n<span style="font-weight:bold;">2. Consignee:</span><br/>\nName: <span>RUBAMIN PRIVATE LIMITED</span><br/>\nAddress: <span>PLOT NO. 100, NANDESARI NOTIFIED AREA NANDESARI -391340, DIST. VADODARA GUJARAT, INDIA</span><br/>\nContact Person: <span>Akhilesh Singh</span><br/>\nTel: <span>+39069251942</span><br/>\nEMAIL: <span>akhilesh.singh@rubamin.com</span>\n</td>\n</tr>\n<tr>\n<td style="padding:1mm; border:1px solid black; vertical-align:top; width:50%;">\n3. Actual quantity: <span>XXXX</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Tonnes(Mg) m3: <span>XXXX</span>\n</td>\n<td style="padding:1mm; border:1px solid black; vertical-align:top; width:50%;">\n4. Actual date of shipment: <span>20/04/2023</span>\n</td>\n</tr>\n<tr>\n<td style="padding:1mm; border:1px solid black; vertical-align:top;">\n<span style="font-weight:bold;">5.(a) First Carrier</span><br/>\nName:<br/>\nAddress:<br/>\nContact Person:<br/>\nTel:<br/>\nFAX:<br/>\nE-mail:<br/>\nMeans of Transport:<br/>\nDate of Transfer:<br/>\nSignature:\n</td>\n<td style="padding:0; border:1px solid black; vertical-align:top;">\n<table style="width:100%; border-collapse:collapse; height:100%; font:inherit;">\n<tr>\n<td style="border-right:1px solid black; width:50%; vertical-align:top; padding:1mm;">\n<span style="font-weight:bold;">5.(b) Second carrier</span><br/>\nName:<br/>\nAddress:<br/>\nTel:<br/>\nE-mail:<br/>\nMeans of Transport:<br/>\nDate of transfer:<br/>\nSignature:\n</td>\n<td style="border:none; vertical-align:top; padding:1mm; width:50%;">\n<span style="font-weight:bold;">5.(c) Third carrier</span><br/>\nName:<br/>\nAddress:<br/>\nContact Person:<br/>\nTel:<br/>\nFAX:<br/>\nE-mail:<br/>\nMeans of Transport:<br/>\nDate of Transfer:<br/>\nSignature:\n</td>\n</tr>\n</table>\n</td>\n</tr>\n</table>\n</div>\n</body>\n</html>', '', 1, '2026-11-04 09:06:44', '2026-11-04 09:06:44'),
+(30, 'ANNEX_VII', 'ANNEX_VII', 10, '<html>\n<body vlink="blue" link="blue">\n<div id="content" style="position:relative; margin:0px; padding:0px; height:267mm; width:180mm; font-family:Arial,Helvetica,sans-serif; font-size:8pt; background-color:white; color:#000000;">\n<h2 id="title" style="text-align:center; font-weight:900;">ANNEX VII</h2>\n<p style="text-align:center;">\nINFORMATION ACCOMPANYING SHIPMENTS OF WASTE AS REFERRED TO IN ARTICLE 3(2) AND (4)<br/>\n(revised version as per Official Journal of the European Union 22.12.2020 L433/13) REGULATION (EU) 2020/2174\n</p>\n<p style="text-align:center; font-weight:bold;">\nMEX2023059 - xxxxx - BL No. xxxxxxx - MSC\n</p>\n<span style="font-weight:bold;">\nConsignment Information (1)\n</span>\n<table border="0" cellpadding="0" cellspacing="0" align="center" style="border-collapse:collapse; width:100%; font:inherit;">\n<tr>\n<td style="padding:1mm; border:1px solid black; vertical-align:top; width:50%;">\n<span style="font-weight:bold;">1. Person who arranges the shipment:</span><br/>\nName: <span>METAENTERPRICES BULGARIA LTD</span><br/>\nAddress: <span>GR PLOVDIV UL. KNYAZ BOGORIDI 5 ET 2</span><br/>\nContact Person: <span>Ivena Milenovic</span><br/>\nTel: <span>+359(0) 887 931 514</span><br/>\nEmail: <span>iva@metaenterprices.co.uk</span>\n</td>\n<td style="padding:1mm; border:1px solid black; vertical-align:top; width:50%;">\n<span style="font-weight:bold;">2. Consignee:</span><br/>\nName: <span>RUBAMIN PRIVATE LIMITED</span><br/>\nAddress: <span>PLOT NO. 100, NANDESARI NOTIFIED AREA NANDESARI -391340, DIST. VADODARA GUJARAT, INDIA</span><br/>\nContact Person: <span>Akhilesh Singh</span><br/>\nTel: <span>+39069251942</span><br/>\nEMAIL: <span>akhilesh.singh@rubamin.com</span>\n</td>\n</tr>\n<tr>\n<td style="padding:1mm; border:1px solid black; vertical-align:top; width:50%;">\n3. Actual quantity: <span>XXXX</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Tonnes(Mg) m3: <span>XXXX</span>\n</td>\n<td style="padding:1mm; border:1px solid black; vertical-align:top; width:50%;">\n4. Actual date of shipment: <span>20/04/2023</span>\n</td>\n</tr>\n<tr>\n<td style="padding:1mm; border:1px solid black; vertical-align:top;">\n<span style="font-weight:bold;">5.(a) First Carrier</span><br/>\nName:<br/>\nAddress:<br/>\nContact Person:<br/>\nTel:<br/>\nFAX:<br/>\nE-mail:<br/>\nMeans of Transport:<br/>\nDate of Transfer:<br/>\nSignature:\n</td>\n<td style="padding:0; border:1px solid black; vertical-align:top;">\n<table style="width:100%; border-collapse:collapse; height:100%; font:inherit;">\n<tr>\n<td style="border-right:1px solid black; width:50%; vertical-align:top; padding:1mm;">\n<span style="font-weight:bold;">5.(b) Second carrier</span><br/>\nName:<br/>\nAddress:<br/>\nTel:<br/>\nE-mail:<br/>\nMeans of Transport:<br/>\nDate of transfer:<br/>\nSignature:\n</td>\n<td style="border:none; vertical-align:top; padding:1mm; width:50%;">\n<span style="font-weight:bold;">5.(c) Third carrier</span><br/>\nName:<br/>\nAddress:<br/>\nContact Person:<br/>\nTel:<br/>\nFAX:<br/>\nE-mail:<br/>\nMeans of Transport:<br/>\nDate of Transfer:<br/>\nSignature:\n</td>\n</tr>\n</table>\n</td>\n</tr>\n</table>\n</div>\n</body>\n</html>', '', 1, '2026-11-04 09:06:44', '2026-11-04 09:06:44'),
+(31, 'Strict Document Template 1793783361', 'INVOICE', NULL, '<div>Invoice: {missing_custom_token}</div>', '{missing_custom_token}', 0, '2026-11-04 09:09:21', '2026-11-04 09:09:21'),
+(32, 'Strict Document Template 1793783479', 'INVOICE', NULL, '<div>Invoice: {missing_custom_token}</div>', '{missing_custom_token}', 0, '2026-11-04 09:11:19', '2026-11-04 09:11:19'),
+(33, 'Strict Document Template 1793784547', 'INVOICE', NULL, '<div>Invoice: {missing_custom_token}</div>', '{missing_custom_token}', 0, '2026-11-04 09:29:07', '2026-11-04 09:29:07'),
+(34, 'Strict Document Template 1793785495', 'INVOICE', NULL, '<div>Invoice: {missing_custom_token}</div>', '{missing_custom_token}', 0, '2026-11-04 09:44:55', '2026-11-04 09:44:55'),
+(35, 'Strict Document Template 1793786203', 'INVOICE', NULL, '<div>Invoice: {missing_custom_token}</div>', '{missing_custom_token}', 0, '2026-11-04 09:56:43', '2026-11-04 09:56:43'),
+(36, 'Strict Document Template 1793786799', 'INVOICE', NULL, '<div>Invoice: {missing_custom_token}</div>', '{missing_custom_token}', 0, '2026-11-04 10:06:39', '2026-11-04 10:06:39'),
+(37, 'Strict Document Template 1793786946', 'INVOICE', NULL, '<div>Invoice: {missing_custom_token}</div>', '{missing_custom_token}', 0, '2026-11-04 10:09:06', '2026-11-04 10:09:06');
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `types`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `types`;
-CREATE TABLE IF NOT EXISTS `types` (
+CREATE TABLE `types` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `description` varchar(255) NULL,
+  `description` varchar(191) NOT NULL,
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
@@ -1540,52 +1857,61 @@ CREATE TABLE IF NOT EXISTS `types` (
 INSERT INTO `types` (`id`, `description`, `version`, `created_at`, `updated_at`) VALUES
 (1, 'Buyer', 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12'),
 (2, 'Seller', 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12'),
-(3, 'Broker', 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12'),
-(4, 'Transporter', 0, '2026-10-29 15:21:12', '2026-10-29 15:21:12');
+(5, 'Trader', 0, '2026-11-04 09:23:12', '2026-11-04 09:23:12'),
+(6, 'Metal Agent', 0, '2026-11-04 09:23:12', '2026-11-04 09:23:12'),
+(7, 'Galvanizer', 0, '2026-11-04 09:23:12', '2026-11-04 09:23:12'),
+(8, 'Recycler', 0, '2026-11-04 09:23:12', '2026-11-04 09:23:12'),
+(9, 'Custom Broker', 0, '2026-11-04 09:29:10', '2026-11-04 09:29:10'),
+(10, 'Custom Broker', 0, '2026-11-04 09:44:57', '2026-11-04 09:44:57'),
+(11, 'Custom Broker', 0, '2026-11-04 09:56:47', '2026-11-04 09:56:47'),
+(12, 'Custom Broker', 0, '2026-11-04 10:06:41', '2026-11-04 10:06:41'),
+(13, 'Custom Broker', 0, '2026-11-04 10:09:13', '2026-11-04 10:09:13');
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `uploadedfiles`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `uploadedfiles`;
-CREATE TABLE IF NOT EXISTS `uploadedfiles` (
+CREATE TABLE `uploadedfiles` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `contract_id` bigint(20) UNSIGNED NULL,
-  `fileName` varchar(255) NULL,
-  `filePath` varchar(255) NULL,
-  `fileSize` int(11) NULL DEFAULT '0',
-  `contentType` varchar(255) NULL,
+  `contract_id` bigint(20) UNSIGNED NOT NULL,
+  `fileName` varchar(191) NOT NULL,
+  `filePath` varchar(191) NOT NULL,
+  `fileSize` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
+  `contentType` varchar(191) NULL DEFAULT NULL,
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
+--
 -- Table structure for table `users`
--- --------------------------------------------------------
+--
+
 DROP TABLE IF EXISTS `users`;
-CREATE TABLE IF NOT EXISTS `users` (
+CREATE TABLE `users` (
   `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `displayName` varchar(255) NULL,
-  `photoUrl` varchar(255) NULL,
-  `signatureFile` longtext NULL,
-  `signature_file_name` varchar(255) NULL,
-  `occupation` varchar(255) NULL,
+  `name` varchar(191) NOT NULL,
+  `displayName` varchar(191) NULL DEFAULT NULL,
+  `photoUrl` varchar(191) NULL DEFAULT NULL,
+  `signatureFile` longtext NULL DEFAULT NULL,
+  `signature_file_name` varchar(191) NULL DEFAULT NULL,
+  `occupation` varchar(191) NULL DEFAULT NULL,
   `username` varchar(191) NOT NULL,
-  `password` varchar(255) NULL,
-  `active` tinyint(1) NOT NULL DEFAULT '0',
-  `role` varchar(255) NULL,
-  `secret` varchar(255) NULL,
+  `password` varchar(191) NOT NULL,
+  `active` tinyint(1) NOT NULL DEFAULT '1',
+  `role` varchar(191) NOT NULL DEFAULT 'ROLE_USER',
+  `secret` varchar(191) NULL DEFAULT NULL,
   `enable2fa` tinyint(1) NOT NULL DEFAULT '0',
-  `archiveSignatureId` bigint(20) UNSIGNED NULL,
+  `archiveSignatureId` bigint(20) UNSIGNED NULL DEFAULT NULL,
   `version` bigint(20) UNSIGNED NOT NULL DEFAULT '0',
-  `remember_token` varchar(255) NULL,
+  `remember_token` varchar(191) NULL DEFAULT NULL,
   `created_at` datetime NULL DEFAULT NULL,
   `updated_at` datetime NULL DEFAULT NULL,
-  `email` varchar(255) NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `users_username_unique` (`username`),
-  KEY `users_email_index` (`email`)
+  `email` varchar(191) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
@@ -1593,8 +1919,8 @@ CREATE TABLE IF NOT EXISTS `users` (
 --
 
 INSERT INTO `users` (`id`, `name`, `displayName`, `photoUrl`, `signatureFile`, `signature_file_name`, `occupation`, `username`, `password`, `active`, `role`, `secret`, `enable2fa`, `archiveSignatureId`, `version`, `remember_token`, `created_at`, `updated_at`, `email`) VALUES
-(1, 'Administrator', 'System Admin', NULL, NULL, NULL, 'Chief Executive', 'admin', '$2y$04$N4WSC4YbrmP1/Qv1jrrkse//7u3YYkHklBg8HQOhXWa7SnvGSkMGm', 1, 'ROLE_ADMIN', 'JBSWY3DPEHPK3PXP', 1, NULL, 0, NULL, '2026-10-29 15:21:13', '2026-11-04 07:57:30', 'root@root.com'),
-(2, 'Test User', 'Test User', NULL, NULL, NULL, NULL, 'testuser', '$2y$04$aDFVtrGEP/qbCwwI.Sxjv.SvXQI/AGt9EKOSTHwebtyvUF4zY8hEW', 1, 'ROLE_USER', NULL, 0, NULL, 0, NULL, '2026-10-29 15:33:23', '2026-11-04 07:57:30', 'testuser@metaenterprices.co.uk'),
+(1, 'Administrator', 'System Admin', NULL, NULL, NULL, 'Chief Executive', 'admin', '$2y$04$iohJd5gI43vktOXdlnswC.MJlQ9My3iAidVIck2kUzofkgz9OP69q', 1, 'ROLE_ADMIN', 'JBSWY3DPEHPK3PXP', 1, NULL, 0, NULL, '2026-10-29 15:21:13', '2026-11-04 10:09:06', 'root@root.com'),
+(2, 'Test User', 'Test User', NULL, NULL, NULL, NULL, 'testuser', '$2y$04$u5ZFnliidHgRkghrxIqaUOONsYoPJgrDY6q3Vp4FoADynUiFvWqke', 1, 'ROLE_USER', NULL, 0, NULL, 0, NULL, '2026-10-29 15:33:23', '2026-11-04 10:09:06', 'testuser@metaenterprices.co.uk'),
 (3, 'Navdeep Birla', 'Navdeep Birla', NULL, NULL, NULL, 'Trading Specialist', 'navdeepwork475@gmail.com', '$2y$10$H9KEKykHxiG78XH9oeOqPOLX1YyrZ2.C7o1EBZ92U9dkhANnjU2Nq', 1, 'ROLE_USER', 'F6TZQOHOTN6RRMXL', 0, NULL, 0, NULL, '2026-11-03 05:24:04', '2026-11-03 05:24:04', 'navdeepwork475@gmail.com'),
 (4, 'Abdul Hasseb Mohammed', 'Hasseb', NULL, NULL, NULL, NULL, 'haseeb@metaenterprices.co.uk', '$2y$10$GtRUWLpJKWM35uTv4l2pG.kV6VMt8xCvyrN4fEkFnEBljj9IouGGe', 1, 'ROLE_USER', NULL, 0, NULL, 0, NULL, '2026-11-03 11:00:27', '2026-11-03 11:00:27', 'haseeb@metaenterprices.co.uk'),
 (5, 'Abdul Samad', 'Samad', NULL, NULL, NULL, NULL, 'samad@metaenterprices.co.uk', '$2y$10$hqleQ5YVhRegPbfAtS0ahuDlo83xY8tmnARKE5hQimaOwed3OH3py', 1, 'ROLE_USER', NULL, 0, NULL, 0, NULL, '2026-11-03 11:00:27', '2026-11-03 11:00:27', 'samad@metaenterprices.co.uk'),
@@ -1603,7 +1929,6 @@ INSERT INTO `users` (`id`, `name`, `displayName`, `photoUrl`, `signatureFile`, `
 (8, 'Ali Khalil', 'Ali', NULL, NULL, NULL, NULL, 'ali@smetatrading.com', '$2y$10$YVkLq0TWxNrP2TvucNBczuONK./pjeS32UJanqe/5iIs1rgH2cTn2', 0, 'ROLE_USER', NULL, 0, NULL, 0, NULL, '2026-11-03 11:00:27', '2026-11-03 11:00:27', 'ali@smetatrading.com'),
 (9, 'Amel', 'Amel', NULL, NULL, NULL, NULL, 'amel@metaenterprices.co.uk', '$2y$10$e4f9f0VgfS2brubZZvPCfu9C64b174fXRhWpHVsvl99/1ILshqPhq', 1, 'ROLE_USER', NULL, 0, NULL, 0, NULL, '2026-11-03 11:00:27', '2026-11-03 11:00:27', 'amel@metaenterprices.co.uk'),
 (10, 'Roger', 'Roger', NULL, NULL, NULL, NULL, 'roger@metaenterprices.co.uk', '$2y$10$GzNf9br58t8mVY2CjV8ynu7bZzr97TOg6bl4eLm5SS/WdsWgPTUfS', 1, 'ROLE_USER', NULL, 0, NULL, 0, NULL, '2026-11-04 03:19:54', '2026-11-04 03:19:54', 'roger@metaenterprices.co.uk');
-
 
 SET FOREIGN_KEY_CHECKS=1;
 COMMIT;

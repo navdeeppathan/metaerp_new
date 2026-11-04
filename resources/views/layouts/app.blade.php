@@ -173,8 +173,85 @@
             <!-- Access Control -->
             <a href="{{ route('accessgroups.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl transition-all {{ request()->routeIs('accessgroups.*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}">
                 <span class="material-icons-outlined text-lg shrink-0">fingerprint</span>
-                <span class="truncate">Access Control</span>
+                <div class="min-w-0">
+                    <div class="truncate text-sm leading-tight">Access Control</div>
+                    <div class="text-[11px] text-slate-400 leading-tight mt-0.5">Manage access control of users</div>
+                </div>
             </a>
+
+            <!-- Templates -->
+            <a href="{{ route('templates.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl transition-all {{ request()->routeIs('templates.*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}">
+                <span class="material-icons-outlined text-lg shrink-0">badge</span>
+                <div class="min-w-0">
+                    <div class="truncate text-sm leading-tight">Templates</div>
+                    <div class="text-[11px] text-slate-400 leading-tight mt-0.5">Manage templates</div>
+                </div>
+            </a>
+
+            <!-- Settings (Collapsible Submenu Matching Screenshots) -->
+            <div x-data="{ open: {{ request()->routeIs('settings.*') || request()->is('settings*') || request()->is('countries*') || request()->is('company-types*') || request()->is('credit-debit-types*') || request()->is('currencies*') || request()->is('departments*') || request()->is('packTypes*') || request()->is('paymentTypes*') || request()->is('paymentTermsTypes*') ? 'true' : 'false' }} }">
+                <button @click="open = !open" type="button" class="w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all cursor-pointer {{ request()->routeIs('settings.*') || request()->is('countries*') || request()->is('company-types*') ? 'text-white' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}">
+                    <div class="flex items-center gap-3 min-w-0">
+                        <span class="material-icons-outlined text-lg shrink-0">settings</span>
+                        <div class="min-w-0 text-left">
+                            <div class="truncate text-xs font-bold uppercase tracking-wider text-slate-300">SETTINGS</div>
+                            <div class="text-[11px] text-slate-400 leading-tight mt-0.5">System settings</div>
+                        </div>
+                    </div>
+                    <span class="material-icons text-sm text-slate-400 transition-transform duration-200" :class="open ? 'rotate-180' : ''">keyboard_arrow_down</span>
+                </button>
+
+                <!-- Submenu Items -->
+                <div x-show="open" class="mt-1 space-y-0.5 pl-2">
+                    <!-- 1. Countries -->
+                    <a href="{{ route('settings.countries') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl transition-all {{ request()->routeIs('settings.countries*') || request()->is('countries*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}">
+                        <span class="material-icons-outlined text-lg shrink-0">public</span>
+                        <span class="text-xs truncate">Countries</span>
+                    </a>
+
+                    <!-- 2. Company type -->
+                    <a href="{{ route('settings.companyTypes') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl transition-all {{ request()->routeIs('settings.companyTypes*') || request()->is('company-types*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}">
+                        <span class="material-icons-outlined text-lg shrink-0">apartment</span>
+                        <span class="text-xs truncate">Company type</span>
+                    </a>
+
+                    <!-- 3. Credit/Debit Type -->
+                    <a href="{{ route('settings.creditDebitTypes') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl transition-all {{ request()->routeIs('settings.creditDebitTypes*') || request()->is('credit-debit-types*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}">
+                        <span class="material-icons-outlined text-lg shrink-0">receipt_long</span>
+                        <span class="text-xs truncate">Credit/Debit Type</span>
+                    </a>
+
+                    <!-- 4. Currencies -->
+                    <a href="{{ route('settings.currencies') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl transition-all {{ request()->routeIs('settings.currencies*') || request()->is('currencies*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}">
+                        <span class="material-icons-outlined text-lg shrink-0">monetization_on</span>
+                        <span class="text-xs truncate">Currencies</span>
+                    </a>
+
+                    <!-- 5. Departments -->
+                    <a href="{{ route('settings.departments') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl transition-all {{ request()->routeIs('settings.departments*') || request()->is('departments*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}">
+                        <span class="material-icons-outlined text-lg shrink-0">account_balance</span>
+                        <span class="text-xs truncate">Departments</span>
+                    </a>
+
+                    <!-- 6. Pack Type -->
+                    <a href="{{ route('settings.packTypes') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl transition-all {{ request()->routeIs('settings.packTypes*') || request()->is('packTypes*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}">
+                        <span class="material-icons-outlined text-lg shrink-0">inventory_2</span>
+                        <span class="text-xs truncate">Pack Type</span>
+                    </a>
+
+                    <!-- 7. Payment Type -->
+                    <a href="{{ route('settings.paymentTypes') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl transition-all {{ request()->routeIs('settings.paymentTypes*') || request()->is('paymentTypes*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}">
+                        <span class="material-icons-outlined text-lg shrink-0">payment</span>
+                        <span class="text-xs truncate">Payment Type</span>
+                    </a>
+
+                    <!-- 8. Payment Terms Type -->
+                    <a href="{{ route('settings.paymentTerms') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl transition-all {{ request()->routeIs('settings.paymentTerms*') || request()->is('paymentTermsTypes*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}">
+                        <span class="material-icons-outlined text-lg shrink-0">price_check</span>
+                        <span class="text-xs truncate">Payment Terms Type</span>
+                    </a>
+                </div>
+            </div>
         </nav>
     </aside>
 
