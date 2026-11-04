@@ -8,7 +8,7 @@
     $to = min($currentPage * $perPage, $total);
 @endphp
 
-<div class="mt-8 pt-4 flex items-center justify-end text-xs text-slate-700 select-none">
+<div class="flex items-center justify-end text-xs text-slate-700 select-none">
     <div class="flex items-center gap-6 sm:gap-8">
         <!-- Rows per page -->
         <div class="flex items-center gap-2">
