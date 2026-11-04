@@ -50,139 +50,203 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.45); }
     </style>
 </head>
-<body class="h-full flex overflow-hidden text-slate-800 bg-slate-50" x-data="{ sidebarOpen: false }">
+<body class="h-full flex overflow-hidden text-slate-800 bg-slate-50"
+      x-data="{
+          sidebarMobileOpen: false,
+          sidebarCollapsed: JSON.parse(localStorage.getItem('metaerp_sidebar_collapsed') || 'false'),
+          sidebarHovered: false,
+          toggleCollapsed() {
+              this.sidebarCollapsed = !this.sidebarCollapsed;
+              this.sidebarHovered = false;
+              localStorage.setItem('metaerp_sidebar_collapsed', JSON.stringify(this.sidebarCollapsed));
+          },
+          get isExpanded() {
+              return !this.sidebarCollapsed || this.sidebarHovered;
+          }
+      }">
 
     <!-- Mobile Sidebar Backdrop -->
-    <div x-show="sidebarOpen" x-cloak class="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-xs lg:hidden" @click="sidebarOpen = false"></div>
+    <div x-show="sidebarMobileOpen" x-cloak class="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-xs lg:hidden" @click="sidebarMobileOpen = false"></div>
 
-    <!-- Main Sidebar (Fuse Style) -->
-    <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" class="fixed inset-y-0 left-0 z-50 w-64 bg-[#0e1726] text-slate-300 transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 flex flex-col shadow-2xl select-none">
+    <!-- Main Sidebar (Fuse Style with Modern Collapsible Icon Rail & Hover Expansion) -->
+    <aside
+        @mouseenter="if(sidebarCollapsed) sidebarHovered = true"
+        @mouseleave="if(sidebarCollapsed) sidebarHovered = false"
+        :class="[
+            sidebarMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
+            isExpanded ? 'w-64' : 'w-[72px]'
+        ]"
+        class="fixed inset-y-0 left-0 z-50 bg-[#0e1726] text-slate-300 transition-all duration-300 ease-in-out flex flex-col shadow-2xl select-none"
+    >
         
-        <!-- Brand Header: Logo + ERP Badge + Hamburger -->
-        <div class="h-14 flex items-center justify-between px-5 border-b border-slate-800/80 bg-[#0a101d]/50">
-            <div class="flex items-center gap-2.5">
-                <img src="{{ asset('assets/images/logo/meta-new-32.png') }}" alt="ME" class="w-7 h-7 object-contain" onerror="this.onerror=null; this.src='/assets/images/logo/meta-new.png'">
-                <div class="px-2 py-0.5 rounded bg-[#0a101d] border border-slate-800 text-[#38bdf8] text-[11px] font-bold tracking-wider">
+        <!-- Brand Header: Logo + ERP Badge + Hamburger Toggle -->
+        <div class="h-14 flex items-center border-b border-slate-800/80 bg-[#0a101d]/50 shrink-0 transition-all duration-300"
+             :class="isExpanded ? 'justify-between px-4' : 'justify-center px-2'">
+            <div class="flex items-center gap-2.5 overflow-hidden" x-show="isExpanded" x-transition.opacity>
+                <img src="{{ asset('assets/images/logo/meta-new-32.png') }}" alt="ME" class="w-7 h-7 object-contain shrink-0" onerror="this.onerror=null; this.src='/assets/images/logo/meta-new.png'">
+                <div class="px-2 py-0.5 rounded bg-[#0a101d] border border-slate-800 text-[#38bdf8] text-[11px] font-bold tracking-wider shrink-0">
                     ERP
                 </div>
             </div>
-            <button type="button" @click="sidebarOpen = false" class="text-slate-400 hover:text-white p-1 rounded transition-colors focus:outline-none">
+            <button type="button"
+                    @click="sidebarMobileOpen ? sidebarMobileOpen = false : toggleCollapsed()"
+                    class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800/60 transition-colors focus:outline-none shrink-0"
+                    :title="sidebarCollapsed ? 'Expand sidebar' : 'Collapse to icons'">
                 <span class="material-icons-outlined text-lg">menu</span>
             </button>
         </div>
 
         <!-- Current User Profile in Sidebar -->
-        <div class="py-6 px-4 text-center border-b border-slate-800/60">
-            <div class="text-4xl sm:text-5xl font-normal text-slate-400/90 mb-3 select-none tracking-tight">
+        <div class="py-5 px-3 text-center border-b border-slate-800/60 shrink-0 transition-all">
+            <div class="font-normal text-slate-400/90 select-none tracking-tight transition-all duration-200"
+                 :class="isExpanded ? 'text-4xl sm:text-5xl mb-2.5' : 'text-2xl mb-0'">
                 {{ strtoupper(substr(Auth::user()->displayName ?? Auth::user()->name ?? 'R', 0, 1)) }}
             </div>
-            <div class="font-bold text-sm text-white tracking-wide">
-                {{ Auth::user()->displayName ?? Auth::user()->name ?? 'Root' }}
-            </div>
-            <div class="text-[12px] text-slate-400 font-normal mt-0.5">
-                {{ Auth::user()->email ?? Auth::user()->username ?? 'root@root.com' }}
+            <div x-show="isExpanded" x-transition.opacity class="overflow-hidden">
+                <div class="font-bold text-sm text-white tracking-wide truncate">
+                    {{ Auth::user()->displayName ?? Auth::user()->name ?? 'Root' }}
+                </div>
+                <div class="text-[12px] text-slate-400 font-normal mt-0.5 truncate">
+                    {{ Auth::user()->email ?? Auth::user()->username ?? 'root@root.com' }}
+                </div>
             </div>
         </div>
 
         <!-- Navigation Menu -->
         <nav class="flex-1 overflow-y-auto px-2 py-3 space-y-1 custom-scrollbar text-sm font-medium">
             <!-- Home -->
-            <a href="{{ route('home') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl transition-all {{ request()->routeIs('home') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}">
+            <a href="{{ route('home') }}"
+               class="flex items-center rounded-xl transition-all {{ request()->routeIs('home') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}"
+               :class="isExpanded ? 'gap-3 px-3 py-2 justify-start' : 'p-2.5 justify-center'"
+               title="Home">
                 <span class="material-icons-outlined text-lg shrink-0">home</span>
-                <span class="truncate">Home</span>
+                <span class="truncate" x-show="isExpanded" x-transition.opacity>Home</span>
             </a>
 
             <!-- Dashboard -->
-            <a href="{{ route('dashboards.analytics') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl transition-all {{ request()->routeIs('dashboards.*') || request()->routeIs('dashboard') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}">
+            <a href="{{ route('dashboards.analytics') }}"
+               class="flex items-center rounded-xl transition-all {{ request()->routeIs('dashboards.*') || request()->routeIs('dashboard') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}"
+               :class="isExpanded ? 'gap-3 px-3 py-2 justify-start' : 'p-2.5 justify-center'"
+               title="Dashboard">
                 <span class="material-icons-outlined text-lg shrink-0">speed</span>
-                <span class="truncate">Dashboard</span>
+                <span class="truncate" x-show="isExpanded" x-transition.opacity>Dashboard</span>
             </a>
 
             <!-- Users -->
-            <a href="{{ route('users.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl transition-all {{ request()->routeIs('users.*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}">
+            <a href="{{ route('users.index') }}"
+               class="flex items-center rounded-xl transition-all {{ request()->routeIs('users.*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}"
+               :class="isExpanded ? 'gap-3 px-3 py-2 justify-start' : 'p-2.5 justify-center'"
+               title="Users">
                 <span class="material-icons-outlined text-lg shrink-0">people_outline</span>
-                <div class="min-w-0">
+                <div class="min-w-0" x-show="isExpanded" x-transition.opacity>
                     <div class="truncate text-sm leading-tight">Users</div>
                     <div class="text-[11px] text-slate-400 leading-tight mt-0.5">Manage users</div>
                 </div>
             </a>
 
             <!-- Products -->
-            <a href="{{ route('products.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl transition-all {{ request()->routeIs('products.*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}">
+            <a href="{{ route('products.index') }}"
+               class="flex items-center rounded-xl transition-all {{ request()->routeIs('products.*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}"
+               :class="isExpanded ? 'gap-3 px-3 py-2 justify-start' : 'p-2.5 justify-center'"
+               title="Products">
                 <span class="material-icons-outlined text-lg shrink-0">inventory_2</span>
-                <div class="min-w-0">
+                <div class="min-w-0" x-show="isExpanded" x-transition.opacity>
                     <div class="truncate text-sm leading-tight">Products</div>
                     <div class="text-[11px] text-slate-400 leading-tight mt-0.5">All products</div>
                 </div>
             </a>
 
             <!-- Meta Group (Companies) -->
-            <a href="{{ route('companies.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl transition-all {{ request()->routeIs('companies.*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}">
+            <a href="{{ route('companies.index') }}"
+               class="flex items-center rounded-xl transition-all {{ request()->routeIs('companies.*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}"
+               :class="isExpanded ? 'gap-3 px-3 py-2 justify-start' : 'p-2.5 justify-center'"
+               title="Meta Group">
                 <span class="material-icons-outlined text-lg shrink-0">apartment</span>
-                <div class="min-w-0">
+                <div class="min-w-0" x-show="isExpanded" x-transition.opacity>
                     <div class="truncate text-sm leading-tight">Meta Group</div>
                     <div class="text-[11px] text-slate-400 leading-tight mt-0.5">Meta Group of companies</div>
                 </div>
             </a>
 
             <!-- Contacts -->
-            <a href="{{ route('contacts.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl transition-all {{ request()->routeIs('contacts.*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}">
+            <a href="{{ route('contacts.index') }}"
+               class="flex items-center rounded-xl transition-all {{ request()->routeIs('contacts.*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}"
+               :class="isExpanded ? 'gap-3 px-3 py-2 justify-start' : 'p-2.5 justify-center'"
+               title="Contacts">
                 <span class="material-icons-outlined text-lg shrink-0">groups</span>
-                <div class="min-w-0">
+                <div class="min-w-0" x-show="isExpanded" x-transition.opacity>
                     <div class="truncate text-sm leading-tight">Contacts</div>
                     <div class="text-[11px] text-slate-400 leading-tight mt-0.5">Add, find, edit contacts</div>
                 </div>
             </a>
 
             <!-- Offers -->
-            <a href="{{ route('offers.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl transition-all {{ request()->routeIs('offers.*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}">
+            <a href="{{ route('offers.index') }}"
+               class="flex items-center rounded-xl transition-all {{ request()->routeIs('offers.*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}"
+               :class="isExpanded ? 'gap-3 px-3 py-2 justify-start' : 'p-2.5 justify-center'"
+               title="Offers">
                 <span class="material-icons-outlined text-lg shrink-0">request_quote</span>
-                <div class="min-w-0">
+                <div class="min-w-0" x-show="isExpanded" x-transition.opacity>
                     <div class="truncate text-sm leading-tight">Offers</div>
                     <div class="text-[11px] text-slate-400 leading-tight mt-0.5">Purchase and sales offers</div>
                 </div>
             </a>
 
             <!-- Find Contracts -->
-            <a href="{{ route('contracts.search') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl transition-all {{ request()->routeIs('contracts.search') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}">
+            <a href="{{ route('contracts.search') }}"
+               class="flex items-center rounded-xl transition-all {{ request()->routeIs('contracts.search') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}"
+               :class="isExpanded ? 'gap-3 px-3 py-2 justify-start' : 'p-2.5 justify-center'"
+               title="Find Contracts">
                 <span class="material-icons-outlined text-lg shrink-0">find_in_page</span>
-                <div class="min-w-0">
+                <div class="min-w-0" x-show="isExpanded" x-transition.opacity>
                     <div class="truncate text-sm leading-tight">Find Contracts</div>
                     <div class="text-[11px] text-slate-400 leading-tight mt-0.5">Search contracts by date, status</div>
                 </div>
             </a>
 
             <!-- Contracts -->
-            <a href="{{ route('contracts.board', ['boardId' => 2]) }}" class="flex items-center gap-3 px-3 py-2 rounded-xl transition-all {{ request()->routeIs('contracts.board') || request()->routeIs('contracts.index') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}">
+            <a href="{{ route('contracts.board', ['boardId' => 2]) }}"
+               class="flex items-center rounded-xl transition-all {{ request()->routeIs('contracts.board') || request()->routeIs('contracts.index') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}"
+               :class="isExpanded ? 'gap-3 px-3 py-2 justify-start' : 'p-2.5 justify-center'"
+               title="Contracts">
                 <span class="material-icons-outlined text-lg shrink-0">newspaper</span>
-                <div class="min-w-0">
+                <div class="min-w-0" x-show="isExpanded" x-transition.opacity>
                     <div class="truncate text-sm leading-tight">Contracts</div>
                     <div class="text-[11px] text-slate-400 leading-tight mt-0.5">Purchase and sales contracts</div>
                 </div>
             </a>
 
             <!-- Detached Notes -->
-            <a href="{{ route('detached-notes.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl transition-all {{ request()->routeIs('detached-notes.*') || request()->is('detached-notes*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}">
+            <a href="{{ route('detached-notes.index') }}"
+               class="flex items-center rounded-xl transition-all {{ request()->routeIs('detached-notes.*') || request()->is('detached-notes*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}"
+               :class="isExpanded ? 'gap-3 px-3 py-2 justify-start' : 'p-2.5 justify-center'"
+               title="Detached Notes">
                 <span class="material-icons-outlined text-lg shrink-0">description</span>
-                <div class="min-w-0">
+                <div class="min-w-0" x-show="isExpanded" x-transition.opacity>
                     <div class="truncate text-sm leading-tight">Detached Notes</div>
                     <div class="text-[11px] text-slate-400 leading-tight mt-0.5">Detached Notes</div>
                 </div>
             </a>
 
             <!-- Access Control -->
-            <a href="{{ route('accessgroups.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl transition-all {{ request()->routeIs('accessgroups.*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}">
+            <a href="{{ route('accessgroups.index') }}"
+               class="flex items-center rounded-xl transition-all {{ request()->routeIs('accessgroups.*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}"
+               :class="isExpanded ? 'gap-3 px-3 py-2 justify-start' : 'p-2.5 justify-center'"
+               title="Access Control">
                 <span class="material-icons-outlined text-lg shrink-0">fingerprint</span>
-                <div class="min-w-0">
+                <div class="min-w-0" x-show="isExpanded" x-transition.opacity>
                     <div class="truncate text-sm leading-tight">Access Control</div>
                     <div class="text-[11px] text-slate-400 leading-tight mt-0.5">Manage access control of users</div>
                 </div>
             </a>
 
             <!-- Templates -->
-            <a href="{{ route('templates.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl transition-all {{ request()->routeIs('templates.*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}">
+            <a href="{{ route('templates.index') }}"
+               class="flex items-center rounded-xl transition-all {{ request()->routeIs('templates.*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}"
+               :class="isExpanded ? 'gap-3 px-3 py-2 justify-start' : 'p-2.5 justify-center'"
+               title="Templates">
                 <span class="material-icons-outlined text-lg shrink-0">badge</span>
-                <div class="min-w-0">
+                <div class="min-w-0" x-show="isExpanded" x-transition.opacity>
                     <div class="truncate text-sm leading-tight">Templates</div>
                     <div class="text-[11px] text-slate-400 leading-tight mt-0.5">Manage templates</div>
                 </div>
@@ -190,19 +254,25 @@
 
             <!-- Settings (Collapsible Submenu Matching Screenshots) -->
             <div x-data="{ open: {{ request()->routeIs('settings.*') || request()->is('settings*') || request()->is('countries*') || request()->is('company-types*') || request()->is('credit-debit-types*') || request()->is('currencies*') || request()->is('departments*') || request()->is('packTypes*') || request()->is('paymentTypes*') || request()->is('paymentTermsTypes*') ? 'true' : 'false' }} }">
-                <button @click="open = !open" type="button" class="w-full flex items-center justify-between px-3 py-2 rounded-xl transition-all cursor-pointer {{ request()->routeIs('settings.*') || request()->is('countries*') || request()->is('company-types*') ? 'text-white' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}">
+                <button @click="if(!isExpanded) { toggleCollapsed(); open = true; } else { open = !open; }"
+                        type="button"
+                        class="w-full flex items-center rounded-xl transition-all cursor-pointer {{ request()->routeIs('settings.*') || request()->is('countries*') || request()->is('company-types*') ? 'text-white' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}"
+                        :class="isExpanded ? 'justify-between px-3 py-2' : 'justify-center p-2.5'"
+                        title="Settings">
                     <div class="flex items-center gap-3 min-w-0">
                         <span class="material-icons-outlined text-lg shrink-0">settings</span>
-                        <div class="min-w-0 text-left">
+                        <div class="min-w-0 text-left" x-show="isExpanded" x-transition.opacity>
                             <div class="truncate text-xs font-bold uppercase tracking-wider text-slate-300">SETTINGS</div>
                             <div class="text-[11px] text-slate-400 leading-tight mt-0.5">System settings</div>
                         </div>
                     </div>
-                    <span class="material-icons text-sm text-slate-400 transition-transform duration-200" :class="open ? 'rotate-180' : ''">keyboard_arrow_down</span>
+                    <span class="material-icons text-sm text-slate-400 transition-transform duration-200"
+                          x-show="isExpanded"
+                          :class="open ? 'rotate-180' : ''">keyboard_arrow_down</span>
                 </button>
 
                 <!-- Submenu Items -->
-                <div x-show="open" class="mt-1 space-y-0.5 pl-2">
+                <div x-show="open && isExpanded" x-transition class="mt-1 space-y-0.5 pl-2">
                     <!-- 1. Countries -->
                     <a href="{{ route('settings.countries') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl transition-all {{ request()->routeIs('settings.countries*') || request()->is('countries*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}">
                         <span class="material-icons-outlined text-lg shrink-0">public</span>
@@ -255,14 +325,29 @@
         </nav>
     </aside>
 
+    <!-- Desktop Spacer Div (reserves layout space for sidebar) -->
+    <div class="hidden lg:block shrink-0 transition-all duration-300 ease-in-out"
+         :class="sidebarCollapsed ? 'w-[72px]' : 'w-64'">
+    </div>
+
     <!-- Main Content Area -->
     <div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
         <!-- Topbar: Amber Star on Left, Fullscreen + Search + Root (u) on Right -->
         <header class="h-14 bg-white border-b border-slate-200/80 px-6 flex items-center justify-between shrink-0 shadow-xs z-30">
-            <!-- Left Side: Favorite Star -->
-            <div class="flex items-center gap-3">
-                <button @click="sidebarOpen = !sidebarOpen" class="p-1.5 text-slate-600 rounded-lg hover:bg-slate-100 lg:hidden">
-                    <span class="material-icons-outlined">menu</span>
+            <!-- Left Side: Hamburger Menu & Favorite Star -->
+            <div class="flex items-center gap-2">
+                <!-- Mobile Menu Button -->
+                <button type="button" @click="sidebarMobileOpen = !sidebarMobileOpen" class="p-1.5 text-slate-600 rounded-lg hover:bg-slate-100 lg:hidden">
+                    <span class="material-icons-outlined text-xl leading-none">menu</span>
+                </button>
+                <!-- Desktop Sidebar Toggle Button (visible when collapsed or in topbar) -->
+                <button type="button"
+                        x-show="sidebarCollapsed"
+                        x-cloak
+                        @click="toggleCollapsed()"
+                        class="hidden lg:flex items-center justify-center p-1.5 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100 transition-colors"
+                        title="Expand Sidebar">
+                    <span class="material-icons-outlined text-xl leading-none">menu</span>
                 </button>
                 <button type="button" class="text-amber-500 hover:text-amber-600 focus:outline-none transition-transform active:scale-95" title="Favorite">
                     <span class="material-icons text-xl leading-none">star</span>
