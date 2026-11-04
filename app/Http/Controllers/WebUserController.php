@@ -12,9 +12,26 @@ use Illuminate\Support\Facades\Hash;
 
 class WebUserController extends Controller
 {
-        public function index()
+    public function index(Request $request)
     {
-        $users = User::with(['permissions.accessGroup', 'permissions.company'])->orderBy('name')->paginate(20);
+        $query = User::with(['permissions.accessGroup', 'permissions.company']);
+
+        $search = $request->input('q') ?? $request->input('search');
+        if (!empty($search)) {
+            $query->where(function($sub) use ($search) {
+                $sub->where('name', 'like', "%{$search}%")
+                    ->orWhere('username', 'like', "%{$search}%")
+                    ->orWhere('displayName', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $perPage = (int) $request->input('per_page', 10);
+        if (!in_array($perPage, [10, 25, 50, 100])) {
+            $perPage = 10;
+        }
+
+        $users = $query->orderBy('name')->paginate($perPage)->withQueryString();
         $accessGroups = AccessGroup::where('active', true)->orderBy('name')->get();
         $companies = Company::where('active', true)->orderBy('name')->get();
         $groups = $accessGroups;

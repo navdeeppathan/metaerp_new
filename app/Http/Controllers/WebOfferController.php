@@ -15,14 +15,14 @@ class WebOfferController extends Controller
     {
         $query = Offer::query();
 
-        if ($request->filled('q')) {
-            $q = $request->input('q');
-            $query->where(function($sub) use ($q) {
-                $sub->where('subject', 'like', "%{$q}%")
-                    ->orWhere('code', 'like', "%{$q}%")
-                    ->orWhere('orderCode', 'like', "%{$q}%")
-                    ->orWhere('contract_code', 'like', "%{$q}%")
-                    ->orWhere('id', 'like', "%{$q}%");
+        $search = $request->input('q') ?? $request->input('search');
+        if (!empty($search)) {
+            $query->where(function($sub) use ($search) {
+                $sub->where('subject', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%")
+                    ->orWhere('orderCode', 'like', "%{$search}%")
+                    ->orWhere('contract_code', 'like', "%{$search}%")
+                    ->orWhere('id', 'like', "%{$search}%");
             });
         }
 
@@ -34,7 +34,12 @@ class WebOfferController extends Controller
             $query->where('type', $request->input('type'));
         }
 
-        $offers = $query->orderBy('id', 'desc')->paginate(10);
+        $perPage = (int) $request->input('per_page', 10);
+        if (!in_array($perPage, [10, 25, 50, 100])) {
+            $perPage = 10;
+        }
+
+        $offers = $query->orderBy('id', 'desc')->paginate($perPage)->withQueryString();
         return view('offers.index', compact('offers'));
     }
 

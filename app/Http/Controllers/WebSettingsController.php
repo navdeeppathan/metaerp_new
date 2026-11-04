@@ -32,7 +32,12 @@ class WebSettingsController extends Controller
             });
         }
 
-        $countries = $query->orderBy('name', 'asc')->get();
+        $perPage = (int) $request->input('per_page', 10);
+        if (!in_array($perPage, [10, 25, 50, 100])) {
+            $perPage = 10;
+        }
+
+        $countries = $query->orderBy('name', 'asc')->paginate($perPage)->withQueryString();
 
         return view('settings.countries.index', compact('countries'));
     }
@@ -105,7 +110,12 @@ class WebSettingsController extends Controller
             $query->where('description', 'like', "%{$search}%");
         }
 
-        $companyTypes = $query->orderBy('id', 'asc')->get();
+        $perPage = (int) $request->input('per_page', 10);
+        if (!in_array($perPage, [10, 25, 50, 100])) {
+            $perPage = 10;
+        }
+
+        $companyTypes = $query->orderBy('id', 'asc')->paginate($perPage)->withQueryString();
 
         return view('settings.company-types.index', compact('companyTypes'));
     }
@@ -173,7 +183,12 @@ class WebSettingsController extends Controller
             $query->where('description', 'like', "%{$search}%");
         }
 
-        $items = $query->orderBy('id', 'asc')->get();
+        $perPage = (int) $request->input('per_page', 10);
+        if (!in_array($perPage, [10, 25, 50, 100])) {
+            $perPage = 10;
+        }
+
+        $items = $query->orderBy('id', 'asc')->paginate($perPage)->withQueryString();
 
         return view('settings.credit-debit-types.index', compact('items'));
     }
@@ -241,7 +256,12 @@ class WebSettingsController extends Controller
             });
         }
 
-        $currencies = $query->orderBy('id', 'asc')->get();
+        $perPage = (int) $request->input('per_page', 10);
+        if (!in_array($perPage, [10, 25, 50, 100])) {
+            $perPage = 10;
+        }
+
+        $currencies = $query->orderBy('id', 'asc')->paginate($perPage)->withQueryString();
 
         return view('settings.currencies.index', ['items' => $currencies, 'currencies' => $currencies]);
     }
@@ -318,7 +338,12 @@ class WebSettingsController extends Controller
             });
         }
 
-        $departments = $query->orderBy('id', 'asc')->get();
+        $perPage = (int) $request->input('per_page', 10);
+        if (!in_array($perPage, [10, 25, 50, 100])) {
+            $perPage = 10;
+        }
+
+        $departments = $query->orderBy('id', 'asc')->paginate($perPage)->withQueryString();
 
         return view('settings.departments.index', ['items' => $departments, 'departments' => $departments]);
     }
@@ -388,7 +413,12 @@ class WebSettingsController extends Controller
             $query->where('description', 'like', "%{$search}%");
         }
 
-        $packTypes = $query->orderBy('id', 'asc')->get();
+        $perPage = (int) $request->input('per_page', 10);
+        if (!in_array($perPage, [10, 25, 50, 100])) {
+            $perPage = 10;
+        }
+
+        $packTypes = $query->orderBy('id', 'asc')->paginate($perPage)->withQueryString();
 
         return view('settings.pack-types.index', ['items' => $packTypes, 'packTypes' => $packTypes]);
     }
@@ -450,7 +480,12 @@ class WebSettingsController extends Controller
             $query->where('description', 'like', "%{$search}%");
         }
 
-        $paymentTypes = $query->orderBy('id', 'asc')->get();
+        $perPage = (int) $request->input('per_page', 10);
+        if (!in_array($perPage, [10, 25, 50, 100])) {
+            $perPage = 10;
+        }
+
+        $paymentTypes = $query->orderBy('id', 'asc')->paginate($perPage)->withQueryString();
 
         return view('settings.payment-types.index', ['items' => $paymentTypes, 'paymentTypes' => $paymentTypes]);
     }
@@ -512,7 +547,12 @@ class WebSettingsController extends Controller
             $query->where('description', 'like', "%{$search}%");
         }
 
-        $paymentTerms = $query->orderBy('id', 'asc')->get();
+        $perPage = (int) $request->input('per_page', 10);
+        if (!in_array($perPage, [10, 25, 50, 100])) {
+            $perPage = 10;
+        }
+
+        $paymentTerms = $query->orderBy('id', 'asc')->paginate($perPage)->withQueryString();
 
         return view('settings.payment-terms.index', ['items' => $paymentTerms, 'paymentTerms' => $paymentTerms]);
     }

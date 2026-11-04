@@ -20,17 +20,22 @@ class WebContactController extends Controller
     {
         $query = Contact::with(['country', 'metaCompany', 'types'])->where('active', true);
 
-        if ($request->filled('q')) {
-            $q = $request->input('q');
-            $query->where(function($sub) use ($q) {
-                $sub->where('name', 'like', "%{$q}%")
-                    ->orWhere('codeMeta', 'like', "%{$q}%")
-                    ->orWhere('vat', 'like', "%{$q}%")
-                    ->orWhere('id', 'like', "%{$q}%");
+        $search = $request->input('q') ?? $request->input('search');
+        if (!empty($search)) {
+            $query->where(function($sub) use ($search) {
+                $sub->where('name', 'like', "%{$search}%")
+                    ->orWhere('codeMeta', 'like', "%{$search}%")
+                    ->orWhere('vat', 'like', "%{$search}%")
+                    ->orWhere('id', 'like', "%{$search}%");
             });
         }
 
-        $contacts = $query->orderBy('id')->get();
+        $perPage = (int) $request->input('per_page', 10);
+        if (!in_array($perPage, [10, 25, 50, 100])) {
+            $perPage = 10;
+        }
+
+        $contacts = $query->orderBy('name')->paginate($perPage)->withQueryString();
         return view('contacts.index', compact('contacts'));
     }
 

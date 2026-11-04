@@ -3,104 +3,131 @@
 @section('title', 'Offers')
 
 @section('content')
-<div class="space-y-4 max-w-7xl mx-auto">
-    <!-- Header with Title & Action Controls -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1 pb-2">
-        <h1 class="text-2xl sm:text-3xl font-extrabold text-[#0e1726] tracking-tight">Offers</h1>
+<div class="space-y-4"
+     x-data="{
+         selectedItems: [],
+         selectAll: false,
+         toggleSelectAll() {
+             this.selectAll = !this.selectAll;
+             this.selectedItems = this.selectAll ? [{{ $offers->pluck('id')->join(',') }}] : [];
+         }
+     }">
+
+    <!-- Top Action Bar (On Page Background): Title, Search Pill, and Add Button -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-1">
+        <div>
+            <h1 class="text-2xl sm:text-[28px] font-bold text-slate-900 tracking-tight">Offers</h1>
+        </div>
 
         <div class="flex items-center gap-3">
-            <!-- Search Pill -->
-            <form method="GET" action="{{ route('offers.index') }}" class="relative w-64 sm:w-72">
-                <span class="material-icons-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg pointer-events-none">search</span>
+            <!-- Search Pill Matching Exact Screenshot -->
+            <form method="GET" action="{{ route('offers.index') }}" class="relative w-full sm:w-72">
+                <span class="material-icons-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none">search</span>
                 <input
                     type="text"
                     name="q"
-                    value="{{ request('q') }}"
+                    value="{{ request('q', request('search')) }}"
                     placeholder="Search offer"
-                    class="w-full pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-full text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-indigo-600 shadow-xs transition"
+                    class="w-full pl-9 pr-4 py-2 bg-white border border-slate-200/90 rounded-full text-xs text-slate-800 placeholder-slate-400 shadow-2xs focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition"
                 >
             </form>
 
-            <!-- + Add Button -->
+            <!-- + Add Button Matching Screenshot -->
             <a
                 href="{{ route('offers.create') }}"
-                class="inline-flex items-center gap-1.5 px-5 py-2 bg-[#4f46e5] hover:bg-[#4338ca] text-white text-sm font-semibold rounded-full shadow-xs transition-colors shrink-0"
+                class="px-5 py-2 bg-[#4f46e5] hover:bg-[#4338ca] text-white rounded-full text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-colors shrink-0 cursor-pointer"
             >
-                <span class="material-icons text-base">add</span>
+                <span class="material-icons text-sm font-bold leading-none">add</span>
                 <span>Add</span>
             </a>
         </div>
     </div>
 
-    <!-- Feedback messages -->
+    <!-- Feedback Alert Messages -->
     @if(session('success'))
         <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700 text-xs font-medium">
             {{ session('success') }}
         </div>
     @endif
 
-    <!-- Offers Table Card -->
-    <div class="bg-white rounded-xl border border-slate-200/80 shadow-xs overflow-hidden">
-        <div class="overflow-x-auto">
+    <!-- Standalone White Table Card -->
+    <div class="bg-white rounded-xl shadow-xs border border-slate-200/70 overflow-hidden min-h-[calc(100vh-210px)] flex flex-col justify-between">
+        <div class="overflow-x-auto flex-1">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="border-b border-slate-100 text-slate-800 text-sm font-bold bg-white">
-                        <th class="w-12 px-6 py-4">
+                    <tr class="bg-slate-50/60 border-b border-slate-100 text-slate-800 text-xs sm:text-sm font-semibold select-none">
+                        <th scope="col" class="py-4 px-6 w-14 text-left">
                             <input
                                 type="checkbox"
-                                class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                                x-model="selectAll"
+                                @change="toggleSelectAll()"
+                                class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-0 cursor-pointer"
                             >
                         </th>
-                        <th class="px-6 py-4 font-bold text-slate-800 text-sm">id</th>
-                        <th class="px-6 py-4 font-bold text-slate-800 text-sm">Status</th>
-                        <th class="px-6 py-4 font-bold text-slate-800 text-sm">Type</th>
-                        <th class="px-6 py-4 font-bold text-slate-800 text-sm">Subject</th>
-                        <th class="px-6 py-4 font-bold text-slate-800 text-sm">Code</th>
-                        <th class="px-6 py-4 font-bold text-slate-800 text-sm">Contract Code</th>
+                        <th scope="col" class="py-4 px-6 font-semibold text-slate-800 text-xs sm:text-sm">
+                            id
+                        </th>
+                        <th scope="col" class="py-4 px-6 font-semibold text-slate-800 text-xs sm:text-sm">
+                            Status
+                        </th>
+                        <th scope="col" class="py-4 px-6 font-semibold text-slate-800 text-xs sm:text-sm">
+                            Type
+                        </th>
+                        <th scope="col" class="py-4 px-6 font-semibold text-slate-800 text-xs sm:text-sm">
+                            Subject
+                        </th>
+                        <th scope="col" class="py-4 px-6 font-semibold text-slate-800 text-xs sm:text-sm">
+                            Code
+                        </th>
+                        <th scope="col" class="py-4 px-6 font-semibold text-slate-800 text-xs sm:text-sm">
+                            Contract Code
+                        </th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100 text-sm">
+                <tbody class="text-xs sm:text-sm">
                     @forelse($offers as $offer)
                         <tr
-                            onclick="window.location='{{ route('offers.show', $offer->id) }}'"
-                            class="hover:bg-slate-50/80 cursor-pointer transition-colors"
+                            onclick="if(!event.target.closest('input')) window.location='{{ route('offers.show', $offer->id) }}'"
+                            :class="{ 'bg-slate-50/90': selectedItems.includes({{ $offer->id }}) }"
+                            class="hover:bg-slate-50/70 transition-colors cursor-pointer group"
                         >
-                            <td class="w-12 px-6 py-4.5" onclick="event.stopPropagation()">
+                            <td class="py-5 px-6 w-14 text-left" onclick="event.stopPropagation()">
                                 <input
                                     type="checkbox"
-                                    class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                                    :value="{{ $offer->id }}"
+                                    x-model="selectedItems"
+                                    class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-0 cursor-pointer"
                                 >
                             </td>
-                            <td class="px-6 py-4.5 text-slate-700">
+                            <td class="py-5 px-6 text-slate-800 font-normal">
                                 {{ $offer->id }}
                             </td>
-                            <td class="px-6 py-4.5">
-                                <div class="font-medium text-slate-900 leading-tight">
+                            <td class="py-5 px-6 font-normal">
+                                <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold {{ $offer->status === 'ACCEPTED' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-700 border border-slate-200' }}">
                                     {{ $offer->status }}
-                                </div>
-                                @if($offer->status === 'ACCEPTED' || $offer->accepted_at)
-                                    <div class="text-xs text-slate-500 font-normal leading-tight mt-0.5">
-                                        {{ $offer->accepted_at ? \Carbon\Carbon::parse($offer->accepted_at)->format('d M y') : '11 Feb 26' }}
-                                    </div>
-                                @endif
+                                </span>
                             </td>
-                            <td class="px-6 py-4.5 text-slate-700">
-                                {{ $offer->type }}
+                            <td class="py-5 px-6 font-normal">
+                                <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold {{ $offer->type === 'BUY' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-purple-50 text-purple-700 border border-purple-200' }}">
+                                    {{ $offer->type }}
+                                </span>
                             </td>
-                            <td class="px-6 py-4.5 font-medium text-slate-900">
-                                {{ $offer->subject }}
+                            <td class="py-5 px-6 text-slate-800 font-normal">
+                                <a href="{{ route('offers.show', $offer->id) }}" class="hover:text-indigo-600 transition font-medium">
+                                    {{ $offer->subject }}
+                                </a>
                             </td>
-                            <td class="px-6 py-4.5 text-slate-700">
-                                {{ $offer->code ?? $offer->orderCode }}
+                            <td class="py-5 px-6 text-slate-800 font-normal">
+                                {{ $offer->code ?? '' }}
                             </td>
-                            <td class="px-6 py-4.5 text-slate-700">
+                            <td class="py-5 px-6 text-slate-800 font-normal">
                                 {{ $offer->contract_code ?? '' }}
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-12 text-center text-slate-400 text-sm">
-                                No offers found.
+                            <td colspan="7" class="py-16 text-center text-slate-400 text-sm">
+                                There are no offers!
                             </td>
                         </tr>
                     @endforelse
@@ -108,25 +135,13 @@
             </table>
         </div>
 
-        <!-- Pagination Bar Matching Screenshot -->
-        <div class="px-6 py-3 border-t border-slate-100 flex items-center justify-end gap-6 text-xs text-slate-600">
-            <div class="flex items-center gap-1.5">
-                <span>Rows per page:</span>
-                <span class="font-medium text-slate-800">10</span>
-                <span class="material-icons text-sm text-slate-500">arrow_drop_down</span>
+        <!-- Bottom Pagination Matching Material UI DataGrid -->
+        @if($offers->total() > 0)
+            <div class="px-6 py-3.5 border-t border-slate-100">
+                @include('partials.pagination', ['paginator' => $offers])
             </div>
-            <div>
-                {{ $offers->firstItem() ?? 1 }}-{{ $offers->lastItem() ?? $offers->count() }} of {{ $offers->total() }}
-            </div>
-            <div class="flex items-center gap-2 text-slate-400">
-                <button type="button" class="hover:text-slate-600 disabled:opacity-40" {{ $offers->onFirstPage() ? 'disabled' : '' }}>
-                    <span class="material-icons text-base">chevron_left</span>
-                </button>
-                <button type="button" class="hover:text-slate-600 disabled:opacity-40" {{ !$offers->hasMorePages() ? 'disabled' : '' }}>
-                    <span class="material-icons text-base">chevron_right</span>
-                </button>
-            </div>
-        </div>
+        @endif
     </div>
+
 </div>
 @endsection

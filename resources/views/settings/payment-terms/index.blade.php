@@ -3,69 +3,75 @@
 @section('title', 'PaymentTermsTypes')
 
 @section('content')
-<div class="space-y-6" x-data="{ selectedItems: [], selectAll: false }">
+<div class="space-y-4" x-data="{ selectedItems: [], selectAll: false }">
     <!-- Top Action Bar: Title, Search, and Add Button -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-1">
         <div>
-            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">PaymentTermsTypes</h1>
+            <h1 class="text-2xl sm:text-[28px] font-bold text-slate-900 tracking-tight">PaymentTermsTypes</h1>
         </div>
 
         <div class="flex items-center gap-3">
-            <!-- Search Input Pill Matching Screenshot -->
             <form method="GET" action="{{ route('settings.paymentTerms') }}" class="relative w-full sm:w-72">
                 <span class="material-icons-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none">search</span>
                 <input type="text" 
                        name="search" 
                        value="{{ request('search') }}"
                        placeholder="Search payment type" 
-                       class="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-full text-xs text-slate-800 placeholder-slate-400 shadow-2xs focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                       class="w-full pl-9 pr-4 py-2 bg-white border border-slate-200/90 rounded-full text-xs text-slate-800 placeholder-slate-400 shadow-2xs focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition">
             </form>
 
-            <!-- + Add Button Matching Screenshot -->
             <a href="{{ route('settings.paymentTerms.create') }}" 
-               class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full text-xs font-semibold flex items-center gap-1.5 shadow-xs transition shrink-0 cursor-pointer">
+               class="px-5 py-2 bg-[#4f46e5] hover:bg-[#4338ca] text-white rounded-full text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-colors shrink-0 cursor-pointer">
                 <span class="material-icons text-sm font-bold leading-none">add</span>
                 <span>Add</span>
             </a>
         </div>
     </div>
 
-    <!-- PaymentTermsTypes Data Table Matching Screenshot -->
-    <div class="bg-white rounded-xl shadow-xs border border-slate-200/80 overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs text-slate-700">
-                <thead class="bg-white border-b border-slate-200/80 text-[11px] font-semibold text-slate-700 select-none">
-                    <tr>
-                        <th scope="col" class="py-3.5 px-4 w-12 text-center">
+    @if(session('success'))
+        <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700 text-xs font-medium">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    <!-- Data Table Card -->
+    <div class="bg-white rounded-xl shadow-xs border border-slate-200/70 overflow-hidden min-h-[calc(100vh-210px)] flex flex-col justify-between">
+        <div class="overflow-x-auto flex-1">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50/60 border-b border-slate-100 text-slate-800 text-xs sm:text-sm font-semibold select-none">
+                        <th scope="col" class="py-4 px-6 w-14 text-left">
                             <input type="checkbox" 
                                    x-model="selectAll"
                                    @change="selectedItems = selectAll ? [{{ $paymentTerms->pluck('id')->join(',') }}] : []"
                                    class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-0 cursor-pointer">
                         </th>
-                        <th scope="col" class="py-3.5 px-6 font-semibold text-slate-700 text-xs">
+                        <th scope="col" class="py-4 px-6 font-semibold text-slate-800 text-xs sm:text-sm">
                             Description
                         </th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100 text-slate-700">
-                    @forelse($paymentTerms as $item)
-                    <tr class="hover:bg-slate-50/70 transition cursor-pointer group" onclick="if(!event.target.closest('input')) window.location='{{ route('settings.paymentTerms.show', $item->id) }}'">
-                        <td class="py-4 px-4 text-center" onclick="event.stopPropagation()">
+                <tbody class="text-xs sm:text-sm">
+                    @forelse($paymentTerms as $term)
+                    <tr class="hover:bg-slate-50/70 transition-colors cursor-pointer group"
+                        :class="{ 'bg-slate-50/90': selectedItems.includes({{ $term->id }}) }"
+                        onclick="if(!event.target.closest('input')) window.location='{{ route('settings.paymentTerms.show', $term->id) }}'">
+                        <td class="py-5 px-6 w-14 text-left" onclick="event.stopPropagation()">
                             <input type="checkbox" 
-                                   :value="{{ $item->id }}" 
+                                   :value="{{ $term->id }}" 
                                    x-model="selectedItems"
                                    class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-0 cursor-pointer">
                         </td>
-                        <td class="py-4 px-6 text-slate-800 tracking-wide font-normal">
-                            <a href="{{ route('settings.paymentTerms.show', $item->id) }}" class="hover:text-indigo-600 transition">
-                                {{ $item->description }}
+                        <td class="py-5 px-6 text-slate-800 font-normal">
+                            <a href="{{ route('settings.paymentTerms.show', $term->id) }}" class="hover:text-indigo-600 transition">
+                                {{ $term->description }}
                             </a>
                         </td>
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="2" class="py-12 text-center text-slate-400 text-xs">
-                            No payment terms types found.
+                        <td colspan="2" class="py-16 text-center text-slate-400 text-sm">
+                            No payment terms found.
                         </td>
                     </tr>
                     @endforelse
@@ -73,27 +79,11 @@
             </table>
         </div>
 
-        <!-- Table Footer / Pagination Matching Screenshot -->
-        <div class="px-6 py-3 border-t border-slate-100 flex items-center justify-end gap-6 text-xs text-slate-600 select-none bg-white">
-            <div class="flex items-center gap-1.5 cursor-pointer">
-                <span>Rows per page:</span>
-                <span class="font-medium">10</span>
-                <span class="material-icons text-sm text-slate-400">arrow_drop_down</span>
+        @if($paymentTerms->total() > 0)
+            <div class="px-6 py-3.5 border-t border-slate-100">
+                @include('partials.pagination', ['paginator' => $paymentTerms])
             </div>
-
-            <div>
-                1-{{ $paymentTerms->count() }} of {{ $paymentTerms->count() }}
-            </div>
-
-            <div class="flex items-center gap-1">
-                <button type="button" class="p-1 text-slate-400 hover:text-slate-600 disabled:opacity-40" disabled>
-                    <span class="material-icons text-sm leading-none">chevron_left</span>
-                </button>
-                <button type="button" class="p-1 text-slate-400 hover:text-slate-600 disabled:opacity-40" disabled>
-                    <span class="material-icons text-sm leading-none">chevron_right</span>
-                </button>
-            </div>
-        </div>
+        @endif
     </div>
 </div>
 @endsection

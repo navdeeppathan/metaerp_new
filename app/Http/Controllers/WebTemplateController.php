@@ -28,7 +28,12 @@ class WebTemplateController extends Controller
             }
         }
 
-        $templates = $query->orderBy('id', 'asc')->get();
+        $perPage = (int) $request->input('per_page', 10);
+        if (!in_array($perPage, [10, 25, 50, 100])) {
+            $perPage = 10;
+        }
+
+        $templates = $query->orderBy('id', 'asc')->paginate($perPage)->withQueryString();
 
         return view('templates.index', compact('templates'));
     }

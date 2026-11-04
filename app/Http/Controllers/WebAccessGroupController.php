@@ -35,11 +35,17 @@ class WebAccessGroupController extends Controller
     {
         $query = AccessGroup::with('accessList')->where('active', true);
 
-        if ($request->filled('search')) {
-            $query->where('name', 'like', '%' . $request->input('search') . '%');
+        $search = $request->input('q') ?? $request->input('search');
+        if (!empty($search)) {
+            $query->where('name', 'like', '%' . $search . '%');
         }
 
-        $groups = $query->orderBy('id')->get();
+        $perPage = (int) $request->input('per_page', 10);
+        if (!in_array($perPage, [10, 25, 50, 100])) {
+            $perPage = 10;
+        }
+
+        $groups = $query->orderBy('id')->paginate($perPage)->withQueryString();
 
         return view('accessgroups.index', compact('groups'));
     }

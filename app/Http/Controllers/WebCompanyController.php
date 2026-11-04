@@ -15,18 +15,23 @@ class WebCompanyController extends Controller
     {
         $query = Company::where('active', true);
 
-        if ($request->filled('q')) {
-            $q = $request->input('q');
-            $query->where(function($sub) use ($q) {
-                $sub->where('name', 'like', "%{$q}%")
-                    ->orWhere('code', 'like', "%{$q}%")
-                    ->orWhere('vatNumber', 'like', "%{$q}%")
-                    ->orWhere('companyNumber', 'like', "%{$q}%")
-                    ->orWhere('phoneNumber', 'like', "%{$q}%");
+        $search = $request->input('q') ?? $request->input('search');
+        if (!empty($search)) {
+            $query->where(function($sub) use ($search) {
+                $sub->where('name', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%")
+                    ->orWhere('vatNumber', 'like', "%{$search}%")
+                    ->orWhere('companyNumber', 'like', "%{$search}%")
+                    ->orWhere('phoneNumber', 'like', "%{$search}%");
             });
         }
 
-        $companies = $query->orderBy('id')->get();
+        $perPage = (int) $request->input('per_page', 10);
+        if (!in_array($perPage, [10, 25, 50, 100])) {
+            $perPage = 10;
+        }
+
+        $companies = $query->orderBy('name')->paginate($perPage)->withQueryString();
         $countries = Country::where('active', true)->orderBy('name')->get();
         return view('companies.index', compact('companies', 'countries'));
     }
