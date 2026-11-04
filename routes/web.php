@@ -14,6 +14,7 @@ use App\Http\Controllers\WebAccessGroupController;
 use App\Http\Controllers\WebProfileController;
 use App\Http\Controllers\WebDashboardController;
 use App\Http\Controllers\WebSettingsController;
+use App\Http\Controllers\WebDetachedNoteController;
 
 // --- Guest / Authentication Routes ---
 Route::middleware('guest')->group(function () {
@@ -92,8 +93,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/users/{id}/signature', [WebUserController::class, 'uploadSignature'])->name('users.signature');
 
     Route::get('/accessgroups', [WebAccessGroupController::class, 'index'])->name('accessgroups.index');
+    Route::get('/accessgroups/new', [WebAccessGroupController::class, 'create'])->name('accessgroups.create');
+    Route::get('/accessgroups/{id}', [WebAccessGroupController::class, 'show'])->name('accessgroups.show');
     Route::post('/accessgroups', [WebAccessGroupController::class, 'store'])->name('accessgroups.store');
     Route::put('/accessgroups/{id}', [WebAccessGroupController::class, 'update'])->name('accessgroups.update');
+    Route::delete('/accessgroups/{id}', [WebAccessGroupController::class, 'destroy'])->name('accessgroups.destroy');
 
     // Profile & Account
     Route::get('/apps/profile', [WebProfileController::class, 'index'])->name('profile.index');
@@ -106,6 +110,11 @@ Route::middleware('auth')->group(function () {
     // Analytics Dashboard
     Route::get('/dashboards/analytics', [WebDashboardController::class, 'analytics'])->name('dashboards.analytics');
     Route::get('/dashboard', fn() => redirect()->route('dashboards.analytics'))->name('dashboard');
+
+    // Detached Notes
+    Route::get('/detached-notes', [WebDetachedNoteController::class, 'index'])->name('detached-notes.index');
+    Route::post('/detached-notes', [WebDetachedNoteController::class, 'store'])->name('detached-notes.store');
+    Route::delete('/detached-notes/{id}', [WebDetachedNoteController::class, 'destroy'])->name('detached-notes.destroy');
 
     // System Settings Lookups
     Route::get('/countries', [WebSettingsController::class, 'countries'])->name('settings.countries');

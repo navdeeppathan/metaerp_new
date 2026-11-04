@@ -109,7 +109,7 @@ class WebRoutesTest extends TestCase
     {
         $response = $this->actingAs($this->user)->get('/accessgroups');
         $response->assertStatus(200);
-        $response->assertSee('Access Groups');
+        $response->assertSee('Access Control');
     }
 
     public function test_analytics_dashboard_renders()
@@ -141,5 +141,13 @@ class WebRoutesTest extends TestCase
             $response = $this->actingAs($this->user)->get($route);
             $response->assertStatus(200);
         }
+    }
+
+    public function test_detached_notes_renders()
+    {
+        $response = $this->actingAs($this->user)->get('/detached-notes');
+        $response->assertStatus(200);
+        $response->assertSee('Detached Notes');
+        $response->assertSee('There are no detachedNotes!');
     }
 }

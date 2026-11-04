@@ -162,7 +162,7 @@
             </a>
 
             <!-- Detached Notes -->
-            <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-xl transition-all {{ request()->is('detached-notes*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}">
+            <a href="{{ route('detached-notes.index') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl transition-all {{ request()->routeIs('detached-notes.*') || request()->is('detached-notes*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}">
                 <span class="material-icons-outlined text-lg shrink-0">description</span>
                 <div class="min-w-0">
                     <div class="truncate text-sm leading-tight">Detached Notes</div>
