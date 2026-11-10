@@ -33,7 +33,7 @@ class WebAuthController extends Controller
         ]);
 
         $user = User::where('username', $credentials['username'])
-            ->orWhere('email', $credentials['username'])
+            ->orWhere('username', $credentials['username'])
             ->first();
 
         if (!$user || !Hash::check($credentials['password'], $user->password)) {

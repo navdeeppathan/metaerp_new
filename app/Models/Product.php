@@ -7,11 +7,37 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     protected $table = 'products';
-    protected $guarded = [];
-    protected $casts = ['active' => 'boolean'];
+    protected $primaryKey = 'id';
+    public $timestamps = false;
 
-    public function contacts()
+    protected $fillable = [
+        'id',
+        'uom',
+        'active',
+        'base_code_annexix',
+        'code',
+        'eu_list_of_wastes',
+        'hs_code',
+        'item_specification',
+        'name',
+        'symbol',
+        'contact_id',
+        'version',
+        'product_category',
+    ];
+
+    protected $casts = [
+        'active' => 'boolean',
+        'version' => 'integer',
+    ];
+
+    public function contact()
     {
-        return $this->belongsToMany(Contact::class, 'contact_products', 'product_id', 'contact_id');
+        return $this->belongsTo(Contact::class, 'contact_id');
+    }
+
+    public function dealProducts()
+    {
+        return $this->hasMany(DealProduct::class, 'product_id');
     }
 }

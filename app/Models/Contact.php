@@ -7,22 +7,28 @@ use Illuminate\Database\Eloquent\Model;
 class Contact extends Model
 {
     protected $table = 'contacts';
-    protected $guarded = [];
-    protected $casts = ['active' => 'boolean'];
+    protected $primaryKey = 'id';
+    public $timestamps = false;
 
-    public function metaCompany()
-    {
-        return $this->belongsTo(Company::class, 'companyId');
-    }
+    protected $guarded = [];
+
+    protected $casts = [
+        'active' => 'boolean',
+    ];
 
     public function country()
     {
-        return $this->belongsTo(Country::class, 'countryId');
+        return $this->belongsTo(Country::class, 'country_id');
     }
 
-    public function currency()
+    public function company()
     {
-        return $this->belongsTo(Currency::class, 'currency_id');
+        return $this->belongsTo(Company::class, 'company_id');
+    }
+
+    public function metaCompany()
+    {
+        return $this->belongsTo(Company::class, 'company_id');
     }
 
     public function language()
@@ -30,9 +36,9 @@ class Contact extends Model
         return $this->belongsTo(Language::class, 'language_id');
     }
 
-    public function bankAccounts()
+    public function addresses()
     {
-        return $this->hasMany(BankAccount::class, 'contact_id');
+        return $this->belongsToMany(Address::class, 'contacts_addresses', 'contact_id', 'addresses_id');
     }
 
     public function representatives()
@@ -40,18 +46,28 @@ class Contact extends Model
         return $this->hasMany(Representative::class, 'contact_id');
     }
 
-    public function addresses()
+    public function products()
     {
-        return $this->hasMany(Address::class, 'contact_id');
+        return $this->belongsToMany(Product::class, 'contact_product_ids', 'contact_id', 'product_ids');
     }
 
     public function types()
     {
-        return $this->belongsToMany(Type::class, 'contact_types', 'contact_id', 'type_id');
+        return $this->belongsToMany(Type::class, 'contact_type_ids', 'contact_id', 'type_ids');
     }
 
-    public function products()
+    public function deals()
     {
-        return $this->belongsToMany(Product::class, 'contact_products', 'contact_id', 'product_id');
+        return $this->hasMany(Deal::class, 'contact_id');
+    }
+
+    public function contracts()
+    {
+        return $this->hasMany(Contract::class, 'contact_id');
+    }
+
+    public function bankAccounts()
+    {
+        return $this->hasMany(BankAccount::class, 'contact_id');
     }
 }

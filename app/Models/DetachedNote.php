@@ -6,23 +6,26 @@ use Illuminate\Database\Eloquent\Model;
 
 class DetachedNote extends Model
 {
-    protected $table = 'detachednote';
-    protected $guarded = [];
-    protected $casts = ['date' => 'datetime', 'total' => 'double'];
+    protected $table = 'detached_note';
+    protected $primaryKey = 'id';
+    public $timestamps = false;
 
-    public function metaCompany()
+    protected $fillable = [
+        'id',
+        'complement',
+        'contract_id',
+        'generated_file_id',
+        'kind',
+    ];
+
+    public function contract()
     {
-        return $this->belongsTo(Company::class, 'meta_company_id');
+        return $this->belongsTo(Contract::class, 'contract_id');
     }
 
-    public function contact()
+    public function generatedFile()
     {
-        return $this->belongsTo(Contact::class, 'contact_id');
-    }
-
-    public function currency()
-    {
-        return $this->belongsTo(Currency::class, 'currency_id');
+        return $this->belongsTo(GeneratedFile::class, 'generated_file_id');
     }
 
     public function details()

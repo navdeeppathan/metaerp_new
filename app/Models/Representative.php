@@ -7,20 +7,28 @@ use Illuminate\Database\Eloquent\Model;
 class Representative extends Model
 {
     protected $table = 'representatives';
-    protected $guarded = [];
+    protected $primaryKey = 'id';
+    public $timestamps = false;
 
-    public function company()
+    protected $fillable = [
+        'id',
+        'email',
+        'name',
+        'phone',
+        'type',
+        'job_title',
+        'mobile',
+        'phone2',
+        'department_id',
+    ];
+
+    public function department()
     {
-        return $this->belongsTo(Company::class, 'company_id');
+        return $this->belongsTo(Department::class, 'department_id');
     }
 
-    public function contact()
+    public function addresses()
     {
-        return $this->belongsTo(Contact::class, 'contact_id');
-    }
-
-    public function address()
-    {
-        return $this->belongsTo(Address::class, 'address_id');
+        return $this->belongsToMany(Address::class, 'addresses_representatives', 'representatives_id', 'address_id');
     }
 }

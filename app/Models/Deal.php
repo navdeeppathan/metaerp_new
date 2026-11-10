@@ -7,16 +7,85 @@ use Illuminate\Database\Eloquent\Model;
 class Deal extends Model
 {
     protected $table = 'deal';
-    protected $guarded = [];
+    protected $primaryKey = 'id';
+    public $timestamps = false;
+
+    protected $fillable = [
+        'id',
+        'dollar_convertion_rate',
+        'incoterms',
+        'payment_terms',
+        'address_id',
+        'contact_id',
+        'contact_representative_id',
+        'currency_id',
+        'meta_company_id',
+        'meta_representative_id',
+        'payment_account_id',
+        'payment_terms_type_id',
+        'payment_type_id',
+        'payment_status',
+        'payment_date',
+        'shipping_address_id',
+        'offer_id',
+        'advanced_payment',
+        'credit_note_text',
+        'debit_note_text',
+        'external_order_number',
+        'notes',
+        'country_of_origin_id',
+        'contract_id',
+    ];
+
+    protected $casts = [
+        'dollar_convertion_rate' => 'double',
+        'advanced_payment' => 'double',
+        'payment_date' => 'datetime',
+    ];
+
+    public function getDollarConversionRateAttribute()
+    {
+        return $this->attributes['dollar_convertion_rate'] ?? null;
+    }
+
+    public function setDollarConversionRateAttribute($value)
+    {
+        $this->attributes['dollar_convertion_rate'] = $value;
+    }
+
+    public function contract()
+    {
+        return $this->belongsTo(Contract::class, 'contract_id');
+    }
+
+    public function contact()
+    {
+        return $this->belongsTo(Contact::class, 'contact_id');
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'meta_company_id');
+    }
 
     public function metaCompany()
     {
         return $this->belongsTo(Company::class, 'meta_company_id');
     }
 
-    public function contact()
+    public function address()
     {
-        return $this->belongsTo(Contact::class, 'contact_id');
+        return $this->belongsTo(Address::class, 'address_id');
+    }
+
+    public function shippingAddress()
+    {
+        return $this->belongsTo(Address::class, 'shipping_address_id');
+    }
+
+    public function destinationAddress()
+    {
+        return $this->belongsTo(Address::class, 'shipping_address_id');
     }
 
     public function contactRepresentative()
@@ -27,16 +96,6 @@ class Deal extends Model
     public function metaRepresentative()
     {
         return $this->belongsTo(Representative::class, 'meta_representative_id');
-    }
-
-    public function address()
-    {
-        return $this->belongsTo(Address::class, 'address_id');
-    }
-
-    public function destinationAddress()
-    {
-        return $this->belongsTo(Address::class, 'destination_address_id');
     }
 
     public function currency()
@@ -56,7 +115,17 @@ class Deal extends Model
 
     public function paymentAccount()
     {
-        return $this->belongsTo(BankAccount::class, 'bank_account_id');
+        return $this->belongsTo(BankAccount::class, 'payment_account_id');
+    }
+
+    public function countryOfOrigin()
+    {
+        return $this->belongsTo(Country::class, 'country_of_origin_id');
+    }
+
+    public function dealProducts()
+    {
+        return $this->hasMany(DealProduct::class, 'deal_id');
     }
 
     public function products()

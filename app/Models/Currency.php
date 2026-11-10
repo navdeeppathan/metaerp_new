@@ -7,16 +7,29 @@ use Illuminate\Database\Eloquent\Model;
 class Currency extends Model
 {
     protected $table = 'currency';
-    protected $guarded = [];
-    protected $casts = ['rate' => 'double'];
+    protected $primaryKey = 'id';
+    public $timestamps = false;
 
-    public function getCurrencyCodeAttribute(): string
+    protected $fillable = [
+        'id',
+        'active',
+        'description',
+        'name',
+        'symbol',
+        'encode_html_symbol',
+    ];
+
+    protected $casts = [
+        'active' => 'boolean',
+    ];
+
+    public function deals()
     {
-        return $this->attributes['currencyCode'] ?? $this->attributes['description'] ?? 'USD';
+        return $this->hasMany(Deal::class, 'currency_id');
     }
 
-    public function getCurrencySymbolAttribute(): string
+    public function dealProducts()
     {
-        return $this->attributes['currencySymbol'] ?? $this->attributes['symbol'] ?? '$';
+        return $this->hasMany(DealProduct::class, 'currency_id');
     }
 }
