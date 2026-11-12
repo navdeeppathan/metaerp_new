@@ -95,6 +95,19 @@ class Company extends Model
 
     public function representatives()
     {
-        return $this->hasMany(Representative::class, 'company_id', 'id');
+        return $this->belongsToMany(Representative::class, 'addresses_representatives', 'address_id', 'representatives_id')
+            ->whereRaw('1 = 0');
+    }
+
+    public function getRepresentativesAttribute()
+    {
+        if ($this->relationLoaded('address') && $this->address) {
+            return $this->address->representatives ?? collect([]);
+        }
+        if ($this->address_id) {
+            $addr = Address::with('representatives')->find($this->address_id);
+            return $addr ? ($addr->representatives ?? collect([])) : collect([]);
+        }
+        return collect([]);
     }
 }

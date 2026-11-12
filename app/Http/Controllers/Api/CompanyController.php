@@ -13,7 +13,7 @@ class CompanyController extends BaseApiController
     public function index(Request $request)
     {
         $size = (int) $request->input('size', 20);
-        $paginator = Company::with(['address.country', 'bankAccounts', 'representatives', 'country'])
+        $paginator = Company::with(['address.country', 'address.representatives', 'bankAccounts', 'country'])
             ->where('active', true)
             ->paginate($size);
 
@@ -27,7 +27,7 @@ class CompanyController extends BaseApiController
 
     public function show($id)
     {
-        $company = Company::with(['address.country', 'bankAccounts', 'representatives', 'country'])->findOrFail($id);
+        $company = Company::with(['address.country', 'address.representatives', 'bankAccounts', 'country'])->findOrFail($id);
         return response()->json($this->formatCompanyDto($company));
     }
 
@@ -43,7 +43,7 @@ class CompanyController extends BaseApiController
                 $this->syncBankAccounts($company, $request->input('bankAccounts'));
             }
 
-            return response()->json($this->formatCompanyDto($company->fresh(['address.country', 'bankAccounts', 'representatives', 'country'])), 201);
+            return response()->json($this->formatCompanyDto($company->fresh(['address.country', 'address.representatives', 'bankAccounts', 'country'])), 201);
         });
     }
 
@@ -58,7 +58,7 @@ class CompanyController extends BaseApiController
                 $this->syncBankAccounts($company, $request->input('bankAccounts'));
             }
 
-            return response()->json($this->formatCompanyDto($company->fresh(['address.country', 'bankAccounts', 'representatives', 'country'])));
+            return response()->json($this->formatCompanyDto($company->fresh(['address.country', 'address.representatives', 'bankAccounts', 'country'])));
         });
     }
 

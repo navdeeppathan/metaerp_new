@@ -73,7 +73,7 @@ class WebContractController extends Controller
         ->get();
 
         $companies = Company::with('bankAccounts')->where('active', true)->get();
-        $contacts = Contact::with(['addresses', 'representatives'])->where('active', true)->get();
+        $contacts = Contact::with(['addresses.representatives'])->where('active', true)->get();
         $products = Product::where('active', true)->get();
         $currencies = Currency::all();
         $packTypes = PackType::all();

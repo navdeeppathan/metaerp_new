@@ -101,7 +101,24 @@ class Contact extends Model
 
     public function representatives()
     {
-        return $this->hasMany(Representative::class, 'contact_id', 'id');
+        return $this->belongsToMany(Representative::class, 'addresses_representatives', 'address_id', 'representatives_id')
+            ->whereRaw('1 = 0');
+    }
+
+    public function getRepresentativesAttribute()
+    {
+        if ($this->relationLoaded('addresses')) {
+            return $this->addresses->flatMap(function ($address) {
+                return $address->representatives ?? collect([]);
+            })->unique('id')->values();
+        }
+
+        return Representative::whereIn('id', function($q) {
+            $q->select('ar.representatives_id')
+              ->from('addresses_representatives as ar')
+              ->join('contacts_addresses as ca', 'ca.addresses_id', '=', 'ar.address_id')
+              ->where('ca.contact_id', $this->id);
+        })->get();
     }
 
     public function bankAccounts()
