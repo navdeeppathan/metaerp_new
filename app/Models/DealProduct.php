@@ -35,10 +35,11 @@ class DealProduct extends Model
         'sales_order_number',
         'start_date',
         'total',
+        'total_price',
         'unit_price',
+        'rate',
         'vat',
         'currency_id',
-        'deal_id',
         'pack_type_id',
         'product_id',
     ];
@@ -47,8 +48,10 @@ class DealProduct extends Model
         'active' => 'boolean',
         'quantity' => 'double',
         'unit_price' => 'double',
+        'rate' => 'double',
         'vat' => 'double',
         'total' => 'double',
+        'total_price' => 'double',
         'gross_weight' => 'double',
         'net_weight' => 'double',
         'lme_price' => 'double',
@@ -60,19 +63,48 @@ class DealProduct extends Model
         'end_date' => 'datetime',
     ];
 
+    public function getTotalPriceAttribute()
+    {
+        return $this->attributes['total_price'] ?? $this->attributes['totalPrice'] ?? $this->attributes['total'] ?? null;
+    }
+
+    public function getTotalAttribute()
+    {
+        return $this->attributes['total'] ?? $this->attributes['total_price'] ?? $this->attributes['totalPrice'] ?? null;
+    }
+
     public function getUnitPriceAttribute()
     {
-        return $this->attributes['unit_price'] ?? null;
+        return $this->attributes['unit_price'] ?? $this->attributes['unitPrice'] ?? $this->attributes['rate'] ?? null;
     }
 
     public function setUnitPriceAttribute($value)
     {
-        $this->attributes['unit_price'] = $value;
+        if (array_key_exists('unitPrice', $this->attributes)) {
+            $this->attributes['unitPrice'] = $value;
+        } else {
+            $this->attributes['unit_price'] = $value;
+        }
+    }
+
+    public function getRateAttribute()
+    {
+        return $this->attributes['rate'] ?? $this->attributes['unit_price'] ?? $this->attributes['unitPrice'] ?? null;
+    }
+
+    public function deals()
+    {
+        return $this->belongsToMany(Deal::class, 'deal_products', 'products_id', 'deal_id');
     }
 
     public function deal()
     {
-        return $this->belongsTo(Deal::class, 'deal_id');
+        return $this->belongsToMany(Deal::class, 'deal_products', 'products_id', 'deal_id');
+    }
+
+    public function getDealAttribute()
+    {
+        return $this->deals()->first();
     }
 
     public function product()

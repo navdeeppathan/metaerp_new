@@ -125,11 +125,11 @@ class Deal extends Model
 
     public function dealProducts()
     {
-        return $this->hasMany(DealProduct::class, 'deal_id');
+        return $this->belongsToMany(DealProduct::class, 'deal_products', 'deal_id', 'products_id');
     }
 
     public function products()
     {
-        return $this->hasMany(DealProduct::class, 'deal_id');
+        return $this->belongsToMany(DealProduct::class, 'deal_products', 'deal_id', 'products_id');
     }
 }

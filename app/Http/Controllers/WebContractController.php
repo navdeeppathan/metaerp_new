@@ -196,15 +196,18 @@ class WebContractController extends Controller
             'dealPaymentStatus' => 'OPEN',
         ]);
 
-        DealProduct::create([
-            'deal_id' => $deal->id,
+        $dealProduct = DealProduct::create([
             'product_id' => $productId,
             'quantity' => $quantity,
-            'unitPrice' => $unitPrice,
+            'unit_price' => $unitPrice,
+            'rate' => $unitPrice,
             'currency_id' => $currencyId,
             'total' => $total,
+            'total_price' => $total,
             'status' => 'PENDING',
+            'active' => true,
         ]);
+        $deal->products()->attach($dealProduct->id);
 
         $firstStage = Stage::where('model_id', $request->input('model_id', 1))->orderBy('priority')->first();
 

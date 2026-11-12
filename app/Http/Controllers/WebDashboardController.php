@@ -79,7 +79,8 @@ class WebDashboardController extends Controller
             if ($c->purchase && $c->purchase->products) {
                 $totalPurchase = 0.0;
                 foreach ($c->purchase->products as $p) {
-                    $totalPurchase += (float) ($p->total ?: ($p->quantity * $p->unit_price));
+                    $itemTotal = (float) ($p->total_price ?: ($p->total ?: ($p->quantity * ($p->unit_price ?: ($p->rate ?: 0)))));
+                    $totalPurchase += $itemTotal;
                 }
                 if ($totalPurchase > 0) {
                     $purchasesByDay[$dueDayStart] += $totalPurchase;
@@ -90,7 +91,8 @@ class WebDashboardController extends Controller
             if ($c->sale && $c->sale->products) {
                 $totalSale = 0.0;
                 foreach ($c->sale->products as $p) {
-                    $totalSale += (float) ($p->total ?: ($p->quantity * $p->unit_price));
+                    $itemTotal = (float) ($p->total_price ?: ($p->total ?: ($p->quantity * ($p->unit_price ?: ($p->rate ?: 0)))));
+                    $totalSale += $itemTotal;
                 }
                 if ($totalSale > 0) {
                     $salesByDay[$dueDayStart] += $totalSale;
@@ -126,7 +128,8 @@ class WebDashboardController extends Controller
                 $cTotal = 0.0;
                 if ($c->sale && $c->sale->products) {
                     foreach ($c->sale->products as $p) {
-                        $cTotal += (float) ($p->total ?: ($p->quantity * $p->unit_price));
+                        $itemTotal = (float) ($p->total_price ?: ($p->total ?: ($p->quantity * ($p->unit_price ?: ($p->rate ?: 0)))));
+                        $cTotal += $itemTotal;
                     }
                 }
                 $totalAmount += $cTotal;

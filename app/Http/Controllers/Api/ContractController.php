@@ -115,18 +115,25 @@ class ContractController extends BaseApiController
 
         if (!empty($dealData['products'])) {
             foreach ($dealData['products'] as $prod) {
-                DealProduct::create([
-                    'deal_id' => $deal->id,
+                $qty = (float) ($prod['quantity'] ?? 0.0);
+                $uPrice = (float) ($prod['unitPrice'] ?? $prod['unit_price'] ?? 0.0);
+                $tot = (float) ($prod['total'] ?? $prod['totalPrice'] ?? $prod['total_price'] ?? ($qty * $uPrice));
+
+                $dp = DealProduct::create([
                     'product_id' => $prod['product']['id'] ?? $prod['product_id'] ?? null,
                     'pack_type_id' => $prod['packType']['id'] ?? $prod['pack_type_id'] ?? null,
                     'currency_id' => $prod['currency']['id'] ?? $deal->currency_id,
-                    'quantity' => $prod['quantity'] ?? 0.0,
-                    'unitPrice' => $prod['unitPrice'] ?? 0.0,
-                    'pricingType' => $prod['pricingType'] ?? 'FIXED',
+                    'quantity' => $qty,
+                    'unit_price' => $uPrice,
+                    'rate' => $uPrice,
+                    'pricing_type' => $prod['pricingType'] ?? $prod['pricing_type'] ?? 'FIXED',
                     'vat' => $prod['vat'] ?? 0.0,
-                    'total' => ($prod['quantity'] ?? 0) * ($prod['unitPrice'] ?? 0),
+                    'total' => $tot,
+                    'total_price' => $tot,
                     'status' => 'PENDING',
+                    'active' => true,
                 ]);
+                $deal->products()->attach($dp->id);
             }
         }
 

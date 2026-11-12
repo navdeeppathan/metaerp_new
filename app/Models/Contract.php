@@ -63,12 +63,13 @@ class Contract extends Model
             'contactName' => $purchase->contact?->name,
             'paymentStatus' => $purchase->payment_status,
             'productContracts' => $products->map(function ($p) {
-                $total = $p->total !== null && $p->total > 0 ? (float) $p->total : ((float) $p->quantity * (float) $p->unit_price);
+                $unitPrice = (float) ($p->unit_price ?: ($p->rate ?: 0));
+                $total = (float) ($p->total_price ?: ($p->total ?: ((float) $p->quantity * $unitPrice)));
                 return [
                     'id' => $p->id,
-                    'totalPrice' => (float) $total,
+                    'totalPrice' => $total,
                     'quantity' => (float) $p->quantity,
-                    'unitPrice' => (float) $p->unit_price,
+                    'unitPrice' => $unitPrice,
                 ];
             })->values()->all(),
         ];
@@ -88,12 +89,13 @@ class Contract extends Model
             'contactName' => $sale->contact?->name,
             'paymentStatus' => $sale->payment_status,
             'productContracts' => $products->map(function ($p) {
-                $total = $p->total !== null && $p->total > 0 ? (float) $p->total : ((float) $p->quantity * (float) $p->unit_price);
+                $unitPrice = (float) ($p->unit_price ?: ($p->rate ?: 0));
+                $total = (float) ($p->total_price ?: ($p->total ?: ((float) $p->quantity * $unitPrice)));
                 return [
                     'id' => $p->id,
-                    'totalPrice' => (float) $total,
+                    'totalPrice' => $total,
                     'quantity' => (float) $p->quantity,
-                    'unitPrice' => (float) $p->unit_price,
+                    'unitPrice' => $unitPrice,
                 ];
             })->values()->all(),
         ];
