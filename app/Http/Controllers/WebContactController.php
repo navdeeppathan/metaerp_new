@@ -119,7 +119,7 @@ class WebContactController extends Controller
         }
 
         // Bank Accounts handling
-        if ($request->has('bank_accounts') && is_array($request->input('bank_accounts'))) {
+        if ($request->has('bank_accounts') && is_array($request->input('bank_accounts')) && \Illuminate\Support\Facades\Schema::hasColumn('bankaccounts', 'contact_id')) {
             foreach ($request->input('bank_accounts') as $accountData) {
                 if (!empty($accountData['name']) || !empty($accountData['accountNumber']) || !empty($accountData['iban']) || !empty($accountData['description'])) {
                     BankAccount::create([
@@ -237,7 +237,7 @@ class WebContactController extends Controller
         }
 
         // Bank Accounts handling
-        if ($request->has('bank_accounts') && is_array($request->input('bank_accounts'))) {
+        if ($request->has('bank_accounts') && is_array($request->input('bank_accounts')) && \Illuminate\Support\Facades\Schema::hasColumn('bankaccounts', 'contact_id')) {
             foreach ($request->input('bank_accounts') as $accountData) {
                 if (!empty($accountData['name']) || !empty($accountData['accountNumber']) || !empty($accountData['iban']) || !empty($accountData['description'])) {
                     if (!empty($accountData['id'])) {

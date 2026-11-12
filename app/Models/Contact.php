@@ -106,7 +106,12 @@ class Contact extends Model
 
     public function bankAccounts()
     {
-        return $this->hasMany(BankAccount::class, 'contact_id', 'id');
+        return $this->hasMany(BankAccount::class, 'id', 'id')->whereRaw('1 = 0');
+    }
+
+    public function getBankAccountsAttribute()
+    {
+        return collect([]);
     }
 
     public function getCodeMetaAttribute()

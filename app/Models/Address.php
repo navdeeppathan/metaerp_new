@@ -68,4 +68,65 @@ class Address extends Model
     {
         return $this->hasMany(SellerContract::class, 'shipping_address_id', 'id');
     }
+
+    public function getAddressNameAttribute()
+    {
+        return $this->attributes['address_name'] ?? null;
+    }
+
+    public function setAddressNameAttribute($value)
+    {
+        $this->attributes['address_name'] = $value;
+    }
+
+    public function getAddressLine1Attribute()
+    {
+        return $this->attributes['address_line1'] ?? null;
+    }
+
+    public function setAddressLine1Attribute($value)
+    {
+        $this->attributes['address_line1'] = $value;
+    }
+
+    public function getAddressLine2Attribute()
+    {
+        return $this->attributes['address_line2'] ?? null;
+    }
+
+    public function setAddressLine2Attribute($value)
+    {
+        $this->attributes['address_line2'] = $value;
+    }
+
+    public function getPostalCodeAttribute()
+    {
+        return $this->attributes['postal_code'] ?? null;
+    }
+
+    public function setPostalCodeAttribute($value)
+    {
+        $this->attributes['postal_code'] = $value;
+    }
+
+    public function getPostalBoxAttribute()
+    {
+        return $this->attributes['postal_box'] ?? null;
+    }
+
+    public function setPostalBoxAttribute($value)
+    {
+        $this->attributes['postal_box'] = $value;
+    }
+
+    public function getForGoogleMapsSearchAttribute()
+    {
+        return $this->attributes['for_google_maps_search'] ?? null;
+    }
+
+    public function setForGoogleMapsSearchAttribute($value)
+    {
+        $this->attributes['for_google_maps_search'] = $value;
+    }
 }
+
