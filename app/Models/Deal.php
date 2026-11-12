@@ -34,7 +34,6 @@ class Deal extends Model
         'external_order_number',
         'notes',
         'country_of_origin_id',
-        'contract_id',
     ];
 
     protected $casts = [
@@ -53,9 +52,19 @@ class Deal extends Model
         $this->attributes['dollar_convertion_rate'] = $value;
     }
 
-    public function contract()
+    public function purchaseContract()
     {
-        return $this->belongsTo(Contract::class, 'contract_id');
+        return $this->hasOne(Contract::class, 'purchase_id');
+    }
+
+    public function saleContract()
+    {
+        return $this->hasOne(Contract::class, 'sale_id');
+    }
+
+    public function getContractAttribute()
+    {
+        return $this->purchaseContract ?: $this->saleContract;
     }
 
     public function contact()

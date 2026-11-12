@@ -199,10 +199,7 @@ class WebContractController extends Controller
         $dealProduct = DealProduct::create([
             'product_id' => $productId,
             'quantity' => $quantity,
-            'unit_price' => $unitPrice,
             'rate' => $unitPrice,
-            'currency_id' => $currencyId,
-            'total' => $total,
             'total_price' => $total,
             'status' => 'PENDING',
             'active' => true,

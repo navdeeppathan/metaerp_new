@@ -27,9 +27,4 @@ class Currency extends Model
     {
         return $this->hasMany(Deal::class, 'currency_id');
     }
-
-    public function dealProducts()
-    {
-        return $this->hasMany(DealProduct::class, 'currency_id');
-    }
 }

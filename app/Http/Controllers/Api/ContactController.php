@@ -13,7 +13,7 @@ class ContactController extends BaseApiController
         $filter = $request->input('filter');
         $name = $request->input('name');
 
-        $query = Contact::with(['types', 'products', 'addresses.country', 'representatives', 'bankAccounts', 'currency', 'language'])
+        $query = Contact::with(['products', 'addresses.country', 'addresses.representatives', 'language'])
             ->where('active', true);
 
         if ($filter) {
@@ -34,7 +34,7 @@ class ContactController extends BaseApiController
 
     public function show($id)
     {
-        $contact = Contact::with(['types', 'products', 'addresses.country', 'representatives', 'bankAccounts', 'currency', 'language'])->findOrFail($id);
+        $contact = Contact::with(['products', 'addresses.country', 'addresses.representatives', 'language'])->findOrFail($id);
         return response()->json($contact);
     }
 

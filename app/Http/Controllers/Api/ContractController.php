@@ -121,14 +121,9 @@ class ContractController extends BaseApiController
 
                 $dp = DealProduct::create([
                     'product_id' => $prod['product']['id'] ?? $prod['product_id'] ?? null,
-                    'pack_type_id' => $prod['packType']['id'] ?? $prod['pack_type_id'] ?? null,
-                    'currency_id' => $prod['currency']['id'] ?? $deal->currency_id,
                     'quantity' => $qty,
-                    'unit_price' => $uPrice,
                     'rate' => $uPrice,
                     'pricing_type' => $prod['pricingType'] ?? $prod['pricing_type'] ?? 'FIXED',
-                    'vat' => $prod['vat'] ?? 0.0,
-                    'total' => $tot,
                     'total_price' => $tot,
                     'status' => 'PENDING',
                     'active' => true,

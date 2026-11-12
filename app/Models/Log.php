@@ -7,11 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 class Log extends Model
 {
     protected $table = 'logs';
+    public $timestamps = false;
     protected $guarded = [];
-    protected $casts = ['dateTime' => 'datetime'];
+    protected $casts = [
+        'date_time' => 'datetime',
+        'dateTime' => 'datetime',
+    ];
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'userId');
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

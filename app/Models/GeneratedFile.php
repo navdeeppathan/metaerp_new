@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class GeneratedFile extends Model
 {
     protected $table = 'generatedfiles';
+    public $timestamps = false;
     protected $guarded = [];
 
     public function contract()
@@ -19,8 +20,13 @@ class GeneratedFile extends Model
         return $this->belongsTo(Template::class, 'template_id');
     }
 
-    public function user()
+    public function offer()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(Offer::class, 'offer_id');
+    }
+
+    public function packingList()
+    {
+        return $this->belongsTo(PackingList::class, 'packing_list_id');
     }
 }

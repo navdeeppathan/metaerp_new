@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class PackingList extends Model
 {
     protected $table = 'packinglists';
+    public $timestamps = false;
     protected $guarded = [];
 
     public function contract()
@@ -16,6 +17,6 @@ class PackingList extends Model
 
     public function packs()
     {
-        return $this->hasMany(Pack::class, 'packing_list_id');
+        return $this->hasMany(Pack::class, 'packinglist_id');
     }
 }

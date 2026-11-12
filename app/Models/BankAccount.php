@@ -7,15 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class BankAccount extends Model
 {
     protected $table = 'bankaccounts';
+    public $timestamps = false;
     protected $guarded = [];
 
-    public function company()
+    public function companies()
     {
-        return $this->belongsTo(Company::class, 'company_id');
-    }
-
-    public function contact()
-    {
-        return $this->belongsTo(Contact::class, 'contact_id');
+        return $this->belongsToMany(Company::class, 'companies_bank_accounts', 'bank_accounts_id', 'company_id');
     }
 }

@@ -50,7 +50,7 @@ class WebContactController extends Controller
 
     public function show($id)
     {
-        $contact = Contact::with(['country', 'metaCompany', 'addresses.representatives', 'bankAccounts', 'products'])->findOrFail($id);
+        $contact = Contact::with(['country', 'metaCompany', 'addresses.representatives', 'products'])->findOrFail($id);
         $companies = Company::where('active', true)->orderBy('name')->get();
         $countries = Country::where('active', true)->orderBy('name')->get();
         $products = Product::where('active', true)->orderBy('name')->get();

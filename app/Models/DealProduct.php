@@ -27,69 +27,78 @@ class DealProduct extends Model
         'premium',
         'price_description',
         'pricing_type',
-        'proforma_invoice_number',
-        'purchased_currency_rate',
+        'quality',
         'quantity',
-        'reference_rate',
-        'sales_invoice_number',
-        'sales_order_number',
-        'start_date',
-        'total',
-        'total_price',
-        'unit_price',
+        'quantity_collected',
+        'quantity_received',
+        'quantity_shipped',
         'rate',
-        'vat',
-        'currency_id',
-        'pack_type_id',
+        'start_date',
+        'status',
+        'total_price',
+        'uom',
+        'version',
         'product_id',
+        'associated_contract_id',
+        'contract_order_code',
     ];
 
     protected $casts = [
         'active' => 'boolean',
         'quantity' => 'double',
-        'unit_price' => 'double',
-        'rate' => 'double',
-        'vat' => 'double',
-        'total' => 'double',
         'total_price' => 'double',
-        'gross_weight' => 'double',
-        'net_weight' => 'double',
+        'rate' => 'double',
+        'premium' => 'double',
         'lme_price' => 'double',
         'lme_price_percentage' => 'float',
-        'premium' => 'double',
-        'purchased_currency_rate' => 'double',
-        'reference_rate' => 'double',
+        'net_weight' => 'double',
+        'gross_weight' => 'double',
+        'quantity_collected' => 'double',
+        'quantity_received' => 'double',
+        'quantity_shipped' => 'double',
+        'version' => 'integer',
         'start_date' => 'datetime',
         'end_date' => 'datetime',
     ];
 
     public function getTotalPriceAttribute()
     {
-        return $this->attributes['total_price'] ?? $this->attributes['totalPrice'] ?? $this->attributes['total'] ?? null;
+        return $this->attributes['total_price'] ?? null;
+    }
+
+    public function setTotalPriceAttribute($value)
+    {
+        $this->attributes['total_price'] = $value;
     }
 
     public function getTotalAttribute()
     {
-        return $this->attributes['total'] ?? $this->attributes['total_price'] ?? $this->attributes['totalPrice'] ?? null;
+        return $this->attributes['total_price'] ?? null;
+    }
+
+    public function setTotalAttribute($value)
+    {
+        $this->attributes['total_price'] = $value;
     }
 
     public function getUnitPriceAttribute()
     {
-        return $this->attributes['unit_price'] ?? $this->attributes['unitPrice'] ?? $this->attributes['rate'] ?? null;
+        return $this->attributes['rate'] ?? null;
     }
 
     public function setUnitPriceAttribute($value)
     {
-        if (array_key_exists('unitPrice', $this->attributes)) {
-            $this->attributes['unitPrice'] = $value;
-        } else {
-            $this->attributes['unit_price'] = $value;
-        }
+        $this->attributes['rate'] = $value;
     }
 
     public function getRateAttribute()
     {
-        return $this->attributes['rate'] ?? $this->attributes['unit_price'] ?? $this->attributes['unitPrice'] ?? null;
+        return $this->attributes['rate'] ?? null;
+    }
+
+    public function setRateAttribute($value)
+    {
+        $this->attributes['rate'] = $value;
     }
 
     public function deals()
@@ -112,14 +121,9 @@ class DealProduct extends Model
         return $this->belongsTo(Product::class, 'product_id');
     }
 
-    public function packType()
+    public function getCurrencyAttribute()
     {
-        return $this->belongsTo(PackType::class, 'pack_type_id');
-    }
-
-    public function currency()
-    {
-        return $this->belongsTo(Currency::class, 'currency_id');
+        return $this->deals->first()?->currency;
     }
 
     public function packs()

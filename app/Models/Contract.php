@@ -293,9 +293,9 @@ class Contract extends Model
         return $this->belongsTo(Stage::class, 'stage_id');
     }
 
-    public function deals()
+    public function getDealsAttribute()
     {
-        return $this->hasMany(Deal::class, 'contract_id');
+        return collect([$this->purchase, $this->sale])->filter()->values();
     }
 
     public function packingLists()
@@ -328,8 +328,16 @@ class Contract extends Model
         return $this->hasMany(GeneratedFile::class, 'contract_id');
     }
 
+    public function getMetaCompanyAttribute()
+    {
+        return $this->sale?->metaCompany ?? $this->purchase?->metaCompany;
+    }
+
     public function metaCompany()
     {
-        return $this->belongsTo(Company::class, 'meta_company_id');
+        // Safe relationship fallback through sale/purchase deal
+        return $this->belongsTo(Company::class, 'purchase_id', 'id')->withDefault(function () {
+            return $this->sale?->metaCompany ?? $this->purchase?->metaCompany;
+        });
     }
 }

@@ -47,9 +47,9 @@ class Company extends Model
         return $this->belongsToMany(BankAccount::class, 'companies_bank_accounts', 'company_id', 'bank_accounts_id');
     }
 
-    public function representatives()
+    public function getRepresentativesAttribute()
     {
-        return $this->hasMany(Representative::class, 'company_id');
+        return $this->address ? $this->address->representatives : collect();
     }
 
     public function deals()

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Contact extends Model
 {
@@ -15,6 +16,69 @@ class Contact extends Model
     protected $casts = [
         'active' => 'boolean',
     ];
+
+    protected $appends = [
+        'typeIds',
+        'productIds',
+        'codeMeta',
+        'companyId',
+        'countryId',
+        'bankAccounts',
+    ];
+
+    public function getCodeMetaAttribute()
+    {
+        return $this->attributes['code_meta'] ?? null;
+    }
+
+    public function setCodeMetaAttribute($value)
+    {
+        $this->attributes['code_meta'] = $value;
+    }
+
+    public function getCompanyIdAttribute()
+    {
+        return $this->attributes['company_id'] ?? null;
+    }
+
+    public function setCompanyIdAttribute($value)
+    {
+        $this->attributes['company_id'] = $value;
+    }
+
+    public function getCountryIdAttribute()
+    {
+        return $this->attributes['country_id'] ?? null;
+    }
+
+    public function setCountryIdAttribute($value)
+    {
+        $this->attributes['country_id'] = $value;
+    }
+
+    public function getTypeIdsAttribute()
+    {
+        if (!$this->id) {
+            return [];
+        }
+        try {
+            return DB::table('contact_type_ids')->where('contact_id', $this->id)->pluck('type_ids')->all();
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+
+    public function getProductIdsAttribute()
+    {
+        if (!$this->id) {
+            return [];
+        }
+        try {
+            return DB::table('contact_product_ids')->where('contact_id', $this->id)->pluck('product_ids')->all();
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
 
     public function country()
     {
@@ -41,9 +105,9 @@ class Contact extends Model
         return $this->belongsToMany(Address::class, 'contacts_addresses', 'contact_id', 'addresses_id');
     }
 
-    public function representatives()
+    public function getRepresentativesAttribute()
     {
-        return $this->hasMany(Representative::class, 'contact_id');
+        return $this->addresses ? $this->addresses->flatMap->representatives : collect();
     }
 
     public function products()
@@ -61,13 +125,14 @@ class Contact extends Model
         return $this->hasMany(Deal::class, 'contact_id');
     }
 
-    public function contracts()
+    public function getContractsAttribute()
     {
-        return $this->hasMany(Contract::class, 'contact_id');
+        $dealIds = $this->deals()->pluck('id');
+        return Contract::whereIn('purchase_id', $dealIds)->orWhereIn('sale_id', $dealIds)->get();
     }
 
-    public function bankAccounts()
+    public function getBankAccountsAttribute()
     {
-        return $this->hasMany(BankAccount::class, 'contact_id');
+        return $this->company ? $this->company->bankAccounts : collect();
     }
 }
