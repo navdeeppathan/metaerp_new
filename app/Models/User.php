@@ -44,6 +44,36 @@ class User extends Authenticatable
         'signature_file',
     ];
 
+    public function getDisplayNameAttribute()
+    {
+        return $this->attributes['display_name'] ?? $this->attributes['name'] ?? null;
+    }
+
+    public function setDisplayNameAttribute($value)
+    {
+        $this->attributes['display_name'] = $value;
+    }
+
+    public function getPhotoUrlAttribute()
+    {
+        return $this->attributes['photo_url'] ?? null;
+    }
+
+    public function setPhotoUrlAttribute($value)
+    {
+        $this->attributes['photo_url'] = $value;
+    }
+
+    public function getSignatureFileAttribute()
+    {
+        return $this->attributes['signature_file'] ?? null;
+    }
+
+    public function setSignatureFileAttribute($value)
+    {
+        $this->attributes['signature_file'] = $value;
+    }
+
     public function archiveSignature()
     {
         return $this->belongsTo(Archive::class, 'archive_signature_id', 'id');

@@ -10,7 +10,7 @@ class LogController extends BaseApiController
     {
         $logs = Log::with('user')
             ->where('module', strtoupper($module))
-            ->where('dataId', $dataId)
+            ->where('data_id', $dataId)
             ->orderBy('id', 'desc')
             ->get();
 

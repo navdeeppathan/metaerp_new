@@ -24,7 +24,7 @@ class WebContactController extends Controller
         if (!empty($search)) {
             $query->where(function($sub) use ($search) {
                 $sub->where('name', 'like', "%{$search}%")
-                    ->orWhere('codeMeta', 'like', "%{$search}%")
+                    ->orWhere('code_meta', 'like', "%{$search}%")
                     ->orWhere('vat', 'like', "%{$search}%")
                     ->orWhere('id', 'like', "%{$search}%");
             });

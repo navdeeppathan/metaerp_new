@@ -12,7 +12,7 @@ class WebProductController extends Controller
         $query = Product::where('active', true);
 
         if ($request->filled('category')) {
-            $query->where('productCategory', $request->input('category'));
+            $query->where('product_category', $request->input('category'));
         }
 
         $search = $request->input('q') ?? $request->input('search');
@@ -20,7 +20,7 @@ class WebProductController extends Controller
             $query->where(function($sub) use ($search) {
                 $sub->where('name', 'like', "%{$search}%")
                     ->orWhere('code', 'like', "%{$search}%")
-                    ->orWhere('chemicalFormula', 'like', "%{$search}%");
+                    ->orWhere('symbol', 'like', "%{$search}%");
             });
         }
 

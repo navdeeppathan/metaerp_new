@@ -12,12 +12,12 @@ class SearchController extends BaseApiController
     public function search(Request $request, $text)
     {
         $contracts = Contract::with(['purchase.contact', 'sale.contact'])
-            ->where('orderCode', 'like', "%{$text}%")
+            ->where('order_code', 'like', "%{$text}%")
             ->limit(10)
             ->get();
 
         $contacts = Contact::where('name', 'like', "%{$text}%")
-            ->orWhere('codeMeta', 'like', "%{$text}%")
+            ->orWhere('code_meta', 'like', "%{$text}%")
             ->limit(10)
             ->get();
 

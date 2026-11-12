@@ -20,9 +20,9 @@ class WebCompanyController extends Controller
             $query->where(function($sub) use ($search) {
                 $sub->where('name', 'like', "%{$search}%")
                     ->orWhere('code', 'like', "%{$search}%")
-                    ->orWhere('vatNumber', 'like', "%{$search}%")
-                    ->orWhere('companyNumber', 'like', "%{$search}%")
-                    ->orWhere('phoneNumber', 'like', "%{$search}%");
+                    ->orWhere('vat_number', 'like', "%{$search}%")
+                    ->orWhere('company_number', 'like', "%{$search}%")
+                    ->orWhere('phone_number', 'like', "%{$search}%");
             });
         }
 

@@ -19,9 +19,7 @@ class WebOfferController extends Controller
         if (!empty($search)) {
             $query->where(function($sub) use ($search) {
                 $sub->where('subject', 'like', "%{$search}%")
-                    ->orWhere('code', 'like', "%{$search}%")
-                    ->orWhere('orderCode', 'like', "%{$search}%")
-                    ->orWhere('contract_code', 'like', "%{$search}%")
+                    ->orWhere('order_code', 'like', "%{$search}%")
                     ->orWhere('id', 'like', "%{$search}%");
             });
         }

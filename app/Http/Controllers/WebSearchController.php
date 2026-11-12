@@ -22,15 +22,15 @@ class WebSearchController extends Controller
         if ($request->filled('q')) {
             $q = $request->input('q');
             $query->where(function($sub) use ($q) {
-                $sub->where('orderCode', 'like', "%{$q}%")
-                    ->orWhere('customerPurchaseOrder', 'like', "%{$q}%")
+                $sub->where('order_code', 'like', "%{$q}%")
+                    ->orWhere('customer_purchase_order', 'like', "%{$q}%")
                     ->orWhereHas('purchase.contact', fn($c) => $c->where('name', 'like', "%{$q}%"))
                     ->orWhereHas('sale.contact', fn($c) => $c->where('name', 'like', "%{$q}%"));
             });
         }
 
         if ($status && $status !== 'ALL') {
-            $query->where('contractStatus', $status);
+            $query->where('status', $status);
         }
 
         if ($type && $type !== 'ALL') {
@@ -38,14 +38,14 @@ class WebSearchController extends Controller
         }
 
         if ($fromDate) {
-            $query->whereDate('date', '>=', $fromDate);
+            $query->whereDate('due_date', '>=', $fromDate);
         }
 
         if ($toDate) {
-            $query->whereDate('date', '<=', $toDate);
+            $query->whereDate('due_date', '<=', $toDate);
         }
 
-        $contracts = $query->orderBy('orderCode', 'asc')->paginate(10);
+        $contracts = $query->orderBy('order_code', 'asc')->paginate(10);
         $companies = Company::where('active', true)->get();
         $contacts = Contact::where('active', true)->get();
 

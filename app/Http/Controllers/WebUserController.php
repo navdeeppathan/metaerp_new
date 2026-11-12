@@ -21,8 +21,7 @@ class WebUserController extends Controller
             $query->where(function($sub) use ($search) {
                 $sub->where('name', 'like', "%{$search}%")
                     ->orWhere('username', 'like', "%{$search}%")
-                    ->orWhere('displayName', 'like', "%{$search}%");
-                    // ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('display_name', 'like', "%{$search}%");
             });
         }
 
@@ -76,7 +75,7 @@ class WebUserController extends Controller
 
         $user = User::create([
             'name' => $validated['name'],
-            'displayName' => $request->input('displayName', $validated['name']),
+            'display_name' => $request->input('displayName') ?: $request->input('display_name') ?: $validated['name'],
             'username' => $finalUsername,
             'password' => Hash::make($validated['password']),
             'occupation' => $request->input('occupation', 'Staff'),
@@ -113,7 +112,11 @@ class WebUserController extends Controller
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
-        $data = $request->only(['name', 'displayName', 'occupation', 'role', 'active']);
+        $data = $request->only(['name', 'occupation', 'role', 'active']);
+
+        if ($request->filled('displayName') || $request->filled('display_name')) {
+            $data['display_name'] = $request->input('displayName') ?: $request->input('display_name');
+        }
 
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->input('password'));
@@ -130,7 +133,10 @@ class WebUserController extends Controller
         if ($request->hasFile('signature')) {
             $file = $request->file('signature');
             $b64 = base64_encode(file_get_contents($file->getRealPath()));
-            $user->signatureFile = $b64;
+            $archive = \App\Models\Archive::create(['content' => $b64]);
+
+            $user->signature_file = $b64;
+            $user->archive_signature_id = $archive->id;
             $user->signature_file_name = $file->getClientOriginalName();
             $user->save();
 

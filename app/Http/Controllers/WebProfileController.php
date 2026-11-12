@@ -26,6 +26,11 @@ class WebProfileController extends Controller
             'occupation' => 'nullable|string',
         ]);
 
+        if (array_key_exists('displayName', $validated)) {
+            $validated['display_name'] = $validated['displayName'];
+            unset($validated['displayName']);
+        }
+
         $user->update($validated);
         return back()->with('success', 'Profile updated successfully');
     }

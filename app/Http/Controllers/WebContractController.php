@@ -68,7 +68,7 @@ class WebContractController extends Controller
             'checklists.checkitems', 'comments'
         ])
         ->where('active', true)
-        ->where('contractStatus', '!=', 'CANCELLED')
+        ->where('status', '!=', 'CANCELLED')
         ->orderBy('id', 'desc')
         ->get();
 
@@ -327,12 +327,12 @@ class WebContractController extends Controller
             'packingLists.packs.packType',
             'packingLists.packs.product',
             'comments.user',
-        ])->where('id', $id)->orWhere('orderCode', $id)->firstOrFail();
+        ])->where('id', $id)->orWhere('order_code', $id)->firstOrFail();
 
         $activities = Log::with('user')
             ->where('module', 'CONTRACT')
-            ->where('dataId', $contract->id)
-            ->orderBy('dateTime', 'desc')
+            ->where('data_id', $contract->id)
+            ->orderBy('date_time', 'desc')
             ->get();
 
         return view('contracts.show', compact('contract', 'activities'));
