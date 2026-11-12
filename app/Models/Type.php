@@ -11,16 +11,31 @@ class Type extends Model
 
     protected $fillable = [
         'name',
+        'description',
         'active',
+        'version',
     ];
 
     protected $casts = [
         'active' => 'boolean',
     ];
 
+    protected $appends = [
+        'description',
+    ];
+
+    public function getNameAttribute($value)
+    {
+        return $value ?? $this->attributes['description'] ?? null;
+    }
+
+    public function getDescriptionAttribute($value)
+    {
+        return $this->attributes['description'] ?? $this->attributes['name'] ?? null;
+    }
+
     public function contacts()
     {
         return $this->belongsToMany(Contact::class, 'contact_type_ids', 'type_ids', 'contact_id');
     }
 }
-
