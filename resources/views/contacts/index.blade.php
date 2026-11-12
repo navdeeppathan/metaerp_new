@@ -105,7 +105,7 @@
                                 </a>
                             </td>
                             <td class="py-5 px-6 text-slate-800 font-normal">
-                                {{ $contact->codeMeta ?? '' }}
+                                {{ $contact->code_meta ?? $contact->codeMeta ?? '' }}
                             </td>
                             <td class="py-5 px-6 text-slate-800 font-normal">
                                 {{ $contact->vat ?? '' }}

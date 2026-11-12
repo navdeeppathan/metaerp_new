@@ -94,4 +94,35 @@ class Contact extends Model
     {
         return $this->hasMany(BankAccount::class, 'contact_id', 'id');
     }
+
+    public function getCodeMetaAttribute()
+    {
+        return $this->attributes['code_meta'] ?? null;
+    }
+
+    public function setCodeMetaAttribute($value)
+    {
+        $this->attributes['code_meta'] = $value;
+    }
+
+    public function getAdditionalInformationAttribute()
+    {
+        return $this->attributes['additional_information'] ?? null;
+    }
+
+    public function setAdditionalInformationAttribute($value)
+    {
+        $this->attributes['additional_information'] = $value;
+    }
+
+    public function getEoriNumberAttribute()
+    {
+        return $this->attributes['eori_number'] ?? null;
+    }
+
+    public function setEoriNumberAttribute($value)
+    {
+        $this->attributes['eori_number'] = $value;
+    }
 }
+

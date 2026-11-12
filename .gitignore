@@ -19,6 +19,7 @@ yarn-error.log
 *.zip
 erp-frontend-react/
 erp-backend-java/
+metaerp-production.sql
 *.md
 
 

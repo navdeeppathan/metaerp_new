@@ -6,13 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class Type extends Model
 {
-    protected $table = 'contact_type_ids';
+    protected $table = 'types';
     public $timestamps = false;
-    public $incrementing = false;
 
     protected $fillable = [
-        'contact_id',
-        'type_ids',
+        'name',
+        'active',
+    ];
+
+    protected $casts = [
+        'active' => 'boolean',
     ];
 
     public function contacts()
@@ -20,3 +23,4 @@ class Type extends Model
         return $this->belongsToMany(Contact::class, 'contact_type_ids', 'type_ids', 'contact_id');
     }
 }
+
