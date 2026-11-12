@@ -10,7 +10,7 @@ class StageController extends BaseApiController
     public function index(Request $request)
     {
         $size = (int) $request->input('size', 50);
-        $paginator = Stage::with(['stageActions.action'])->where('active', true)->orderBy('priority')->paginate($size);
+        $paginator = Stage::with(['stageActions.action'])->where('active', true)->orderBy('position')->paginate($size);
         return response()->json($this->paginateResponse($paginator));
     }
 

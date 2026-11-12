@@ -59,7 +59,7 @@ class WebContractController extends Controller
             $currentModel = $models->first();
         }
 
-        $stages = $currentModel ? $currentModel->stages()->orderBy('priority')->get() : collect();
+        $stages = $currentModel ? $currentModel->stages()->orderBy('position')->get() : collect();
 
         $contracts = Contract::with([
             'stage',
@@ -105,7 +105,7 @@ class WebContractController extends Controller
             'comments.user'
         ])->findOrFail($id);
 
-        $stages = Stage::where('model_id', $contract->stage?->model_id ?? 1)->orderBy('priority')->get();
+        $stages = Stage::where('model_id', $contract->stage?->model_id ?? 1)->orderBy('position')->get();
         $templates = Template::all();
 
         return view('contracts.partials.card-modal', compact('contract', 'stages', 'templates'));
@@ -206,7 +206,7 @@ class WebContractController extends Controller
         ]);
         $deal->products()->attach($dealProduct->id);
 
-        $firstStage = Stage::where('model_id', $request->input('model_id', 1))->orderBy('priority')->first();
+        $firstStage = Stage::where('model_id', $request->input('model_id', 1))->orderBy('position')->first();
 
         $contract = Contract::create([
             'date' => now(),

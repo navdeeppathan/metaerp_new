@@ -39,4 +39,15 @@ class Stage extends Model
     {
         return $this->hasMany(Contract::class, 'stage_id', 'id');
     }
+
+    public function getPriorityAttribute()
+    {
+        return $this->attributes['position'] ?? null;
+    }
+
+    public function setPriorityAttribute($value)
+    {
+        $this->attributes['position'] = $value;
+    }
 }
+
