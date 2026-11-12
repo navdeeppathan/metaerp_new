@@ -120,6 +120,11 @@ class Contract extends Model
         return $this->hasMany(DealProduct::class, 'associated_contract_id', 'id');
     }
 
+    public function products()
+    {
+        return $this->hasMany(DealProduct::class, 'associated_contract_id', 'id');
+    }
+
     public function members()
     {
         return $this->belongsToMany(User::class, 'contract_member_ids', 'contract_id', 'member_ids');
@@ -128,5 +133,42 @@ class Contract extends Model
     public function tags()
     {
         return $this->hasMany(ContractTag::class, 'contract_id', 'id');
+    }
+
+    public function metaCompany()
+    {
+        return $this->belongsTo(Company::class, 'purchase_id', 'id')->withDefault(function () {
+            return $this->sale?->metaCompany ?? $this->purchase?->metaCompany;
+        });
+    }
+
+    public function getMetaCompanyAttribute()
+    {
+        return $this->sale?->metaCompany ?? $this->purchase?->metaCompany;
+    }
+
+    public function getPurchaseCompanyAttribute()
+    {
+        return $this->purchase?->meta_company_id ?? $this->sale?->meta_company_id;
+    }
+
+    public function getSalesCompanyAttribute()
+    {
+        return $this->sale?->meta_company_id ?? $this->purchase?->meta_company_id;
+    }
+
+    public function getPurchaseCompanyNameAttribute()
+    {
+        return $this->purchase?->metaCompany?->name ?? $this->sale?->metaCompany?->name;
+    }
+
+    public function getSalesCompanyNameAttribute()
+    {
+        return $this->sale?->metaCompany?->name ?? $this->purchase?->metaCompany?->name;
+    }
+
+    public function getOrderCodeAttribute()
+    {
+        return $this->attributes['order_code'] ?? null;
     }
 }

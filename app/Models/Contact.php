@@ -79,4 +79,19 @@ class Contact extends Model
     {
         return $this->hasMany(SellerContract::class, 'contact_id', 'id');
     }
+
+    public function metaCompany()
+    {
+        return $this->belongsTo(Company::class, 'company_id', 'id');
+    }
+
+    public function representatives()
+    {
+        return $this->hasMany(Representative::class, 'contact_id', 'id');
+    }
+
+    public function bankAccounts()
+    {
+        return $this->hasMany(BankAccount::class, 'contact_id', 'id');
+    }
 }

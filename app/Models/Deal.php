@@ -111,6 +111,41 @@ class Deal extends Model
         return $this->hasOne(Contract::class, 'sale_id', 'id');
     }
 
+    public function company()
+    {
+        return $this->belongsTo(Company::class, 'meta_company_id', 'id');
+    }
+
+    public function destinationAddress()
+    {
+        return $this->belongsTo(Address::class, 'shipping_address_id', 'id');
+    }
+
+    public function products()
+    {
+        return $this->belongsToMany(DealProduct::class, 'deal_products', 'deal_id', 'products_id');
+    }
+
+    public function dealProducts()
+    {
+        return $this->belongsToMany(DealProduct::class, 'deal_products', 'deal_id', 'products_id');
+    }
+
+    public function getContractAttribute()
+    {
+        return $this->purchaseContract ?: $this->saleContract;
+    }
+
+    public function getDollarConversionRateAttribute()
+    {
+        return $this->attributes['dollar_convertion_rate'] ?? null;
+    }
+
+    public function setDollarConversionRateAttribute($value)
+    {
+        $this->attributes['dollar_convertion_rate'] = $value;
+    }
+
     public function purchaseOffer()
     {
         return $this->hasOne(Offer::class, 'purchase_id', 'id');

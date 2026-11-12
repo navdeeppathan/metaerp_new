@@ -92,4 +92,9 @@ class Company extends Model
     {
         return $this->hasMany(Deal::class, 'meta_company_id', 'id');
     }
+
+    public function representatives()
+    {
+        return $this->hasMany(Representative::class, 'company_id', 'id');
+    }
 }
