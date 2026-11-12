@@ -21,9 +21,14 @@ class AccessGroup extends Model
         'version' => 'integer',
     ];
 
-    public function accesses()
+    public function accessList()
     {
         return $this->hasMany(Access::class, 'accessgroup_id', 'id');
+    }
+
+    public function accesses()
+    {
+        return $this->accessList();
     }
 
     public function permissions()

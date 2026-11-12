@@ -148,7 +148,7 @@ function accessGroupForm() {
         name: '{{ isset($group) ? $group->name : '' }}',
         selectedModule: '',
         selectedAccessType: '',
-        rules: @json(isset($group) ? $group->accessList->map(fn($a) => ['module' => $a->module, 'accessType' => $a->accessType]) : []),
+        rules: @json(isset($group) ? $group->accessList->map(fn($a) => ['module' => $a->module, 'accessType' => $a->access_type ?? $a->accessType]) : []),
 
         addRule() {
             if (!this.selectedModule || !this.selectedAccessType) return;

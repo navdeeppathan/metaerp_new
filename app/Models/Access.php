@@ -27,4 +27,15 @@ class Access extends Model
     {
         return $this->belongsTo(AccessGroup::class, 'accessgroup_id', 'id');
     }
+
+    public function getAccessTypeAttribute()
+    {
+        return $this->attributes['access_type'] ?? null;
+    }
+
+    public function setAccessTypeAttribute($value)
+    {
+        $this->attributes['access_type'] = $value;
+    }
 }
+
