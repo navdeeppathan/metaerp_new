@@ -15,10 +15,16 @@ class ContactType extends Model
         'type_ids',
     ];
 
+    public function getIdAttribute()
+    {
+        return $this->attributes['type_ids'] ?? null;
+    }
+
     public function contact()
     {
         return $this->belongsTo(Contact::class, 'contact_id', 'id');
     }
+
 
     public function type()
     {

@@ -18,7 +18,7 @@ class WebContactController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Contact::with(['country', 'metaCompany', 'types'])->where('active', true);
+        $query = Contact::with(['country', 'metaCompany'])->where('active', true);
 
         $search = $request->input('q') ?? $request->input('search');
         if (!empty($search)) {

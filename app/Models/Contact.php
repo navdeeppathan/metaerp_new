@@ -57,8 +57,22 @@ class Contact extends Model
 
     public function types()
     {
-        return $this->belongsToMany(Type::class, 'contact_type_ids', 'contact_id', 'type_ids');
+        return $this->hasMany(ContactType::class, 'contact_id', 'id');
     }
+
+    public function getTypeIdsAttribute()
+    {
+        if ($this->relationLoaded('types')) {
+            return $this->types->pluck('type_ids')->filter()->values()->all();
+        }
+        return \Illuminate\Support\Facades\DB::table('contact_type_ids')
+            ->where('contact_id', $this->id)
+            ->pluck('type_ids')
+            ->filter()
+            ->values()
+            ->all();
+    }
+
 
     public function directProducts()
     {
