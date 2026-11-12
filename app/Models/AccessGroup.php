@@ -7,16 +7,27 @@ use Illuminate\Database\Eloquent\Model;
 class AccessGroup extends Model
 {
     protected $table = 'accessgroups';
-    protected $guarded = [];
-    protected $casts = ['active' => 'boolean'];
+    protected $primaryKey = 'id';
+    public $timestamps = false;
 
-    public function accessList()
+    protected $fillable = [
+        'active',
+        'name',
+        'version',
+    ];
+
+    protected $casts = [
+        'active' => 'boolean',
+        'version' => 'integer',
+    ];
+
+    public function accesses()
     {
-        return $this->hasMany(Access::class, 'accessgroup_id');
+        return $this->hasMany(Access::class, 'accessgroup_id', 'id');
     }
 
     public function permissions()
     {
-        return $this->hasMany(Permission::class, 'accessgroup_id');
+        return $this->hasMany(Permission::class, 'accessgroup_id', 'id');
     }
 }

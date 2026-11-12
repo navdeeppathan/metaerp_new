@@ -39,17 +39,18 @@ class OrderCodeService
         $seq = DB::transaction(function () use ($currentYear) {
             $record = ContractOrderCodeSequence::firstOrCreate(
                 ['year' => $currentYear],
-                ['lastId' => 0]
+                ['last_id' => 0]
             );
-            $record->lastId += 1;
+            $record->last_id += 1;
             $record->save();
-            return $record->lastId;
+            return $record->last_id;
         });
 
-        if ($keepYear && !empty($contract->orderCode) && str_contains($contract->orderCode, '-')) {
-            $dashIndex = strpos($contract->orderCode, '-');
+        $orderCode = $contract->order_code ?? $contract->orderCode ?? null;
+        if ($keepYear && !empty($orderCode) && str_contains($orderCode, '-')) {
+            $dashIndex = strpos($orderCode, '-');
             if ($dashIndex >= 2) {
-                $twoDigitYear = substr($contract->orderCode, $dashIndex - 2, 2);
+                $twoDigitYear = substr($orderCode, $dashIndex - 2, 2);
             }
         }
 

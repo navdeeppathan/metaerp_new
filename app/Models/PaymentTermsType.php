@@ -10,33 +10,17 @@ class PaymentTermsType extends Model
     protected $primaryKey = 'id';
     public $timestamps = false;
 
-    protected $guarded = [];
+    protected $fillable = [
+        'active',
+        'description',
+    ];
 
     protected $casts = [
         'active' => 'boolean',
     ];
 
-    public function getNameAttribute()
+    public function deals()
     {
-        return $this->attributes['description'] ?? $this->attributes['name'] ?? null;
-    }
-
-    public function setNameAttribute($value)
-    {
-        if (array_key_exists('name', $this->attributes) && !array_key_exists('description', $this->attributes)) {
-            $this->attributes['name'] = $value;
-        } else {
-            $this->attributes['description'] = $value;
-        }
-    }
-
-    public function getDescriptionAttribute()
-    {
-        return $this->attributes['description'] ?? $this->attributes['name'] ?? null;
-    }
-
-    public function setDescriptionAttribute($value)
-    {
-        $this->attributes['description'] = $value;
+        return $this->hasMany(Deal::class, 'payment_terms_type_id', 'id');
     }
 }

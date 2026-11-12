@@ -11,7 +11,6 @@ class DetachedNoteDetail extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'id',
         'amount',
         'complement',
         'container',
@@ -26,16 +25,16 @@ class DetachedNoteDetail extends Model
 
     public function detachedNote()
     {
-        return $this->belongsTo(DetachedNote::class, 'detached_note_id');
+        return $this->belongsTo(DetachedNote::class, 'detached_note_id', 'id');
     }
 
     public function creditDebitType()
     {
-        return $this->belongsTo(CreditDebitType::class, 'credit_debit_type_id');
+        return $this->belongsTo(CreditDebitType::class, 'credit_debit_type_id', 'id');
     }
 
     public function dealProduct()
     {
-        return $this->belongsTo(DealProduct::class, 'deal_product_id');
+        return $this->belongsTo(DealProduct::class, 'deal_product_id', 'id');
     }
 }

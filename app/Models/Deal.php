@@ -11,7 +11,6 @@ class Deal extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'id',
         'dollar_convertion_rate',
         'incoterms',
         'payment_terms',
@@ -42,103 +41,83 @@ class Deal extends Model
         'payment_date' => 'datetime',
     ];
 
-    public function getDollarConversionRateAttribute()
+    public function metaCompany()
     {
-        return $this->attributes['dollar_convertion_rate'] ?? null;
-    }
-
-    public function setDollarConversionRateAttribute($value)
-    {
-        $this->attributes['dollar_convertion_rate'] = $value;
-    }
-
-    public function purchaseContract()
-    {
-        return $this->hasOne(Contract::class, 'purchase_id');
-    }
-
-    public function saleContract()
-    {
-        return $this->hasOne(Contract::class, 'sale_id');
-    }
-
-    public function getContractAttribute()
-    {
-        return $this->purchaseContract ?: $this->saleContract;
+        return $this->belongsTo(Company::class, 'meta_company_id', 'id');
     }
 
     public function contact()
     {
-        return $this->belongsTo(Contact::class, 'contact_id');
-    }
-
-    public function company()
-    {
-        return $this->belongsTo(Company::class, 'meta_company_id');
-    }
-
-    public function metaCompany()
-    {
-        return $this->belongsTo(Company::class, 'meta_company_id');
-    }
-
-    public function address()
-    {
-        return $this->belongsTo(Address::class, 'address_id');
-    }
-
-    public function shippingAddress()
-    {
-        return $this->belongsTo(Address::class, 'shipping_address_id');
-    }
-
-    public function destinationAddress()
-    {
-        return $this->belongsTo(Address::class, 'shipping_address_id');
+        return $this->belongsTo(Contact::class, 'contact_id', 'id');
     }
 
     public function contactRepresentative()
     {
-        return $this->belongsTo(Representative::class, 'contact_representative_id');
+        return $this->belongsTo(Representative::class, 'contact_representative_id', 'id');
     }
 
     public function metaRepresentative()
     {
-        return $this->belongsTo(Representative::class, 'meta_representative_id');
+        return $this->belongsTo(Representative::class, 'meta_representative_id', 'id');
+    }
+
+    public function address()
+    {
+        return $this->belongsTo(Address::class, 'address_id', 'id');
+    }
+
+    public function shippingAddress()
+    {
+        return $this->belongsTo(Address::class, 'shipping_address_id', 'id');
     }
 
     public function currency()
     {
-        return $this->belongsTo(Currency::class, 'currency_id');
-    }
-
-    public function paymentType()
-    {
-        return $this->belongsTo(PaymentType::class, 'payment_type_id');
-    }
-
-    public function paymentTermsType()
-    {
-        return $this->belongsTo(PaymentTermsType::class, 'payment_terms_type_id');
+        return $this->belongsTo(Currency::class, 'currency_id', 'id');
     }
 
     public function paymentAccount()
     {
-        return $this->belongsTo(BankAccount::class, 'payment_account_id');
+        return $this->belongsTo(BankAccount::class, 'payment_account_id', 'id');
+    }
+
+    public function paymentType()
+    {
+        return $this->belongsTo(PaymentType::class, 'payment_type_id', 'id');
+    }
+
+    public function paymentTermsType()
+    {
+        return $this->belongsTo(PaymentTermsType::class, 'payment_terms_type_id', 'id');
     }
 
     public function countryOfOrigin()
     {
-        return $this->belongsTo(Country::class, 'country_of_origin_id');
+        return $this->belongsTo(Country::class, 'country_of_origin_id', 'id');
     }
 
-    public function dealProducts()
+    public function offer()
     {
-        return $this->belongsToMany(DealProduct::class, 'deal_products', 'deal_id', 'products_id');
+        return $this->belongsTo(Offer::class, 'offer_id', 'id');
     }
 
-    public function products()
+    public function purchaseContract()
     {
-        return $this->belongsToMany(DealProduct::class, 'deal_products', 'deal_id', 'products_id');
+        return $this->hasOne(Contract::class, 'purchase_id', 'id');
+    }
+
+    public function saleContract()
+    {
+        return $this->hasOne(Contract::class, 'sale_id', 'id');
+    }
+
+    public function purchaseOffer()
+    {
+        return $this->hasOne(Offer::class, 'purchase_id', 'id');
+    }
+
+    public function saleOffer()
+    {
+        return $this->hasOne(Offer::class, 'sale_id', 'id');
     }
 }

@@ -11,7 +11,6 @@ class Product extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'id',
         'uom',
         'active',
         'base_code_annexix',
@@ -33,11 +32,26 @@ class Product extends Model
 
     public function contact()
     {
-        return $this->belongsTo(Contact::class, 'contact_id');
+        return $this->belongsTo(Contact::class, 'contact_id', 'id');
     }
 
     public function dealProducts()
     {
-        return $this->hasMany(DealProduct::class, 'product_id');
+        return $this->hasMany(DealProduct::class, 'product_id', 'id');
+    }
+
+    public function productContracts()
+    {
+        return $this->hasMany(ProductContract::class, 'product_id', 'id');
+    }
+
+    public function packs()
+    {
+        return $this->hasMany(Pack::class, 'product_id', 'id');
+    }
+
+    public function contacts()
+    {
+        return $this->belongsToMany(Contact::class, 'contact_product_ids', 'product_ids', 'contact_id');
     }
 }

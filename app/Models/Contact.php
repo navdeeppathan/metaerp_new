@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
 
 class Contact extends Model
 {
@@ -11,103 +10,44 @@ class Contact extends Model
     protected $primaryKey = 'id';
     public $timestamps = false;
 
-    protected $guarded = [];
+    protected $fillable = [
+        'active',
+        'code_meta',
+        'company_id',
+        'country_id',
+        'currency',
+        'initials',
+        'name',
+        'registration',
+        'vat',
+        'additional_information',
+        'eori_number',
+        'website',
+        'language_id',
+    ];
 
     protected $casts = [
         'active' => 'boolean',
     ];
 
-    protected $appends = [
-        'typeIds',
-        'productIds',
-        'codeMeta',
-        'companyId',
-        'countryId',
-        'bankAccounts',
-    ];
-
-    public function getCodeMetaAttribute()
+    public function language()
     {
-        return $this->attributes['code_meta'] ?? null;
-    }
-
-    public function setCodeMetaAttribute($value)
-    {
-        $this->attributes['code_meta'] = $value;
-    }
-
-    public function getCompanyIdAttribute()
-    {
-        return $this->attributes['company_id'] ?? null;
-    }
-
-    public function setCompanyIdAttribute($value)
-    {
-        $this->attributes['company_id'] = $value;
-    }
-
-    public function getCountryIdAttribute()
-    {
-        return $this->attributes['country_id'] ?? null;
-    }
-
-    public function setCountryIdAttribute($value)
-    {
-        $this->attributes['country_id'] = $value;
-    }
-
-    public function getTypeIdsAttribute()
-    {
-        if (!$this->id) {
-            return [];
-        }
-        try {
-            return DB::table('contact_type_ids')->where('contact_id', $this->id)->pluck('type_ids')->all();
-        } catch (\Throwable $e) {
-            return [];
-        }
-    }
-
-    public function getProductIdsAttribute()
-    {
-        if (!$this->id) {
-            return [];
-        }
-        try {
-            return DB::table('contact_product_ids')->where('contact_id', $this->id)->pluck('product_ids')->all();
-        } catch (\Throwable $e) {
-            return [];
-        }
-    }
-
-    public function country()
-    {
-        return $this->belongsTo(Country::class, 'country_id');
+        return $this->belongsTo(Language::class, 'language_id', 'id');
     }
 
     public function company()
     {
-        return $this->belongsTo(Company::class, 'company_id');
+        return $this->belongsTo(Company::class, 'company_id', 'id');
     }
 
-    public function metaCompany()
+    public function country()
     {
-        return $this->belongsTo(Company::class, 'company_id');
-    }
-
-    public function language()
-    {
-        return $this->belongsTo(Language::class, 'language_id');
+        return $this->belongsTo(Country::class, 'country_id', 'id');
     }
 
     public function addresses()
     {
         return $this->belongsToMany(Address::class, 'contacts_addresses', 'contact_id', 'addresses_id');
-    }
-
-    public function getRepresentativesAttribute()
-    {
-        return $this->addresses ? $this->addresses->flatMap->representatives : collect();
     }
 
     public function products()
@@ -120,19 +60,23 @@ class Contact extends Model
         return $this->belongsToMany(Type::class, 'contact_type_ids', 'contact_id', 'type_ids');
     }
 
+    public function directProducts()
+    {
+        return $this->hasMany(Product::class, 'contact_id', 'id');
+    }
+
     public function deals()
     {
-        return $this->hasMany(Deal::class, 'contact_id');
+        return $this->hasMany(Deal::class, 'contact_id', 'id');
     }
 
-    public function getContractsAttribute()
+    public function buyerContracts()
     {
-        $dealIds = $this->deals()->pluck('id');
-        return Contract::whereIn('purchase_id', $dealIds)->orWhereIn('sale_id', $dealIds)->get();
+        return $this->hasMany(BuyerContract::class, 'contact_id', 'id');
     }
 
-    public function getBankAccountsAttribute()
+    public function sellerContracts()
     {
-        return $this->company ? $this->company->bankAccounts : collect();
+        return $this->hasMany(SellerContract::class, 'contact_id', 'id');
     }
 }

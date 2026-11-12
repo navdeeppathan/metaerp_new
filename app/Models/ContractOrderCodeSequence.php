@@ -10,22 +10,13 @@ class ContractOrderCodeSequence extends Model
     protected $primaryKey = 'id';
     public $timestamps = false;
 
-    protected $guarded = [];
+    protected $fillable = [
+        'last_id',
+        'year',
+    ];
 
     protected $casts = [
         'last_id' => 'integer',
-        'lastId' => 'integer',
         'year' => 'integer',
     ];
-
-    public function getLastIdAttribute()
-    {
-        return $this->attributes['last_id'] ?? $this->attributes['lastId'] ?? 0;
-    }
-
-    public function setLastIdAttribute($value)
-    {
-        $this->attributes['last_id'] = $value;
-        $this->attributes['lastId'] = $value;
-    }
 }

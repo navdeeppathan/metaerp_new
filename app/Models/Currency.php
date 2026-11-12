@@ -11,7 +11,6 @@ class Currency extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'id',
         'active',
         'description',
         'name',
@@ -25,6 +24,6 @@ class Currency extends Model
 
     public function deals()
     {
-        return $this->hasMany(Deal::class, 'currency_id');
+        return $this->hasMany(Deal::class, 'currency_id', 'id');
     }
 }

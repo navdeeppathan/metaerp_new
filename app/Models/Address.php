@@ -11,7 +11,6 @@ class Address extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'id',
         'active',
         'address_line1',
         'address_line2',
@@ -30,15 +29,9 @@ class Address extends Model
         'version' => 'integer',
     ];
 
-    public function getAddressLine1Attribute() { return $this->attributes['address_line1'] ?? null; }
-    public function setAddressLine1Attribute($val) { $this->attributes['address_line1'] = $val; }
-
-    public function getAddressLine2Attribute() { return $this->attributes['address_line2'] ?? null; }
-    public function setAddressLine2Attribute($val) { $this->attributes['address_line2'] = $val; }
-
     public function country()
     {
-        return $this->belongsTo(Country::class, 'country_id');
+        return $this->belongsTo(Country::class, 'country_id', 'id');
     }
 
     public function representatives()
@@ -49,5 +42,30 @@ class Address extends Model
     public function contacts()
     {
         return $this->belongsToMany(Contact::class, 'contacts_addresses', 'addresses_id', 'contact_id');
+    }
+
+    public function companies()
+    {
+        return $this->hasMany(Company::class, 'address_id', 'id');
+    }
+
+    public function deals()
+    {
+        return $this->hasMany(Deal::class, 'address_id', 'id');
+    }
+
+    public function shippingDeals()
+    {
+        return $this->hasMany(Deal::class, 'shipping_address_id', 'id');
+    }
+
+    public function buyerContracts()
+    {
+        return $this->hasMany(BuyerContract::class, 'shipping_address_id', 'id');
+    }
+
+    public function sellerContracts()
+    {
+        return $this->hasMany(SellerContract::class, 'shipping_address_id', 'id');
     }
 }

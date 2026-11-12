@@ -16,13 +16,18 @@ class UserController extends BaseApiController
             ->orderBy('name')
             ->paginate($size);
 
+        $transformed = $paginator->getCollection()->map(function ($u) {
+            return $this->formatUserDto($u);
+        });
+        $paginator->setCollection($transformed);
+
         return response()->json($this->paginateResponse($paginator));
     }
 
     public function show($id)
     {
         $user = User::with(['permissions.accessGroup.accessList', 'permissions.company'])->findOrFail($id);
-        return response()->json($user);
+        return response()->json($this->formatUserDto($user));
     }
 
     public function store(Request $request)
@@ -33,32 +38,43 @@ class UserController extends BaseApiController
             'password' => 'required|string|min:6',
         ]);
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'displayName' => $request->input('displayName', $validated['name']),
-            'username' => $validated['username'],
-            'password' => Hash::make($validated['password']),
-            'occupation' => $request->input('occupation'),
-            'role' => $request->input('role', 'ROLE_USER'),
-            'active' => $request->input('active', true),
-            'secret' => app(\App\Services\TotpService::class)->generateSecret(),
-            'enable2fa' => $request->input('enable2fa', false),
-        ]);
+        $user = new User();
+        $user->name = $validated['name'];
+        $user->username = $validated['username'];
+        $user->password = Hash::make($validated['password']);
+        $user->display_name = $request->input('displayName', $validated['name']);
+        $user->occupation = $request->input('occupation');
+        $user->role = $request->input('role', 'ROLE_USER');
+        $user->active = $request->input('active', true);
+        $user->enable2fa = $request->input('enable2fa', false);
+        $user->photo_url = $request->input('photoURL') ?: $request->input('photoUrl');
+        $user->secret = app(\App\Services\TotpService::class)->generateSecret();
+        $user->save();
 
-        return response()->json($user, 201);
+        return response()->json($this->formatUserDto($user), 201);
     }
 
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
-        $data = $request->only(['name', 'displayName', 'occupation', 'role', 'active', 'enable2fa']);
 
-        if ($request->filled('password')) {
-            $data['password'] = Hash::make($request->input('password'));
+        if ($request->filled('name')) $user->name = $request->input('name');
+        if ($request->filled('displayName')) $user->display_name = $request->input('displayName');
+        if ($request->filled('display_name')) $user->display_name = $request->input('display_name');
+        if ($request->filled('occupation')) $user->occupation = $request->input('occupation');
+        if ($request->filled('role')) $user->role = $request->input('role');
+        if ($request->has('active')) $user->active = (bool) $request->input('active');
+        if ($request->has('enable2fa')) $user->enable2fa = (bool) $request->input('enable2fa');
+        if ($request->filled('photoURL') || $request->filled('photo_url')) {
+            $user->photo_url = $request->input('photoURL') ?: $request->input('photo_url');
         }
 
-        $user->update($data);
-        return response()->json($user);
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->input('password'));
+        }
+
+        $user->save();
+        return response()->json($this->formatUserDto($user));
     }
 
     public function destroy($id)
@@ -72,34 +88,60 @@ class UserController extends BaseApiController
     public function uploadSignature(Request $request, $userId)
     {
         $user = User::findOrFail($userId);
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-            $content = file_get_contents($file->getRealPath());
-            $b64 = base64_encode($content);
-
-            $archive = Archive::create([
-                'fileName' => $file->getClientOriginalName(),
-                'file' => $b64,
-            ]);
-
-            $user->signatureFile = $b64;
-            $user->signature_file_name = $file->getClientOriginalName();
-            $user->archiveSignatureId = $archive->id;
-            $user->save();
-
-            return response()->json(['message' => 'Signature uploaded successfully']);
+        if (!$request->hasFile('file')) {
+            return response()->json(['error' => 'No signature file provided'], 400);
         }
-        return response()->json(['error' => 'No signature file provided'], 400);
+
+        $file = $request->file('file');
+        $b64 = base64_encode(file_get_contents($file->getRealPath()));
+
+        $archive = Archive::create([
+            'content' => $b64,
+        ]);
+
+        $user->signature_file = $b64;
+        $user->signature_file_name = $file->getClientOriginalName();
+        $user->archive_signature_id = $archive->id;
+        $user->save();
+
+        return response()->json(['message' => 'Signature uploaded successfully']);
     }
 
     public function downloadSignature($userId)
     {
         $user = User::findOrFail($userId);
-        if (empty($user->signatureFile)) {
+        if (empty($user->signature_file) && $user->archive_signature_id) {
+            $archive = Archive::find($user->archive_signature_id);
+            if ($archive) {
+                $user->signature_file = $archive->content;
+            }
+        }
+
+        if (empty($user->signature_file)) {
             return response()->json(['error' => 'No signature on file'], 404);
         }
 
-        $binary = base64_decode($user->signatureFile);
-        return response($binary, 200)->header('Content-Type', 'image/png');
+        $raw = base64_decode($user->signature_file);
+        return response($raw, 200)
+            ->header('Content-Type', 'image/png')
+            ->header('Content-Disposition', 'inline; filename="signature.png"');
+    }
+
+    private function formatUserDto(User $u): array
+    {
+        return [
+            'id' => $u->id,
+            'name' => $u->name,
+            'displayName' => $u->display_name ?: $u->name,
+            'username' => $u->username,
+            'email' => $u->username,
+            'occupation' => $u->occupation,
+            'role' => $u->role,
+            'photoURL' => $u->photo_url ?: '/assets/images/avatars/brian-hughes.jpg',
+            'photoUrl' => $u->photo_url,
+            'active' => (bool) $u->active,
+            'enable2fa' => (bool) $u->enable2fa,
+            'permissions' => $u->permissions ?? [],
+        ];
     }
 }

@@ -7,8 +7,48 @@ use Illuminate\Database\Eloquent\Model;
 class Offer extends Model
 {
     protected $table = 'offer';
+    protected $primaryKey = 'id';
     public $timestamps = false;
-    protected $guarded = [];
+
+    protected $fillable = [
+        'active',
+        'cancellation_date',
+        'cancellation_reason',
+        'close_date',
+        'currency',
+        'customer_purchase_order',
+        'delivery_plan',
+        'delivery_terms',
+        'description',
+        'due_date',
+        'extra_information',
+        'internal_notes',
+        'loading_date',
+        'mode_of_payment',
+        'order_code',
+        'packing',
+        'payment_description',
+        'payment_terms',
+        'quality_check',
+        'quotational_period',
+        'sales_invoice_date',
+        'sales_invoice_number',
+        'sales_order',
+        'status',
+        'subject',
+        'supplies_note',
+        'terms',
+        'transport_notes',
+        'transport_price_agreed',
+        'transport_special_notes',
+        'type',
+        'version',
+        'weights',
+        'purchase_id',
+        'sale_id',
+        'contract_id_when_promoted',
+        'contract_order_code_when_promoted',
+    ];
 
     protected $casts = [
         'active' => 'boolean',
@@ -23,42 +63,41 @@ class Offer extends Model
 
     public function purchase()
     {
-        return $this->belongsTo(Deal::class, 'purchase_id');
+        return $this->belongsTo(Deal::class, 'purchase_id', 'id');
     }
 
     public function sale()
     {
-        return $this->belongsTo(Deal::class, 'sale_id');
+        return $this->belongsTo(Deal::class, 'sale_id', 'id');
+    }
+
+    public function promotedContract()
+    {
+        return $this->belongsTo(Contract::class, 'contract_id_when_promoted', 'id');
     }
 
     public function comments()
     {
-        return $this->hasMany(Comment::class, 'offer_id');
+        return $this->hasMany(Comment::class, 'offer_id', 'id');
     }
 
     public function generatedFiles()
     {
-        return $this->hasMany(GeneratedFile::class, 'offer_id');
+        return $this->hasMany(GeneratedFile::class, 'offer_id', 'id');
     }
 
     public function uploadedFiles()
     {
-        return $this->hasMany(UploadedFile::class, 'offer_id');
+        return $this->hasMany(UploadedFile::class, 'offer_id', 'id');
     }
 
-    public function getMetaCompanyAttribute()
+    public function members()
     {
-        return $this->sale?->metaCompany ?: $this->purchase?->metaCompany;
+        return $this->belongsToMany(User::class, 'offer_member_ids', 'offer_id', 'member_ids');
     }
 
-    public function getContactAttribute()
+    public function tags()
     {
-        return $this->sale?->contact ?: $this->purchase?->contact;
-    }
-
-    public function getProductsAttribute()
-    {
-        $deal = $this->sale ?: $this->purchase;
-        return $deal ? $deal->products : collect();
+        return $this->hasMany(OfferTag::class, 'offer_id', 'id');
     }
 }

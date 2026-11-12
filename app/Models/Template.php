@@ -7,18 +7,37 @@ use Illuminate\Database\Eloquent\Model;
 class Template extends Model
 {
     protected $table = 'templates';
-    protected $guarded = [];
+    protected $primaryKey = 'id';
+    public $timestamps = false;
+
+    protected $fillable = [
+        'content',
+        'country_id',
+        'description',
+        'name',
+        'not_required_keys',
+        'type',
+        'language_id',
+        'original_content',
+    ];
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class, 'country_id', 'id');
+    }
 
     public function language()
     {
-        return $this->belongsTo(Language::class, 'language_id');
+        return $this->belongsTo(Language::class, 'language_id', 'id');
     }
 
-    public function getKeysListAttribute()
+    public function actions()
     {
-        if (empty($this->keys)) {
-            return [];
-        }
-        return array_map('trim', explode(',', $this->keys));
+        return $this->hasMany(Action::class, 'template_id', 'id');
+    }
+
+    public function generatedFiles()
+    {
+        return $this->hasMany(GeneratedFile::class, 'template_id', 'id');
     }
 }

@@ -86,16 +86,31 @@ Route::put('/products/{id}', [ProductController::class, 'update']);
 Route::delete('/products/{id}', [ProductController::class, 'destroy']);
 
 // --- Contracts ---
+// Specific routes first to prevent /{id} wildcard capturing
+Route::get('/contracts/contractsForAssociation/{productId}', [ContractController::class, 'listContractsForAssociation']);
+Route::get('/contracts/sale-contracts-with-pending-products/{contractId}/{productId}', [ContractController::class, 'listPendingContracts']);
+Route::get('/contracts/status/{status}', [ContractController::class, 'listByStatus']);
+Route::post('/contracts/listByCriteria', [ContractController::class, 'listByCriteria']);
+Route::post('/contracts/{contractId}/move/{stageId}', [ContractController::class, 'move']);
+Route::post('/contracts/{dealProductId}/associateWith/{purchaseContractId}', [ContractController::class, 'associateContract']);
+Route::get('/contracts/{saleContractId}/associatedContracts', [ContractController::class, 'listAssociatedContractsIds']);
+Route::get('/contracts/{saleContractId}/associatedContractsWithOrderCode', [ContractController::class, 'listAssociatedContractsOrderCode']);
+Route::get('/contracts/{purchaseContractId}/listProductsRemainingBalance', [ContractController::class, 'listProductsRemainingBalance']);
+Route::put('/contracts/cancel/{id}', [ContractController::class, 'cancel']);
+Route::put('/contracts/close/{id}', [ContractController::class, 'close']);
+
+// File management routes
+Route::get('/contracts/{contractId}/files', [ContractController::class, 'listFilesForContract']);
+Route::post('/contracts/upload/{contractId}/files', [ContractController::class, 'uploadContractFiles']);
+Route::delete('/contracts/delete/{contractId}/files/{fileId}', [ContractController::class, 'deleteFileFromContract']);
+Route::get('/contracts/download/{contractId}/files/{fileId}', [ContractController::class, 'downloadFileFromDisk']);
+
+// Standard CRUD
 Route::get('/contracts', [ContractController::class, 'index']);
 Route::get('/contracts/{id}', [ContractController::class, 'show']);
 Route::post('/contracts', [ContractController::class, 'store']);
 Route::put('/contracts/{id}', [ContractController::class, 'update']);
 Route::delete('/contracts/{id}', [ContractController::class, 'destroy']);
-Route::post('/contracts/{contractId}/move/{stageId}', [ContractController::class, 'move']);
-Route::post('/contracts/{dealProductId}/associateWith/{purchaseContractId}', [ContractController::class, 'associateContract']);
-Route::get('/contracts/contractsForAssociation/{productId}', [ContractController::class, 'listContractsForAssociation']);
-Route::put('/contracts/cancel/{id}', [ContractController::class, 'cancel']);
-Route::put('/contracts/close/{id}', [ContractController::class, 'close']);
 
 // --- Offers ---
 Route::get('/offers', [OfferController::class, 'index']);

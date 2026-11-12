@@ -25,7 +25,7 @@ class ContractActionService
     public function move(int $contractId, int $stageId, ?int $userId = null): Contract
     {
         return DB::transaction(function () use ($contractId, $stageId, $userId) {
-            $contract = Contract::with(['stage.stageActions.action', 'purchase.products', 'sale.products'])->findOrFail($contractId);
+            $contract = Contract::with(['stage.stageActions.action', 'purchase', 'sale', 'dealProducts'])->findOrFail($contractId);
             $targetStage = Stage::with(['stageActions.action'])->findOrFail($stageId);
 
             $oldStage = $contract->stage;
@@ -33,28 +33,29 @@ class ContractActionService
             // 1. Check OUT actions of previous stage if any
             if ($oldStage) {
                 foreach ($oldStage->stageActions as $sa) {
-                    if ($sa->contractTypesNotAllowed && in_array($contract->type, explode(',', $sa->contractTypesNotAllowed))) {
+                    $notAllowed = $sa->contractTypesNotAllowed->pluck('contract_types_not_allowed')->all();
+                    if (!empty($notAllowed) && in_array($contract->type, $notAllowed)) {
                         throw new \Exception("This contract type is not allowed in this stage", 409);
                     }
                 }
             }
 
             // 2. Integrity checks depending on stage
-            if (strtoupper($targetStage->stageType ?? '') === 'LOGISTICS' || str_contains(strtolower($targetStage->name), 'logistics')) {
+            if (strtoupper($targetStage->type ?? '') === 'LOGISTICS' || str_contains(strtolower($targetStage->description ?? ''), 'logistics')) {
                 // Must have products
-                $deal = $contract->purchase ?: $contract->sale;
-                if (!$deal || $deal->products->isEmpty()) {
+                if ($contract->dealProducts->isEmpty()) {
                     throw new \Exception("Contract cannot proceed to Logistics without deal products", 400);
                 }
             }
 
             // 3. Update stage
             $contract->stage_id = $targetStage->id;
+            $contract->stage_contract_id = $targetStage->id;
             $contract->save();
 
             // 4. Execute IN actions of target stage
             foreach ($targetStage->stageActions as $sa) {
-                if ($sa->triggerType === 'IN') {
+                if ($sa->trigger_type === 'IN') {
                     $this->executeAction($sa, $contract, $userId);
                 }
             }
@@ -62,8 +63,8 @@ class ContractActionService
             // 5. Audit Log
             $history = json_encode([
                 'stage' => [
-                    'from' => $oldStage?->name ?? 'None',
-                    'to' => $targetStage->name,
+                    'from' => $oldStage?->description ?? 'None',
+                    'to' => $targetStage->description,
                 ]
             ]);
             $this->auditService->register('CONTRACT', $contract->id, 'STAGE_TRANSITION', $history, $userId);

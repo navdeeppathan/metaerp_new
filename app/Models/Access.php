@@ -7,11 +7,24 @@ use Illuminate\Database\Eloquent\Model;
 class Access extends Model
 {
     protected $table = 'access';
-    protected $guarded = [];
-    protected $casts = ['active' => 'boolean'];
+    protected $primaryKey = 'id';
+    public $timestamps = false;
+
+    protected $fillable = [
+        'access_type',
+        'active',
+        'module',
+        'version',
+        'accessgroup_id',
+    ];
+
+    protected $casts = [
+        'active' => 'boolean',
+        'version' => 'integer',
+    ];
 
     public function accessGroup()
     {
-        return $this->belongsTo(AccessGroup::class, 'accessgroup_id');
+        return $this->belongsTo(AccessGroup::class, 'accessgroup_id', 'id');
     }
 }

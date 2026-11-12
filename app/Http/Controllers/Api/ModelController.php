@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\ModelWorkflow;
 use App\Models\Contract;
+use App\Models\Stage;
 use Illuminate\Http\Request;
 
 class ModelController extends BaseApiController
@@ -11,10 +12,10 @@ class ModelController extends BaseApiController
     public function index(Request $request)
     {
         $size = (int) $request->input('size', 20);
-        $paginator = ModelWorkflow::with([
-            'stages.contracts.purchase.products',
-            'stages.contracts.sale.products',
-        ])->where('active', true)->paginate($size);
+        $paginator = ModelWorkflow::with(['stages.stageActions'])
+            ->where('active', true)
+            ->paginate($size);
+
         return response()->json($this->paginateResponse($paginator));
     }
 
@@ -27,60 +28,146 @@ class ModelController extends BaseApiController
     public function withPermissions(Request $request, $id)
     {
         $model = ModelWorkflow::with(['stages'])->findOrFail($id);
+
         $contracts = Contract::with([
-            'purchase.metaCompany', 'purchase.contact', 'purchase.products.product',
-            'sale.metaCompany', 'sale.contact', 'sale.products.product',
-            'checklists.checkitems', 'comments'
+            'purchase.metaCompany',
+            'purchase.contact',
+            'sale.metaCompany',
+            'sale.contact',
+            'checklists.checkitems',
+            'comments',
+            'dealProducts',
+            'members',
+            'tags'
         ])
         ->where('active', true)
-        ->where('contractStatus', '!=', 'CANCELLED')
+        ->where(function ($q) {
+            $q->whereNull('status')
+              ->orWhere('status', 'OPEN')
+              ->orWhere('status', '!=', 'CANCELLED');
+        })
         ->get();
 
-        // Build Board format matching Fuse React Scrumboard
-        $lists = [];
-        $cards = [];
+        $stagesData = [];
+        $orderedStages = $model->stages->sortBy('position')->values();
 
-        foreach ($model->stages as $stage) {
-            $stageContractIds = [];
+        foreach ($orderedStages as $stage) {
+            $stageContracts = [];
+
             foreach ($contracts as $c) {
-                if ($c->stage_id == $stage->id) {
-                    $stageContractIds[] = (string) $c->id;
-                    $deal = $c->purchase ?: $c->sale;
-                    $partnerName = $deal?->contact?->name ?? 'Unknown Partner';
-                    $total = $deal?->total ? number_format($deal->total, 2) : '0.00';
+                $matchesStage = ($c->stage_contract_id == $stage->id) || ($c->stage_id == $stage->id);
+                if (!$matchesStage) {
+                    continue;
+                }
 
-                    $cards[] = [
-                        'id' => (string) $c->id,
-                        'name' => $c->orderCode ?: "Contract #{$c->id}",
-                        'description' => "{$c->type} - {$partnerName} ({$total})",
-                        'orderCode' => $c->orderCode,
-                        'type' => $c->type,
-                        'contract' => $c,
-                        'stageContractId' => $stage->id,
-                        'idList' => (string) $stage->id,
-                        'attachments' => [],
-                        'checklists' => $c->checklists,
-                        'comments' => $c->comments,
-                        'due' => $c->loadingDate ? $c->loadingDate->timestamp * 1000 : null,
+                $purchaseMetaCompany = $c->purchase?->metaCompany;
+                $saleMetaCompany = $c->sale?->metaCompany;
+
+                $purchaseCompanyId = $purchaseMetaCompany?->id ?? $c->purchase?->meta_company_id;
+                $purchaseCompanyName = $purchaseMetaCompany?->name;
+
+                $saleCompanyId = $saleMetaCompany?->id ?? $c->sale?->meta_company_id;
+                $saleCompanyName = $saleMetaCompany?->name;
+
+                if (!$purchaseCompanyId && $saleCompanyId) {
+                    $purchaseCompanyId = $saleCompanyId;
+                    $purchaseCompanyName = $saleCompanyName;
+                }
+
+                $buyerContract = null;
+                if ($c->purchase) {
+                    $buyerContract = [
+                        'contactId' => $c->purchase->contact?->id,
+                        'contactName' => $c->purchase->contact?->name,
+                        'paymentStatus' => $c->purchase->payment_status ?? ($c->purchase->payment_date ? 'PAID' : 'PENDING'),
                     ];
+                }
+
+                $sellerContract = null;
+                if ($c->sale) {
+                    $sellerContract = [
+                        'contactId' => $c->sale->contact?->id,
+                        'contactName' => $c->sale->contact?->name,
+                        'paymentStatus' => $c->sale->payment_status ?? ($c->sale->payment_date ? 'PAID' : 'PENDING'),
+                    ];
+                }
+
+                $associationStatus = $this->calculateAssociationStatus($c);
+
+                $stageContracts[] = [
+                    'id' => $c->id,
+                    'type' => $c->type,
+                    'orderCode' => $c->order_code,
+                    'description' => $c->description,
+                    'dueDate' => $c->due_date ? $c->due_date->timestamp : null,
+                    'status' => $c->status ?: 'OPEN',
+                    'purchaseCompany' => $purchaseCompanyId,
+                    'purchaseCompanyName' => $purchaseCompanyName,
+                    'saleCompany' => $saleCompanyId,
+                    'saleCompanyName' => $saleCompanyName,
+                    'buyerContract' => $buyerContract,
+                    'sellerContract' => $sellerContract,
+                    'associationStatus' => $associationStatus,
+                    'comments' => $c->comments->map(function ($cm) {
+                        return [
+                            'id' => $cm->id,
+                            'message' => $cm->message,
+                            'createdAt' => $cm->created_at ? $cm->created_at->timestamp : null,
+                        ];
+                    })->values(),
+                    'checklists' => $c->checklists,
+                    'memberIds' => $c->members->pluck('id')->values(),
+                    'tags' => $c->tags->pluck('tag')->values(),
+                    'stageContractId' => $stage->id,
+                ];
+            }
+
+            $stageActionsData = [];
+            if ($stage->relationLoaded('stageActions')) {
+                foreach ($stage->stageActions as $sa) {
+                    $stageActionsData[] = $sa;
                 }
             }
 
-            $lists[] = [
-                'id' => (string) $stage->id,
-                'name' => $stage->name,
-                'title' => $stage->name,
-                'idCards' => $stageContractIds,
+            $stagesData[] = [
+                'id' => $stage->id,
+                'description' => $stage->description,
+                'type' => $stage->type,
+                'position' => (int) $stage->position,
+                'version' => (int) ($stage->version ?? 1),
+                'active' => (bool) $stage->active,
+                'contracts' => $stageContracts,
             ];
         }
 
         return response()->json([
-            'id' => (string) $model->id,
-            'name' => $model->name,
-            'title' => $model->name,
-            'lists' => $lists,
-            'cards' => $cards,
+            'id' => $model->id,
+            'description' => $model->description,
+            'version' => (int) ($model->version ?? 1),
+            'active' => (bool) $model->active,
+            'stages' => $stagesData,
         ]);
+    }
+
+    private function calculateAssociationStatus(Contract $contract): string
+    {
+        if ($contract->type !== 'SELL') {
+            return 'NOT_APPLY';
+        }
+
+        $products = $contract->dealProducts;
+        if (!$products || $products->isEmpty()) {
+            return 'PENDING';
+        }
+
+        $total = $products->count();
+        $associated = $products->whereNotNull('associated_contract_id')->count();
+
+        if ($associated === $total) {
+            return 'COMPLETE';
+        }
+
+        return $associated === 0 ? 'PENDING' : 'PARTIAL';
     }
 
     public function store(Request $request)

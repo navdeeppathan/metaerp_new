@@ -15,7 +15,6 @@ class User extends Authenticatable
     public $timestamps = false;
 
     protected $fillable = [
-        'id',
         'active',
         'display_name',
         'name',
@@ -45,28 +44,33 @@ class User extends Authenticatable
         'signature_file',
     ];
 
-    public function getEmailAttribute()
+    public function archiveSignature()
     {
-        return $this->attributes['username'] ?? null;
-    }
-
-    public function setEmailAttribute($value)
-    {
-        $this->attributes['username'] = $value;
-    }
-
-    public function getDisplayNameAttribute()
-    {
-        return $this->attributes['display_name'] ?? $this->attributes['name'] ?? null;
+        return $this->belongsTo(Archive::class, 'archive_signature_id', 'id');
     }
 
     public function permissions()
     {
-        return $this->hasMany(Permission::class, 'user_id');
+        return $this->hasMany(Permission::class, 'user_id', 'id');
     }
 
     public function comments()
     {
-        return $this->hasMany(Comment::class, 'id_member');
+        return $this->hasMany(Comment::class, 'id_member', 'id');
+    }
+
+    public function logs()
+    {
+        return $this->hasMany(Log::class, 'user_id', 'id');
+    }
+
+    public function contracts()
+    {
+        return $this->belongsToMany(Contract::class, 'contract_member_ids', 'member_ids', 'contract_id');
+    }
+
+    public function offers()
+    {
+        return $this->belongsToMany(Offer::class, 'offer_member_ids', 'member_ids', 'offer_id');
     }
 }

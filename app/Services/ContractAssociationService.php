@@ -28,7 +28,7 @@ class ContractAssociationService
         $differences = [];
 
         foreach ($purchaseProducts as $pp) {
-            $soldQty = DealProduct::where('associatedContractId', $purchaseContractId)
+            $soldQty = DealProduct::where('associated_contract_id', $purchaseContractId)
                 ->where('product_id', $pp->product_id)
                 ->sum('quantity');
 
@@ -56,12 +56,13 @@ class ContractAssociationService
             return 'NOT_APPLY';
         }
 
-        if (!$contract->sale || $contract->sale->products->isEmpty()) {
+        $saleProducts = $contract->dealProducts;
+        if (!$saleProducts || $saleProducts->isEmpty()) {
             return 'PENDING';
         }
 
-        $total = $contract->sale->products->count();
-        $associated = $contract->sale->products->whereNotNull('associatedContractId')->count();
+        $total = $saleProducts->count();
+        $associated = $saleProducts->whereNotNull('associated_contract_id')->count();
 
         if ($associated === $total) {
             return 'COMPLETE';
@@ -78,8 +79,8 @@ class ContractAssociationService
         $dp = DealProduct::findOrFail($dealProductId);
         $purchaseContract = Contract::findOrFail($purchaseContractId);
 
-        $dp->associatedContractId = $purchaseContractId;
-        $dp->status = 'ASSOCIATED';
+        $dp->associated_contract_id = $purchaseContractId;
+        $dp->contract_order_code = $purchaseContract->order_code;
         $dp->save();
 
         return $dp;
