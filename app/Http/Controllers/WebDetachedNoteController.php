@@ -14,27 +14,38 @@ class WebDetachedNoteController extends Controller
 {
     public function index(Request $request)
     {
-        $contracts = Contract::whereNotNull('orderCode')
+        $contracts = Contract::whereNotNull('order_code')
             ->orderByDesc('id')
-            ->get(['id', 'orderCode', 'type']);
+            ->get(['id', 'order_code', 'type']);
 
         $selectedCode = $request->input('code');
         $selectedContract = null;
         $detachedNotes = collect();
 
+        $withRelations = [
+            'contract.purchase.metaCompany',
+            'contract.purchase.contact',
+            'contract.purchase.currency',
+            'contract.sale.metaCompany',
+            'contract.sale.contact',
+            'contract.sale.currency',
+            'details.dealProduct',
+            'details.creditDebitType'
+        ];
+
         if ($selectedCode) {
-            $selectedContract = Contract::where('orderCode', $selectedCode)
+            $selectedContract = Contract::where('order_code', $selectedCode)
                 ->orWhere('id', $selectedCode)
                 ->first();
 
             if ($selectedContract) {
-                // If notes are associated or exist
-                $detachedNotes = DetachedNote::with(['metaCompany', 'contact', 'currency', 'details'])
+                $detachedNotes = DetachedNote::with($withRelations)
+                    ->where('contract_id', $selectedContract->id)
                     ->orderByDesc('id')
                     ->get();
             }
         } else {
-            $detachedNotes = DetachedNote::with(['metaCompany', 'contact', 'currency', 'details'])
+            $detachedNotes = DetachedNote::with($withRelations)
                 ->orderByDesc('id')
                 ->get();
         }
@@ -66,15 +77,16 @@ class WebDetachedNoteController extends Controller
             'total' => 'nullable|numeric',
         ]);
 
+        $contractId = null;
+        if ($request->filled('contract_code')) {
+            $c = Contract::where('order_code', $request->input('contract_code'))->first();
+            $contractId = $c?->id;
+        }
+
         $note = DetachedNote::create([
             'kind' => $validated['kind'],
-            'number' => $validated['number'] ?? ('DN-' . date('y') . '-' . rand(100, 999)),
-            'date' => $validated['date'] ?? now(),
-            'meta_company_id' => $validated['meta_company_id'] ?? null,
-            'contact_id' => $validated['contact_id'] ?? null,
-            'currency_id' => $validated['currency_id'] ?? 1,
-            'total' => $validated['total'] ?? 0,
-            'version' => 0,
+            'contract_id' => $contractId,
+            'complement' => $validated['number'] ?? ('DN-' . date('y') . '-' . rand(100, 999)),
         ]);
 
         if ($request->has('descriptions')) {
@@ -88,10 +100,8 @@ class WebDetachedNoteController extends Controller
                     $price = (float)($unitPrices[$i] ?? 0);
                     DetachedNoteDetail::create([
                         'detached_note_id' => $note->id,
-                        'description' => $desc,
-                        'quantity' => $qty,
-                        'unitPrice' => $price,
-                        'total' => $qty * $price,
+                        'complement' => $desc,
+                        'amount' => $qty * $price,
                     ]);
                 }
             }

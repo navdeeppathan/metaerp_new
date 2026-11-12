@@ -60,6 +60,10 @@ class Contract extends Model
         'version' => 'integer',
     ];
 
+    protected $appends = [
+        'orderCode',
+    ];
+
     public function purchase()
     {
         return $this->belongsTo(Deal::class, 'purchase_id', 'id');
@@ -171,4 +175,10 @@ class Contract extends Model
     {
         return $this->attributes['order_code'] ?? null;
     }
+
+    public function setOrderCodeAttribute($value)
+    {
+        $this->attributes['order_code'] = $value;
+    }
 }
+

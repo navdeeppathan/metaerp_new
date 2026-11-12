@@ -37,4 +37,15 @@ class DetachedNoteDetail extends Model
     {
         return $this->belongsTo(DealProduct::class, 'deal_product_id', 'id');
     }
+
+    public function getDescriptionAttribute()
+    {
+        return $this->attributes['complement'] ?? null;
+    }
+
+    public function getTotalAttribute()
+    {
+        return $this->attributes['amount'] ?? 0;
+    }
 }
+
