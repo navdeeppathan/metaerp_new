@@ -97,8 +97,8 @@
                             <td class="p-3 font-bold text-emerald-600">PURCHASE</td>
                             <td class="p-3 font-medium">{{ $p->product?->name }} ({{ $p->product?->code }})</td>
                             <td class="p-3 text-right font-mono">{{ number_format($p->quantity, 2) }}</td>
-                            <td class="p-3 text-right font-mono">{{ number_format($p->unitPrice, 2) }} {{ $p->currency?->currencySymbol }}</td>
-                            <td class="p-3 text-right font-mono font-bold">{{ number_format($p->total, 2) }}</td>
+                            <td class="p-3 text-right font-mono">{{ number_format($p->unitPrice ?? $p->rate ?? 0, 2) }} {{ $contract->purchase?->currency?->currencySymbol ?? $p->currency?->currencySymbol ?? '' }}</td>
+                            <td class="p-3 text-right font-mono font-bold">{{ number_format($p->total ?? $p->total_price ?? 0, 2) }}</td>
                         </tr>
                         @endforeach
                         @endif
@@ -108,8 +108,8 @@
                             <td class="p-3 font-bold text-blue-600">SALE</td>
                             <td class="p-3 font-medium">{{ $s->product?->name }} ({{ $s->product?->code }})</td>
                             <td class="p-3 text-right font-mono">{{ number_format($s->quantity, 2) }}</td>
-                            <td class="p-3 text-right font-mono">{{ number_format($s->unitPrice, 2) }} {{ $s->currency?->currencySymbol }}</td>
-                            <td class="p-3 text-right font-mono font-bold">{{ number_format($s->total, 2) }}</td>
+                            <td class="p-3 text-right font-mono">{{ number_format($s->unitPrice ?? $s->rate ?? 0, 2) }} {{ $contract->sale?->currency?->currencySymbol ?? $s->currency?->currencySymbol ?? '' }}</td>
+                            <td class="p-3 text-right font-mono font-bold">{{ number_format($s->total ?? $s->total_price ?? 0, 2) }}</td>
                         </tr>
                         @endforeach
                         @endif

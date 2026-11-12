@@ -79,4 +79,26 @@ class DealProduct extends Model
     {
         return $this->hasMany(DetachedNoteDetail::class, 'deal_product_id', 'id');
     }
+
+    public function packType()
+    {
+        return $this->belongsTo(PackType::class, 'id', 'id')->whereRaw('1 = 0');
+    }
+
+    public function currency()
+    {
+        return $this->belongsTo(Currency::class, 'id', 'id')->whereRaw('1 = 0');
+    }
+
+    public function getUnitPriceAttribute()
+    {
+        return $this->attributes['rate'] ?? 0;
+    }
+
+    public function getTotalAttribute()
+    {
+        return $this->attributes['total_price'] ?? 0;
+    }
 }
+
+
