@@ -25,6 +25,80 @@ class Contract extends Model
         'version' => 'integer',
     ];
 
+    protected $appends = [
+        'orderCode',
+        'salesCompany',
+        'purchaseCompany',
+        'subsidiary',
+        'buyerContract',
+        'sellerContract',
+    ];
+
+    public function getSalesCompanyAttribute()
+    {
+        return $this->sale?->meta_company_id ?? $this->attributes['meta_company_id'] ?? null;
+    }
+
+    public function getPurchaseCompanyAttribute()
+    {
+        return $this->purchase?->meta_company_id ?? null;
+    }
+
+    public function getSubsidiaryAttribute()
+    {
+        return $this->sale?->meta_company_id ?? $this->purchase?->meta_company_id ?? $this->attributes['meta_company_id'] ?? null;
+    }
+
+    public function getBuyerContractAttribute()
+    {
+        $purchase = $this->relationLoaded('purchase') ? $this->purchase : null;
+        if (!$purchase) {
+            return null;
+        }
+
+        $products = $purchase->relationLoaded('products') ? $purchase->products : collect();
+        return [
+            'id' => $purchase->id,
+            'contactId' => $purchase->contact_id,
+            'contactName' => $purchase->contact?->name,
+            'paymentStatus' => $purchase->payment_status,
+            'productContracts' => $products->map(function ($p) {
+                $total = $p->total !== null && $p->total > 0 ? (float) $p->total : ((float) $p->quantity * (float) $p->unit_price);
+                return [
+                    'id' => $p->id,
+                    'totalPrice' => (float) $total,
+                    'quantity' => (float) $p->quantity,
+                    'unitPrice' => (float) $p->unit_price,
+                ];
+            })->values()->all(),
+        ];
+    }
+
+    public function getSellerContractAttribute()
+    {
+        $sale = $this->relationLoaded('sale') ? $this->sale : null;
+        if (!$sale) {
+            return null;
+        }
+
+        $products = $sale->relationLoaded('products') ? $sale->products : collect();
+        return [
+            'id' => $sale->id,
+            'contactId' => $sale->contact_id,
+            'contactName' => $sale->contact?->name,
+            'paymentStatus' => $sale->payment_status,
+            'productContracts' => $products->map(function ($p) {
+                $total = $p->total !== null && $p->total > 0 ? (float) $p->total : ((float) $p->quantity * (float) $p->unit_price);
+                return [
+                    'id' => $p->id,
+                    'totalPrice' => (float) $total,
+                    'quantity' => (float) $p->quantity,
+                    'unitPrice' => (float) $p->unit_price,
+                ];
+            })->values()->all(),
+        ];
+    }
+
     public function getOrderCodeAttribute()
     {
         return $this->attributes['order_code'] ?? $this->attributes['orderCode'] ?? null;

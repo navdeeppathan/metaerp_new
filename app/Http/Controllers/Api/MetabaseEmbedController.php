@@ -11,6 +11,9 @@ class MetabaseEmbedController extends BaseApiController
     {
         $dashboardId = (int) $request->input('dashboardId', 1);
         $url = $service->generateEmbedUrl($dashboardId);
-        return response()->json(['url' => $url]);
+        return response()->json([
+            'iframeUrl' => $url,
+            'url' => $url,
+        ]);
     }
 }

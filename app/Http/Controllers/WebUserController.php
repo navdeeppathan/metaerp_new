@@ -21,8 +21,8 @@ class WebUserController extends Controller
             $query->where(function($sub) use ($search) {
                 $sub->where('name', 'like', "%{$search}%")
                     ->orWhere('username', 'like', "%{$search}%")
-                    ->orWhere('displayName', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('displayName', 'like', "%{$search}%");
+                    // ->orWhere('email', 'like', "%{$search}%");
             });
         }
 

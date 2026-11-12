@@ -1,185 +1,330 @@
 @extends('layouts.app')
 
-@section('title', 'Metabase Dashboard - MetaERP')
+@section('title', 'Analytics Dashboard - MetaERP')
 
 @section('content')
-<div class="space-y-4 max-w-7xl mx-auto">
-    <!-- Header -->
-    <div class="pb-1">
-        <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight leading-tight">
-            Metabase dashboard
-        </h1>
-        <p class="text-xs sm:text-sm text-slate-500 mt-1 font-normal">
-            Monitor metrics, check reports and review performance
-        </p>
+<div class="space-y-8 max-w-7xl mx-auto pb-12">
+
+    <!-- Header matching AnalyticsDashboardAppHeader.js -->
+    <div class="flex flex-col sm:flex-row flex-auto sm:items-center justify-between min-w-0 pb-2">
+        <div class="flex flex-col flex-auto">
+            <h1 class="text-3xl font-semibold tracking-tight leading-8 text-slate-900 dark:text-white">
+                Analytics dashboard
+            </h1>
+            <p class="font-medium tracking-tight text-slate-500 mt-1 text-sm">
+                Monitor metrics, check reports and review performance
+            </p>
+        </div>
+        <div class="flex items-center mt-4 sm:mt-0 space-x-3">
+            <button type="button" class="inline-flex items-center gap-2 px-3.5 py-2 text-sm font-semibold rounded-lg bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 transition-colors shadow-xs">
+                <span class="material-icons-outlined text-lg">settings</span>
+                <span>Settings</span>
+            </button>
+            <button type="button" onclick="window.print()" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg bg-[#4f46e5] text-white hover:bg-[#4338ca] transition-colors shadow-xs">
+                <span class="material-icons-outlined text-lg">save</span>
+                <span>Export</span>
+            </button>
+        </div>
     </div>
 
-    <!-- Main Card Panel -->
-    <div class="bg-white rounded-xl border border-slate-200/80 shadow-xs p-6 sm:p-7">
-        <!-- Card Top Bar: E-commerce insights & Export button -->
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <h2 class="text-lg font-bold text-slate-800">
-                    E-commerce insights
-                </h2>
-                <span class="material-icons-outlined text-sm text-slate-400 cursor-pointer" title="Dashboard details">info</span>
-            </div>
-            <div>
-                <a href="javascript:window.print()" class="text-blue-600 hover:text-blue-700 flex items-center gap-1.5 text-xs font-semibold transition-colors">
-                    <span class="material-icons-outlined text-sm">picture_as_pdf</span>
-                    <span>Export tab as PDF</span>
-                </a>
-            </div>
-        </div>
+    <!-- Main Grid matching AnalyticsDashboardApp.js -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
 
-        <!-- Navigation Tabs -->
-        <div class="border-b border-slate-200 flex items-center gap-6 mt-4 text-xs font-medium">
-            <button type="button" class="text-blue-600 font-semibold border-b-2 border-blue-600 pb-2.5 -mb-[1px] focus:outline-none">
-                Overview
-            </button>
-            <button type="button" class="text-slate-500 hover:text-slate-800 pb-2.5 transition-colors focus:outline-none">
-                Portfolio performance
-            </button>
-            <button type="button" class="text-slate-500 hover:text-slate-800 pb-2.5 transition-colors focus:outline-none">
-                Demographics
-            </button>
-        </div>
-
-        <!-- Section Title -->
-        <h3 class="text-base font-bold text-slate-800 mt-6 mb-4">
-            Overall business health
-        </h3>
-
-        <!-- 4 KPI Cards Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <!-- Card 1: Revenue per quarter -->
-            <div class="border border-slate-200/80 rounded-lg p-4 bg-white flex flex-col justify-between">
-                <span class="text-xs font-semibold text-slate-700">Revenue per quarter</span>
-                <div class="my-4 text-center">
-                    <div class="text-3xl font-extrabold text-slate-800 tracking-tight">
-                        30,759.47
-                    </div>
-                    <div class="text-xs text-slate-500 font-medium mt-1">
-                        Q2 2026
-                    </div>
+        <!-- Widget 1: VisitorsOverviewWidget / Contracts Overview -->
+        <div class="sm:col-span-2 lg:col-span-3 bg-[#1e293b] text-white shadow-xl rounded-2xl overflow-hidden flex flex-col">
+            <div class="flex items-center justify-between p-6 sm:px-8 pb-2">
+                <div class="flex flex-col">
+                    <h2 class="text-2xl md:text-3xl font-semibold tracking-tight leading-7 text-white">
+                        Contracts Overview
+                    </h2>
+                    <span class="font-medium text-slate-400 text-sm mt-1">
+                        Sales amount
+                    </span>
                 </div>
-                <div class="text-[11px] text-slate-400 text-center font-normal">
-                    N/A &bull; vs. previous quarter: (No data)
+                <div class="flex items-center gap-4 text-xs font-medium">
+                    <span class="inline-flex items-center gap-1.5 text-slate-300">
+                        <span class="w-2.5 h-2.5 rounded-full bg-[#38bdf8]"></span>
+                        <span>Purchases</span>
+                    </span>
+                    <span class="inline-flex items-center gap-1.5 text-slate-300">
+                        <span class="w-2.5 h-2.5 rounded-full bg-[#ffff55]"></span>
+                        <span>Sales</span>
+                    </span>
+                    <span class="px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 text-xs font-semibold">
+                        60 days
+                    </span>
                 </div>
             </div>
 
-            <!-- Card 2: Discount given per quarter -->
-            <div class="border border-slate-200/80 rounded-lg p-4 bg-white flex flex-col justify-between">
-                <span class="text-xs font-semibold text-slate-700">Discount given per quarter</span>
-                <div class="my-4 text-center">
-                    <div class="text-3xl font-extrabold text-slate-800 tracking-tight">
-                        $171.75
-                    </div>
-                    <div class="text-xs text-slate-500 font-medium mt-1">
-                        Q2 2026
-                    </div>
-                </div>
-                <div class="text-[11px] text-slate-400 text-center font-normal">
-                    N/A &bull; vs. previous quarter: (No data)
-                </div>
-            </div>
-
-            <!-- Card 3: Number of orders per month -->
-            <div class="border border-slate-200/80 rounded-lg p-4 bg-white flex flex-col justify-between">
-                <span class="text-xs font-semibold text-slate-700">Number of orders per month</span>
-                <div class="py-3 flex items-center justify-center">
-                    <svg class="w-24 h-16 text-slate-300" viewBox="0 0 100 80" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="48" y1="12" x2="48" y2="52" />
-                        <path d="M48 16 L20 48 L48 48 Z" />
-                        <path d="M52 22 L78 48 L52 48 Z" />
-                        <path d="M14 54 L84 54 L74 65 L24 65 Z" />
-                        <path d="M8 70 Q 24 73 40 70 T 72 70 T 92 70" />
-                        <path d="M18 75 Q 34 78 50 75 T 82 75" />
-                    </svg>
-                </div>
-                <div class="h-4"></div>
-            </div>
-
-            <!-- Card 4: Unique customers per month -->
-            <div class="border border-slate-200/80 rounded-lg p-4 bg-white flex flex-col justify-between">
-                <span class="text-xs font-semibold text-slate-700">Unique customers per month</span>
-                <div class="py-3 flex items-center justify-center">
-                    <svg class="w-24 h-16 text-slate-300" viewBox="0 0 100 80" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="48" y1="12" x2="48" y2="52" />
-                        <path d="M48 16 L20 48 L48 48 Z" />
-                        <path d="M52 22 L78 48 L52 48 Z" />
-                        <path d="M14 54 L84 54 L74 65 L24 65 Z" />
-                        <path d="M8 70 Q 24 73 40 70 T 72 70 T 92 70" />
-                        <path d="M18 75 Q 34 78 50 75 T 82 75" />
-                    </svg>
-                </div>
-                <div class="h-4"></div>
+            <div class="p-4 sm:p-6 pt-0">
+                <div id="contractsOverviewChart" class="w-full h-80"></div>
             </div>
         </div>
 
-        <!-- Bottom Row: Goal & Revenue & Orders Over Time -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mt-4">
-            <!-- Card 5: Revenue goal for this quarter -->
-            <div class="border border-slate-200/80 rounded-lg p-4 bg-white flex flex-col justify-between">
-                <span class="text-xs font-semibold text-slate-700">Revenue goal for this quarter</span>
-                <div class="mt-4 mb-2">
-                    <span class="text-xs font-bold text-slate-700">$0</span>
-                </div>
-                <div class="w-full h-16 bg-[#a3e635] rounded-t-sm"></div>
-            </div>
+        <!-- Widget 2: ConversionsWidget for each company -->
+        @foreach ($companyWidgets as $idx => $cw)
+            @php
+                $themeColor = $cw['themeColor'];
+                $sparklineColor = $themeColor === 'success' ? '#10b981' : ($themeColor === 'secondary' ? '#6366f1' : '#ef4444');
+                $sparklineLight = $themeColor === 'success' ? '#86efac' : ($themeColor === 'secondary' ? '#a5b4fc' : '#fca5a5');
+            @endphp
+            <div class="sm:col-span-2 lg:col-span-1 bg-white dark:bg-slate-800 shadow rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-700/60 flex flex-col justify-between">
+                <div class="p-6 pb-2">
+                    <div class="flex items-start justify-between">
+                        <h3 class="text-lg font-medium tracking-tight leading-6 truncate text-slate-800 dark:text-slate-100" title="{{ $cw['name'] }}">
+                            {{ $cw['name'] }}
+                        </h3>
+                        <div class="ml-4 shrink-0">
+                            <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+                                30 days
+                            </span>
+                        </div>
+                    </div>
 
-            <!-- Card 6: Revenue and orders over time -->
-            <div class="border border-slate-200/80 rounded-lg p-4 bg-white lg:col-span-2">
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
-                    <span class="text-xs font-semibold text-slate-700">Revenue and orders over time</span>
-                    <div class="flex items-center gap-4 text-xs font-medium text-slate-600">
-                        <span class="flex items-center gap-1.5">
-                            <span class="w-2.5 h-2.5 rounded-full bg-[#8cb04a]"></span>
-                            <span>Revenue</span>
-                        </span>
-                        <span class="flex items-center gap-1.5">
-                            <span class="w-2.5 h-2.5 rounded-full bg-[#4d4484]"></span>
-                            <span>Number of orders</span>
-                        </span>
+                    <div class="flex flex-col lg:flex-row lg:items-center mt-3 gap-2">
+                        <div class="text-4xl lg:text-5xl font-bold tracking-tighter leading-tight text-slate-900 dark:text-white">
+                            {{ number_format($cw['amount'], 2) }}
+                        </div>
+                        <div class="flex items-center lg:flex-col lg:items-start lg:ml-3 text-red-500">
+                            <div class="flex items-center gap-1">
+                                <span class="material-icons-outlined text-base">trending_down</span>
+                                <span class="text-xs font-bold leading-none">2%</span>
+                            </div>
+                            <span class="text-xs text-slate-400 dark:text-slate-500 lg:mt-0.5 ml-1 lg:ml-0 whitespace-nowrap">
+                                below target
+                            </span>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Combo Chart SVG -->
-                <div class="w-full overflow-hidden">
-                    <svg class="w-full h-40" viewBox="0 0 700 160" fill="none" preserveAspectRatio="none">
-                        <!-- Grid Lines -->
-                        <line x1="55" y1="20" x2="645" y2="20" stroke="#f1f5f9" stroke-width="1" />
-                        <line x1="55" y1="50" x2="645" y2="50" stroke="#f1f5f9" stroke-width="1" />
-                        <line x1="55" y1="80" x2="645" y2="80" stroke="#f1f5f9" stroke-width="1" />
-                        <line x1="55" y1="110" x2="645" y2="110" stroke="#f1f5f9" stroke-width="1" />
-                        <line x1="55" y1="140" x2="645" y2="140" stroke="#e2e8f0" stroke-width="1" />
-
-                        <!-- Left Axis Labels -->
-                        <text x="48" y="24" text-anchor="end" font-size="10" fill="#64748b" font-family="Inter, sans-serif">60,000</text>
-                        <text x="48" y="54" text-anchor="end" font-size="10" fill="#64748b" font-family="Inter, sans-serif">50,000</text>
-                        <text x="48" y="84" text-anchor="end" font-size="10" fill="#64748b" font-family="Inter, sans-serif">40,000</text>
-                        <text x="48" y="114" text-anchor="end" font-size="10" fill="#64748b" font-family="Inter, sans-serif">30,000</text>
-
-                        <!-- Right Axis Labels -->
-                        <text x="652" y="54" text-anchor="start" font-size="10" fill="#64748b" font-family="Inter, sans-serif">4,000</text>
-                        <text x="652" y="84" text-anchor="start" font-size="10" fill="#64748b" font-family="Inter, sans-serif">3,000</text>
-                        <text x="652" y="114" text-anchor="start" font-size="10" fill="#64748b" font-family="Inter, sans-serif">2,000</text>
-
-                        <!-- Indigo Bars for Number of Orders -->
-                        <rect x="260" y="100" width="24" height="40" fill="#4d4484" rx="1" />
-                        <rect x="295" y="70" width="24" height="70" fill="#4d4484" rx="1" />
-                        <rect x="330" y="88" width="24" height="52" fill="#4d4484" rx="1" />
-                        <rect x="365" y="52" width="24" height="88" fill="#4d4484" rx="1" />
-                        <rect x="400" y="88" width="24" height="52" fill="#4d4484" rx="1" />
-                        <rect x="435" y="76" width="24" height="64" fill="#4d4484" rx="1" />
-
-                        <!-- Green Smooth Line for Revenue -->
-                        <path d="M 55 52 C 100 52, 120 46, 150 46 C 180 46, 200 54, 230 50 C 260 46, 280 52, 310 52 C 340 52, 360 52, 390 55 C 420 58, 450 54, 480 54 C 510 54, 540 44, 570 48 C 600 52, 615 85, 645 135"
-                              stroke="#8cb04a" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-                    </svg>
+                <div class="h-20 w-full overflow-hidden mt-2">
+                    <div id="companySparkline_{{ $cw['id'] }}" class="w-full h-full -mb-3"></div>
                 </div>
             </div>
+        @endforeach
+
+        <!-- Section: Contracts per stage -->
+        <div class="w-full mt-4 sm:col-span-2 lg:col-span-3">
+            <h2 class="text-2xl font-semibold tracking-tight leading-6 text-slate-900 dark:text-white">
+                Contracts per stage
+            </h2>
+            <p class="font-medium tracking-tight text-slate-500 text-sm mt-1">
+                Number of contracts
+            </p>
         </div>
+
+        <div class="sm:col-span-2 lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
+            @forelse ($stageWidgets as $sw)
+                <div class="bg-white dark:bg-slate-800 shadow rounded-2xl overflow-hidden p-6 border border-slate-100 dark:border-slate-700/60 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-start justify-between">
+                            <h3 class="text-lg font-medium tracking-tight leading-6 truncate text-slate-800 dark:text-slate-100" title="{{ $sw['title'] }}">
+                                {{ $sw['title'] }}
+                            </h3>
+                            <div class="ml-2 shrink-0">
+                                <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">
+                                    30 days
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Donut Chart -->
+                        <div class="mt-4 h-48 flex items-center justify-center">
+                            <div id="stageDonut_{{ $sw['id'] }}" class="w-full flex items-center justify-center"></div>
+                        </div>
+                    </div>
+
+                    <!-- Breakdown Table -->
+                    <div class="mt-6 pt-2 border-t border-slate-100 dark:border-slate-700/50">
+                        <div class="divide-y divide-slate-100 dark:divide-slate-700/50 text-xs">
+                            @foreach ($sw['breakdown'] as $b)
+                                <div class="grid grid-cols-3 py-2 items-center">
+                                    <div class="flex items-center min-w-0 pr-2">
+                                        <span class="w-2.5 h-2.5 rounded-full shrink-0 mr-2" style="background-color: {{ $b['color'] }};"></span>
+                                        <span class="truncate font-medium text-slate-700 dark:text-slate-300">{{ $b['label'] }}</span>
+                                    </div>
+                                    <div class="font-semibold text-right text-slate-900 dark:text-white">
+                                        {{ number_format($b['count']) }}
+                                    </div>
+                                    <div class="text-right text-slate-400 font-medium">
+                                        {{ $b['percentage'] }}%
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            @empty
+                <div class="col-span-full p-8 text-center bg-white rounded-2xl border border-slate-200 text-slate-400 text-sm">
+                    No stage data available for workflow model.
+                </div>
+            @endforelse
+        </div>
+
     </div>
+
 </div>
+
+<!-- ApexCharts Script -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // 1. VisitorsOverviewWidget (Contracts Overview)
+    const overviewSeriesData = @json($overviewSeries);
+
+    const overviewOptions = {
+        chart: {
+            animations: {
+                speed: 400,
+                animateGradually: { enabled: false },
+            },
+            fontFamily: 'Inter, sans-serif',
+            foreColor: '#94a3b8',
+            width: '100%',
+            height: 320,
+            type: 'line',
+            toolbar: { show: false },
+            zoom: { enabled: false },
+        },
+        colors: ['#38bdf8', '#ffff55'],
+        dataLabels: { enabled: false },
+        grid: {
+            show: true,
+            borderColor: '#334155',
+            padding: { top: 10, bottom: -20, left: 10, right: 10 },
+            position: 'back',
+            xaxis: { lines: { show: true } },
+        },
+        stroke: { width: 2, curve: 'smooth' },
+        tooltip: {
+            followCursor: true,
+            theme: 'dark',
+            x: { format: 'dd/MM/yyyy' },
+            y: { formatter: (value) => Number(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) },
+        },
+        xaxis: {
+            type: 'datetime',
+            axisBorder: { show: false },
+            axisTicks: { show: false },
+            crosshairs: {
+                stroke: { color: '#475569', dashArray: 0, width: 2 },
+            },
+            labels: {
+                offsetY: -5,
+                style: { colors: '#94a3b8' },
+            },
+            tickAmount: 10,
+        },
+        yaxis: {
+            show: false,
+            axisTicks: { show: false },
+            axisBorder: { show: false },
+            min: 0,
+        },
+        series: overviewSeriesData,
+    };
+
+    const overviewChartEl = document.querySelector('#contractsOverviewChart');
+    if (overviewChartEl) {
+        const overviewChart = new ApexCharts(overviewChartEl, overviewOptions);
+        overviewChart.render();
+    }
+
+    // 2. ConversionsWidget (Company Sparkline Charts)
+    const companyWidgets = @json($companyWidgets);
+    const themeColors = {
+        success: { main: '#10b981', light: '#a7f3d0' },
+        secondary: { main: '#6366f1', light: '#c7d2fe' },
+        error: { main: '#ef4444', light: '#fecaca' }
+    };
+
+    companyWidgets.forEach((cw) => {
+        const el = document.querySelector(`#companySparkline_${cw.id}`);
+        if (!el) return;
+
+        const palette = themeColors[cw.themeColor] || themeColors.success;
+        const sparklineOptions = {
+            chart: {
+                animations: { enabled: false },
+                fontFamily: 'Inter, sans-serif',
+                foreColor: 'inherit',
+                height: 80,
+                type: 'area',
+                sparkline: { enabled: true },
+            },
+            colors: [palette.main],
+            fill: {
+                colors: [palette.light],
+                opacity: 0.5,
+            },
+            stroke: { curve: 'smooth', width: 2 },
+            tooltip: {
+                followCursor: true,
+                theme: 'dark',
+                x: { format: 'dd/MM/yyyy' },
+                y: { formatter: (val) => Number(val).toLocaleString('en-US') },
+            },
+            xaxis: { type: 'datetime' },
+            series: cw.sparklineSeries,
+        };
+
+        const sparkChart = new ApexCharts(el, sparklineOptions);
+        sparkChart.render();
+    });
+
+    // 3. NewVsReturningWidget (Donut Charts per Stage)
+    const stageWidgets = @json($stageWidgets);
+
+    stageWidgets.forEach((sw) => {
+        const el = document.querySelector(`#stageDonut_${sw.id}`);
+        if (!el) return;
+
+        const donutOptions = {
+            chart: {
+                animations: {
+                    speed: 400,
+                    animateGradually: { enabled: false },
+                },
+                fontFamily: 'Inter, sans-serif',
+                foreColor: 'inherit',
+                height: 192,
+                type: 'donut',
+                sparkline: { enabled: true },
+            },
+            colors: sw.colors || ['#3182CE', '#63B3ED', '#483FF2', '#3F6FF2', '#833FF2', '#F2D53F', '#736E57', '#F2CA3F'],
+            labels: sw.labels,
+            plotOptions: {
+                pie: {
+                    customScale: 0.9,
+                    expandOnClick: false,
+                    donut: { size: '70%' },
+                },
+            },
+            stroke: {
+                colors: ['#ffffff'],
+                width: 2,
+            },
+            series: sw.series.length > 0 ? sw.series : [0],
+            tooltip: {
+                enabled: true,
+                fillSeriesColor: false,
+                theme: 'dark',
+                custom: function ({ seriesIndex, w }) {
+                    const color = w.config.colors[seriesIndex] || '#3182CE';
+                    const label = w.config.labels[seriesIndex] || 'N/A';
+                    const pct = w.config.series[seriesIndex] || 0;
+                    return `<div class="flex items-center h-8 px-3 text-xs">
+                        <div class="w-3 h-3 rounded-full mr-2" style="background-color: ${color};"></div>
+                        <div class="text-slate-300 mr-2">${label}:</div>
+                        <div class="font-bold text-white">${pct}%</div>
+                    </div>`;
+                },
+            },
+        };
+
+        const donutChart = new ApexCharts(el, donutOptions);
+        donutChart.render();
+    });
+});
+</script>
 @endsection

@@ -11,7 +11,10 @@ class ModelController extends BaseApiController
     public function index(Request $request)
     {
         $size = (int) $request->input('size', 20);
-        $paginator = ModelWorkflow::with(['stages'])->where('active', true)->paginate($size);
+        $paginator = ModelWorkflow::with([
+            'stages.contracts.purchase.products',
+            'stages.contracts.sale.products',
+        ])->where('active', true)->paginate($size);
         return response()->json($this->paginateResponse($paginator));
     }
 

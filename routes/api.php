@@ -26,6 +26,7 @@ use App\Http\Controllers\Api\TypeController;
 use App\Http\Controllers\Api\LanguageController;
 use App\Http\Controllers\Api\MetalPriceController;
 use App\Http\Controllers\Api\MetabaseEmbedController;
+use App\Http\Controllers\WebDashboardController;
 use App\Http\Controllers\Api\TOTPController;
 use App\Http\Controllers\Api\SearchController;
 use App\Http\Controllers\Api\LogController;
@@ -157,6 +158,8 @@ Route::apiResource('languages', LanguageController::class);
 // --- Utilities & Integrations ---
 Route::get('/metal-price', [MetalPriceController::class, 'index']);
 Route::get('/metabase/embed', [MetabaseEmbedController::class, 'embed']);
+Route::get('/dashboards/analytics/widgets', [WebDashboardController::class, 'apiWidgets']);
+Route::get('/api/dashboards/analytics/widgets', [WebDashboardController::class, 'apiWidgets']);
 Route::get('/totp/{id}', [TOTPController::class, 'getQrCode']);
 Route::post('/totp/{id}', [TOTPController::class, 'update']);
 Route::get('/search/{text}', [SearchController::class, 'search']);
