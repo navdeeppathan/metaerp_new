@@ -8,9 +8,92 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap">
     <style>
         body { font-family: 'Inter', sans-serif; }
+
+        /* FUSE Splash Screen (Matching FuseSplashScreen in React) */
+        #fuse-splash-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #111827;
+            color: #F9FAFB;
+            z-index: 999999;
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #fuse-splash-screen img {
+            width: 128px;
+            max-width: 128px;
+        }
+
+        #spinner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 36px;
+            width: 56px;
+        }
+
+        #spinner > div {
+            width: 12px;
+            height: 12px;
+            background-color: #1E96F7;
+            border-radius: 100%;
+            display: inline-block;
+            -webkit-animation: fuse-bouncedelay 1s infinite ease-in-out both;
+            animation: fuse-bouncedelay 1s infinite ease-in-out both;
+        }
+
+        #spinner .bounce1 {
+            -webkit-animation-delay: -0.32s;
+            animation-delay: -0.32s;
+        }
+
+        #spinner .bounce2 {
+            -webkit-animation-delay: -0.16s;
+            animation-delay: -0.16s;
+        }
+
+        @-webkit-keyframes fuse-bouncedelay {
+            0%, 80%, 100% {
+                -webkit-transform: scale(0);
+            }
+            40% {
+                -webkit-transform: scale(1.0);
+            }
+        }
+
+        @keyframes fuse-bouncedelay {
+            0%, 80%, 100% {
+                -webkit-transform: scale(0);
+                transform: scale(0);
+            }
+            40% {
+                -webkit-transform: scale(1.0);
+                transform: scale(1.0);
+            }
+        }
     </style>
 </head>
 <body class="h-full bg-white text-slate-800 antialiased m-0 p-0">
+
+    <!-- FUSE Splash Screen (Matching FuseSplashScreen in React) -->
+    <div id="fuse-splash-screen">
+        <div class="logo">
+            <img width="128" src="{{ asset('assets/images/logo/meta-new.png') }}" alt="Metaenterprises Logo">
+        </div>
+        <div id="spinner">
+            <div class="bounce1"></div>
+            <div class="bounce2"></div>
+            <div class="bounce3"></div>
+        </div>
+    </div>
 
     <div class="flex flex-col md:flex-row h-screen w-full min-h-screen">
         <!-- Left Side: Login Form -->
@@ -39,7 +122,7 @@
                     </div>
                 @endif
 
-                <form action="{{ route('login.post') }}" method="POST" class="space-y-5">
+                <form action="{{ route('login.post') }}" method="POST" class="space-y-5" onsubmit="document.getElementById('fuse-splash-screen').style.display = 'flex';">
                     @csrf
 
                     <!-- Email Field with Outlined Notch Style -->

@@ -49,6 +49,43 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.25); border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.45); }
 
+        /* FUSE Splash Screen (Matching FuseSplashScreen in React) */
+        body #fuse-splash-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #111827;
+            color: #F9FAFB;
+            z-index: 999999;
+            opacity: 1;
+            visibility: visible;
+            transition: opacity 400ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body #fuse-splash-screen.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        body #fuse-splash-screen img {
+            width: 128px;
+            max-width: 128px;
+        }
+
+        body #fuse-splash-screen #spinner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 36px;
+            width: 56px;
+        }
+
         /* FUSE Loading Spinner (Matching FuseLoading in React) */
         .fuse-spinner, #spinner {
             display: flex;
@@ -112,6 +149,18 @@
               return !this.sidebarCollapsed || this.sidebarHovered;
           }
       }">
+
+    <!-- FUSE Splash Screen (Matching FuseSplashScreen in React - Image Screenshot) -->
+    <div id="fuse-splash-screen">
+        <div class="logo">
+            <img width="128" src="{{ asset('assets/images/logo/meta-new.png') }}" alt="Metaenterprises Logo">
+        </div>
+        <div id="spinner">
+            <div class="bounce1"></div>
+            <div class="bounce2"></div>
+            <div class="bounce3"></div>
+        </div>
+    </div>
 
     <!-- Mobile Sidebar Backdrop -->
     <div x-show="sidebarMobileOpen" x-cloak class="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-xs lg:hidden" @click="sidebarMobileOpen = false"></div>
@@ -596,6 +645,36 @@
     @stack('scripts')
 
     <script>
+        // Fuse Splash Screen Lifecycle (Matching React app index.html)
+        window.hideSplashScreen = function() {
+            const splash = document.getElementById('fuse-splash-screen');
+            if (splash) {
+                splash.classList.add('fade-out');
+                setTimeout(() => {
+                    splash.style.display = 'none';
+                }, 400);
+            }
+        };
+
+        window.showSplashScreen = function() {
+            const splash = document.getElementById('fuse-splash-screen');
+            if (splash) {
+                splash.style.display = 'flex';
+                splash.offsetHeight; // trigger reflow
+                splash.classList.remove('fade-out');
+            }
+        };
+
+        // Automatically fade out splash screen when initial page is ready
+        if (document.readyState === 'complete') {
+            setTimeout(window.hideSplashScreen, 200);
+        } else {
+            window.addEventListener('load', function() {
+                setTimeout(window.hideSplashScreen, 250);
+            });
+            // Safety fallback
+            setTimeout(window.hideSplashScreen, 1200);
+        }
         // Global Confirmation Dialog Helpers (Matching Image 2)
         window.openConfirmDialog = function(options) {
             window.dispatchEvent(new CustomEvent('open-confirmation-modal', {
