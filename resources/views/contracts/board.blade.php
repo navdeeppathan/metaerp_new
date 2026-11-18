@@ -767,33 +767,35 @@
                                             Add Product
                                         </button>
                                     </div>
+
+                                    <!-- Weight Tolerance (Screenshot 4: right below Add Product in Selling tab) -->
+                                    <div class="pt-4 border-t border-slate-100">
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Weight Tolerance</label>
+                                            <input type="text" name="weight_tolerance" placeholder="Weight Tolerance" class="text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 w-full">
+                                        </div>
+                                    </div>
+
+                                    <!-- Transport Section (Screenshot 4: before Comment in Selling tab) -->
+                                    <div class="pt-4 border-t border-slate-100">
+                                        <div class="flex items-center gap-2 mb-3">
+                                            <span class="material-icons-outlined text-slate-700 text-base">local_shipping</span>
+                                            <h4 class="font-bold text-xs text-slate-900">Transport</h4>
+                                        </div>
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Mode of transport *</label>
+                                            <select name="mode_of_transport" class="w-full text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 cursor-pointer">
+                                                <option value="SEA" selected>SEA</option>
+                                                <option value="ROAD">ROAD</option>
+                                                <option value="SEA/ROAD">SEA/ROAD</option>
+                                            </select>
+                                            <span class="material-icons absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none">arrow_drop_down</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Transport Section (Screenshot 2) -->
-                            <div class="pt-4 border-t border-slate-100">
-                                <div class="flex items-center gap-2 mb-3">
-                                    <span class="material-icons-outlined text-slate-700 text-base">local_shipping</span>
-                                    <h4 class="font-bold text-xs text-slate-900">Transport</h4>
-                                </div>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
-                                        <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Mode of transport</label>
-                                        <select name="mode_of_transport" class="w-full text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 cursor-pointer">
-                                            <option value="SEA" selected>SEA</option>
-                                            <option value="ROAD">ROAD</option>
-                                            <option value="SEA/ROAD">SEA/ROAD</option>
-                                        </select>
-                                        <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">arrow_drop_down</span>
-                                    </div>
-                                    <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
-                                        <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Weight Tolerance (%)</label>
-                                        <input type="number" step="0.01" name="weight_tolerance" placeholder="e.g. 5.0" class="text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 w-full">
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Comment Section (Screenshot 2) -->
+                            <!-- Comment Section (Screenshot 2 & 4) -->
                             <div class="pt-4 border-t border-slate-100">
                                 <div class="flex items-center gap-2 mb-3">
                                     <span class="material-icons-outlined text-slate-700 text-base">chat_bubble_outline</span>

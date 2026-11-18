@@ -459,8 +459,8 @@
             </div>
         </div>
 
-        <!-- Horizontal Divider Line & Weight Tolerance (Screenshot 3 & 4) -->
-        <div class="border-t-2 border-slate-200/80 pt-4">
+        <!-- Horizontal Divider Line & Weight Tolerance (Screenshot 4: only under Selling tab) -->
+        <div class="border-t-2 border-slate-200/80 pt-4" x-show="activeDealTab === 'selling'">
             <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
                 <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Weight Tolerance</label>
                 <input type="text" name="weight_tolerance" 
@@ -469,8 +469,8 @@
             </div>
         </div>
 
-        <!-- Section: Transport (Screenshot 4) -->
-        <div class="border-t-2 border-slate-200/80 pt-4 space-y-3">
+        <!-- Section: Transport (Screenshot 4: only under Selling tab) -->
+        <div class="border-t-2 border-slate-200/80 pt-4 space-y-3" x-show="activeDealTab === 'selling'">
             <div class="flex items-center gap-2">
                 <span class="material-icons-outlined text-slate-700 text-lg">local_shipping</span>
                 <h4 class="text-sm font-semibold text-slate-800">Transport</h4>
