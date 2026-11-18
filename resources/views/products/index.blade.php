@@ -93,7 +93,7 @@
                                 </a>
                             </td>
                             <td class="py-5 px-6 text-slate-800 font-normal">
-                                {{ $product->chemicalFormula ?? $product->code ?? '' }}
+                                {{ $product->symbol ?? $product->chemicalFormula ?? $product->code ?? '' }}
                             </td>
                         </tr>
                     @empty

@@ -63,7 +63,12 @@ class UserController extends BaseApiController
         if ($request->filled('display_name')) $user->display_name = $request->input('display_name');
         if ($request->filled('occupation')) $user->occupation = $request->input('occupation');
         if ($request->filled('role')) $user->role = $request->input('role');
-        if ($request->has('active')) $user->active = (bool) $request->input('active');
+        if ($request->has('status')) {
+            $user->status = $request->input('status');
+        } elseif ($request->has('active')) {
+            $val = $request->input('active');
+            $user->active = in_array(strtolower((string)$val), ['1', 'true', 'on', 'yes', 'active'], true) || $request->boolean('active');
+        }
         if ($request->has('enable2fa')) $user->enable2fa = (bool) $request->input('enable2fa');
         if ($request->filled('photoURL') || $request->filled('photo_url')) {
             $user->photo_url = $request->input('photoURL') ?: $request->input('photo_url');

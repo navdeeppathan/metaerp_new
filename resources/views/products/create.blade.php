@@ -108,6 +108,22 @@
                 </label>
             </div>
 
+            <!-- Field: Active Checkbox -->
+            <div class="flex items-center gap-2 pt-1">
+                <input type="hidden" name="active" value="0">
+                <input
+                    type="checkbox"
+                    name="active"
+                    id="active"
+                    value="1"
+                    {{ old('active', $product->exists ? $product->active : true) ? 'checked' : '' }}
+                    class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
+                />
+                <label for="active" class="text-sm font-normal text-slate-800 cursor-pointer select-none">
+                    Active
+                </label>
+            </div>
+
             <!-- Field 2: Category * -->
             <div class="relative">
                 <select
@@ -118,7 +134,7 @@
                 >
                     <option value="">Select Category</option>
                     @foreach(['COMMODITIES', 'FERROUS', 'NON_FERROUS', 'SCRAP', 'SERVICES'] as $cat)
-                        <option value="{{ $cat }}" {{ old('category', $product->productCategory) === $cat ? 'selected' : '' }}>
+                        <option value="{{ $cat }}" {{ old('category', $product->category ?? $product->productCategory) === $cat ? 'selected' : '' }}>
                             {{ $cat }}
                         </option>
                     @endforeach
@@ -138,7 +154,7 @@
                     type="text"
                     name="symbol"
                     id="symbol"
-                    value="{{ old('symbol', $product->chemicalFormula) }}"
+                    value="{{ old('symbol', $product->symbol ?? $product->chemicalFormula) }}"
                     class="peer w-full px-3.5 py-3 rounded border border-slate-300 focus:border-indigo-600 bg-white text-slate-800 text-sm focus:outline-none transition-colors"
                     placeholder=" "
                 />
@@ -174,7 +190,7 @@
                     type="text"
                     name="hsCode"
                     id="hsCode"
-                    value="{{ old('hsCode', $product->hsCode) }}"
+                    value="{{ old('hsCode', $product->hsCode ?? $product->hs_code) }}"
                     class="peer w-full px-3.5 py-3 rounded border border-slate-300 focus:border-indigo-600 bg-white text-slate-800 text-sm focus:outline-none transition-colors"
                     placeholder=" "
                 />
@@ -192,7 +208,7 @@
                     type="text"
                     name="basel_code"
                     id="basel_code"
-                    value="{{ old('basel_code', $product->basel_code) }}"
+                    value="{{ old('basel_code', $product->basel_code ?? $product->base_code_annexix) }}"
                     class="peer w-full px-3.5 py-3 rounded border border-slate-300 focus:border-indigo-600 bg-white text-slate-800 text-sm focus:outline-none transition-colors"
                     placeholder=" "
                 />
@@ -211,7 +227,7 @@
                     name="uom"
                     id="uom"
                     required
-                    value="{{ old('uom', $product->unitOfMeasurement ?? 'MT') }}"
+                    value="{{ old('uom', $product->unitOfMeasurement ?? $product->uom ?? 'MT') }}"
                     class="peer w-full px-3.5 py-3 rounded border border-slate-300 focus:border-indigo-600 bg-white text-slate-800 text-sm focus:outline-none transition-colors"
                     placeholder=" "
                 />
@@ -229,7 +245,7 @@
                     type="text"
                     name="ec_waste_code"
                     id="ec_waste_code"
-                    value="{{ old('ec_waste_code', $product->ec_waste_code) }}"
+                    value="{{ old('ec_waste_code', $product->ec_waste_code ?? $product->eu_list_of_wastes) }}"
                     class="peer w-full px-3.5 py-3 rounded border border-slate-300 focus:border-indigo-600 bg-white text-slate-800 text-sm focus:outline-none transition-colors"
                     placeholder=" "
                 />
@@ -249,7 +265,7 @@
                     rows="4"
                     class="peer w-full px-3.5 py-3 rounded border border-slate-300 focus:border-indigo-600 bg-white text-slate-800 text-sm focus:outline-none transition-colors resize-y"
                     placeholder=" "
-                >{{ old('description', $product->description) }}</textarea>
+                >{{ old('description', $product->description ?? $product->item_specification) }}</textarea>
                 <label
                     for="description"
                     class="absolute left-2.5 -top-2.5 bg-white px-1 text-xs font-normal text-slate-500 peer-focus:text-indigo-600 pointer-events-none transition-all"

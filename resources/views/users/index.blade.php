@@ -34,6 +34,13 @@
         </div>
     </div>
 
+    <!-- Feedback Alert Messages -->
+    @if(session('success'))
+        <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700 text-xs font-medium">
+            {{ session('success') }}
+        </div>
+    @endif
+
     <!-- Users Table Card -->
     <div class="bg-white rounded-xl border border-slate-200/70 shadow-xs overflow-hidden min-h-[calc(100vh-210px)] flex flex-col justify-between">
         <div class="overflow-x-auto flex-1">

@@ -112,7 +112,26 @@ class WebUserController extends Controller
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
-        $data = $request->only(['name', 'occupation', 'role', 'active']);
+        $data = $request->only(['name', 'occupation', 'role']);
+
+        // Handle active/status properly
+        if ($request->has('status')) {
+            $val = $request->input('status');
+            $data['active'] = in_array(strtolower((string)$val), ['active', '1', 'true', 'on', 'yes'], true);
+        } elseif ($request->has('active')) {
+            $val = $request->input('active');
+            $data['active'] = in_array(strtolower((string)$val), ['1', 'true', 'on', 'yes', 'active'], true) || $request->boolean('active');
+        } else {
+            $data['active'] = false;
+        }
+
+        // Handle enable2fa
+        if ($request->has('enable2fa')) {
+            $val = $request->input('enable2fa');
+            $data['enable2fa'] = in_array(strtolower((string)$val), ['1', 'true', 'on', 'yes'], true) || $request->boolean('enable2fa');
+        } else {
+            $data['enable2fa'] = false;
+        }
 
         if ($request->filled('displayName') || $request->filled('display_name')) {
             $data['display_name'] = $request->input('displayName') ?: $request->input('display_name');
@@ -124,7 +143,24 @@ class WebUserController extends Controller
 
         $user->update($data);
 
-        return back()->with('success', 'User updated successfully');
+        // Update permissions if provided
+        if ($request->has('permissions_json')) {
+            $perms = json_decode($request->input('permissions_json'), true);
+            if (is_array($perms)) {
+                Permission::where('user_id', $user->id)->delete();
+                foreach ($perms as $p) {
+                    if (!empty($p['company_id']) && !empty($p['accessgroup_id'])) {
+                        Permission::create([
+                            'user_id' => $user->id,
+                            'company_id' => $p['company_id'],
+                            'accessgroup_id' => $p['accessgroup_id'],
+                        ]);
+                    }
+                }
+            }
+        }
+
+        return redirect()->route('users.show', $user->id)->with('success', 'User updated successfully');
     }
 
     public function uploadSignature(Request $request, $id)
