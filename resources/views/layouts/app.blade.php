@@ -429,15 +429,15 @@
 
     <!-- Main Content Area -->
     <div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
-        <!-- Topbar: Amber Star on Left, Fullscreen + Search + Root (u) on Right -->
-        <header class="h-14 bg-white border-b border-slate-200/80 px-6 flex items-center justify-between shrink-0 shadow-xs z-30">
-            <!-- Left Side: Hamburger Menu & Favorite Star -->
-            <div class="flex items-center gap-2">
+        <!-- Topbar: Amber Star on Left, Fullscreen + Search + Root (u) on Right (Matching Screenshot Exactly) -->
+        <header class="h-16 bg-white border-b border-slate-200/80 px-6 sm:px-8 flex items-center justify-between shrink-0 shadow-xs z-30 select-none">
+            <!-- Left Side: Mobile Hamburger Menu & Favorite Amber Star -->
+            <div class="flex items-center gap-3">
                 <!-- Mobile Menu Button -->
                 <button type="button" @click="sidebarMobileOpen = !sidebarMobileOpen" class="p-1.5 text-slate-600 rounded-lg hover:bg-slate-100 lg:hidden">
                     <span class="material-icons-outlined text-xl leading-none">menu</span>
                 </button>
-                <!-- Desktop Sidebar Toggle Button (visible when collapsed or in topbar) -->
+                <!-- Desktop Sidebar Toggle Button (visible only when collapsed) -->
                 <button type="button"
                         x-show="sidebarCollapsed"
                         x-cloak
@@ -446,41 +446,54 @@
                         title="Expand Sidebar">
                     <span class="material-icons-outlined text-xl leading-none">menu</span>
                 </button>
-                <button type="button" class="text-amber-500 hover:text-amber-600 focus:outline-none transition-transform active:scale-95" title="Favorite">
-                    <span class="material-icons text-xl leading-none">star</span>
+                <!-- Amber Star Favorite Icon -->
+                <button type="button" class="w-8 h-8 flex items-center justify-center text-amber-500 hover:text-amber-600 focus:outline-none transition-transform active:scale-95 cursor-pointer" title="Favorite">
+                    <svg class="w-5 h-5 fill-current text-amber-500" viewBox="0 0 24 24">
+                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                    </svg>
                 </button>
             </div>
 
-            <!-- Right Side: Fullscreen, Search, User Avatar -->
-            <div class="flex items-center gap-3">
-                <!-- Fullscreen Button -->
-                <button type="button" @click="if (!document.fullscreenElement) { document.documentElement.requestFullscreen(); } else { document.exitFullscreen(); }" class="p-1 text-slate-500 hover:text-slate-800 rounded-lg hover:bg-slate-100 transition-colors" title="Toggle Fullscreen">
-                    <span class="material-icons-outlined text-xl leading-none">fullscreen</span>
+            <!-- Right Side: Fullscreen, Search, User Avatar (Matching Screenshot Exactly) -->
+            <div class="flex items-center gap-4 sm:gap-5">
+                <!-- Fullscreen Toggle Button (heroicons-outline:arrows-expand) -->
+                <button type="button" 
+                        @click="if (!document.fullscreenElement) { document.documentElement.requestFullscreen(); } else { document.exitFullscreen(); }" 
+                        class="w-10 h-10 flex items-center justify-center text-slate-500 hover:text-slate-800 rounded-full hover:bg-slate-100 transition-colors cursor-pointer" 
+                        title="Toggle Fullscreen">
+                    <svg class="w-5 h-5 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+                    </svg>
                 </button>
 
-                <!-- Search Button -->
-                <a href="{{ route('contracts.search') }}" class="p-1 text-slate-500 hover:text-slate-800 rounded-lg hover:bg-slate-100 transition-colors" title="Search">
-                    <span class="material-icons-outlined text-lg leading-none">search</span>
+                <!-- Navigation Search Button -->
+                <a href="{{ route('contracts.search') }}" 
+                   class="w-10 h-10 flex items-center justify-center text-slate-500 hover:text-slate-800 rounded-full hover:bg-slate-100 transition-colors cursor-pointer" 
+                   title="Search">
+                    <svg class="w-5 h-5 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
                 </a>
 
-                <!-- User Dropdown: Text 'Root' + circle 'u' -->
+                <!-- User Dropdown Menu: Root + circle 'u' -->
                 <div class="relative" x-data="{ open: false }">
-                    <button @click="open = !open" class="flex items-center gap-2 py-1 px-1.5 rounded-full hover:bg-slate-100 transition-colors">
-                        <span class="text-xs font-semibold text-slate-700">
+                    <button @click="open = !open" class="flex items-center gap-3 py-1.5 px-2 rounded-full hover:bg-slate-100 transition-colors cursor-pointer">
+                        <span class="text-sm font-semibold text-slate-800">
                             {{ Auth::user()->name ?? 'Root' }}
                         </span>
-                        <div class="w-7 h-7 rounded-full bg-[#b0b8c4] text-white font-normal flex items-center justify-center text-xs select-none">
-                            {{ strtolower(substr(Auth::user()->name ?? 'u', 0, 1)) }}
+                        <div class="w-9 h-9 rounded-full bg-[#94a3b8] text-white font-medium flex items-center justify-center text-sm select-none shadow-2xs">
+                            {{ strtolower(substr(Auth::user()->username ?? 'u', 0, 1)) }}
                         </div>
                     </button>
-                    <div x-show="open" x-cloak @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-slate-100 py-1 z-50 text-sm">
+                    <!-- Popover Dropdown -->
+                    <div x-show="open" x-cloak @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-slate-100 py-1.5 z-50 text-sm">
                         <a href="{{ route('profile.index') }}" class="flex items-center gap-2 px-4 py-2 hover:bg-slate-50 text-slate-700">
                             <span class="material-icons-outlined text-base">person</span> My Profile
                         </a>
                         <hr class="my-1 border-slate-100">
                         <form action="{{ route('logout') }}" method="POST">
                             @csrf
-                            <button type="submit" class="w-full flex items-center gap-2 px-4 py-2 hover:bg-red-50 text-red-600 text-left">
+                            <button type="submit" class="w-full flex items-center gap-2 px-4 py-2 hover:bg-red-50 text-red-600 text-left cursor-pointer">
                                 <span class="material-icons-outlined text-base">logout</span> Sign Out
                             </button>
                         </form>
