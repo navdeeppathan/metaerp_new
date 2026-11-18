@@ -13,72 +13,72 @@
         <h1 class="text-2xl sm:text-[28px] font-extrabold text-[#0f172a] tracking-tight">Find Contracts</h1>
 
         <!-- Filter Bar -->
-        <form action="{{ route('contracts.search') }}" method="GET" id="searchFilterForm" class="flex flex-wrap items-center gap-2.5 sm:gap-3">
+        <form action="{{ route('contracts.search') }}" method="GET" id="searchFilterForm" class="flex flex-wrap items-center gap-3">
             <input type="hidden" name="per_page" id="per_page_input" value="{{ $perPage ?? 10 }}">
 
             <!-- Date Range Picker Pill -->
-            <div class="flex items-center bg-white border border-slate-200 rounded-full px-4 py-2 shadow-2xs text-xs sm:text-[13px] text-slate-700">
+            <div class="flex items-center bg-white border border-slate-200/90 rounded-full px-5 py-2.5 shadow-2xs text-sm text-slate-800">
                 <input
                     type="text"
                     name="from_date"
                     id="from_date"
                     value="{{ $fromDateRaw }}"
-                    class="w-24 bg-transparent text-slate-800 text-xs sm:text-[13px] focus:outline-none cursor-pointer text-center"
+                    class="w-24 bg-transparent text-slate-800 text-sm font-normal focus:outline-none cursor-pointer text-center"
                     placeholder="DD/MM/YYYY"
                     readonly
                 />
-                <button type="button" id="from_calendar_btn" class="text-slate-400 hover:text-slate-600 focus:outline-none ml-1 flex items-center">
-                    <span class="material-icons-outlined text-[17px]">calendar_today</span>
+                <button type="button" id="from_calendar_btn" class="text-slate-400 hover:text-slate-600 focus:outline-none ml-1.5 flex items-center">
+                    <span class="material-icons-outlined text-lg">calendar_today</span>
                 </button>
-                <span class="text-slate-400 mx-2">-</span>
+                <span class="text-slate-400 mx-2 text-sm">-</span>
                 <input
                     type="text"
                     name="to_date"
                     id="to_date"
                     value="{{ $toDateRaw }}"
-                    class="w-24 bg-transparent text-slate-800 text-xs sm:text-[13px] focus:outline-none cursor-pointer text-center"
+                    class="w-24 bg-transparent text-slate-800 text-sm font-normal focus:outline-none cursor-pointer text-center"
                     placeholder="DD/MM/YYYY"
                     readonly
                 />
-                <button type="button" id="to_calendar_btn" class="text-slate-400 hover:text-slate-600 focus:outline-none ml-1 flex items-center">
-                    <span class="material-icons-outlined text-[17px]">calendar_today</span>
+                <button type="button" id="to_calendar_btn" class="text-slate-400 hover:text-slate-600 focus:outline-none ml-1.5 flex items-center">
+                    <span class="material-icons-outlined text-lg">calendar_today</span>
                 </button>
             </div>
 
             <!-- Status Dropdown Pill -->
-            <div class="relative flex items-center bg-white border border-slate-200 rounded-full px-4 py-2 shadow-2xs">
+            <div class="relative flex items-center bg-white border border-slate-200/90 rounded-full pl-5 pr-9 py-2.5 shadow-2xs">
                 <select
                     name="status"
                     id="status"
-                    class="appearance-none bg-transparent pr-5 text-xs sm:text-[13px] font-normal text-slate-700 focus:outline-none cursor-pointer"
+                    class="appearance-none bg-transparent text-sm font-normal text-slate-800 focus:outline-none cursor-pointer w-full"
                 >
                     <option value="OPEN" {{ ($status ?? 'OPEN') === 'OPEN' ? 'selected' : '' }}>Status: OPEN</option>
                     <option value="ALL" {{ ($status ?? '') === 'ALL' ? 'selected' : '' }}>Status: ALL</option>
                     <option value="CLOSED" {{ ($status ?? '') === 'CLOSED' ? 'selected' : '' }}>Status: CLOSED</option>
                     <option value="CANCELLED" {{ ($status ?? '') === 'CANCELLED' ? 'selected' : '' }}>Status: CANCELLED</option>
                 </select>
-                <span class="material-icons absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-base pointer-events-none">arrow_drop_down</span>
+                <span class="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg pointer-events-none">arrow_drop_down</span>
             </div>
 
             <!-- Type Dropdown Pill -->
-            <div class="relative flex items-center bg-white border border-slate-200 rounded-full px-4 py-2 shadow-2xs">
+            <div class="relative flex items-center bg-white border border-slate-200/90 rounded-full pl-5 pr-9 py-2.5 shadow-2xs">
                 <select
                     name="type"
                     id="type"
-                    class="appearance-none bg-transparent pr-5 text-xs sm:text-[13px] font-normal text-slate-700 focus:outline-none cursor-pointer"
+                    class="appearance-none bg-transparent text-sm font-normal text-slate-800 focus:outline-none cursor-pointer w-full"
                 >
                     <option value="ALL" {{ ($type ?? 'ALL') === 'ALL' ? 'selected' : '' }}>Type: ALL</option>
                     <option value="BUY_AND_SELL" {{ ($type ?? '') === 'BUY_AND_SELL' ? 'selected' : '' }}>Type: BUY & SELL</option>
                     <option value="BUY" {{ ($type ?? '') === 'BUY' ? 'selected' : '' }}>Type: BUY</option>
                     <option value="SELL" {{ ($type ?? '') === 'SELL' ? 'selected' : '' }}>Type: SELL</option>
                 </select>
-                <span class="material-icons absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-base pointer-events-none">arrow_drop_down</span>
+                <span class="material-icons absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg pointer-events-none">arrow_drop_down</span>
             </div>
 
             <!-- Search Button -->
             <button
                 type="submit"
-                class="bg-[#4f46e5] hover:bg-[#4338ca] text-white px-6 py-2 rounded-full font-medium text-xs sm:text-[13px] shadow-xs transition-colors cursor-pointer"
+                class="bg-[#4f46e5] hover:bg-[#4338ca] text-white px-7 py-2.5 rounded-full font-semibold text-sm shadow-xs transition-colors cursor-pointer whitespace-nowrap flex items-center justify-center"
             >
                 Search
             </button>
