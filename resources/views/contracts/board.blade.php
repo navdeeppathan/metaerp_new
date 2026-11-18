@@ -69,8 +69,17 @@
                     $companyName = $contract->type == 'BUY' 
                         ? ($contract->purchase?->metaCompany?->name ?? 'MetaZn LTD') 
                         : ($contract->sale?->metaCompany?->name ?? 'Metaenterprices LTD');
+                    
+                    $payColor = 'text-[#D32F2F]';
+                    $bPay = $contract->purchase?->paymentStatus ?? $contract->buyerContract?->paymentStatus ?? null;
+                    $sPay = $contract->sale?->paymentStatus ?? $contract->sellerContract?->paymentStatus ?? null;
+                    if ($bPay == 'PAID' && $sPay == 'PAID') {
+                        $payColor = 'text-[#388E3C]';
+                    } elseif ($bPay == 'PAID' || $sPay == 'PAID') {
+                        $payColor = 'text-[#FBC02D]';
+                    }
                 @endphp
-                <div class="bg-white p-3.5 rounded-xl border {{ $contract->type == 'SELL' ? 'border-2 border-[#ea580c]' : ($contract->type == 'BUY' ? 'border-2 border-[#86efac]' : 'border border-slate-200/80') }} shadow-2xs hover:shadow-md transition-all cursor-pointer space-y-2.5 relative group"
+                <div class="bg-white p-3.5 rounded-xl {{ $contract->type == 'SELL' ? 'border-2 border-[#F57C00]' : ($contract->type == 'BUY' ? 'border-2 border-[#81C784]' : 'border border-slate-200/80') }} shadow-2xs hover:shadow-md transition-all cursor-pointer space-y-2.5 relative group"
                      draggable="true"
                      id="card-contract-{{ $contract->id }}"
                      data-contract-id="{{ $contract->id }}"
@@ -82,10 +91,10 @@
                      @dragstart="onDragStart($event, {{ $contract->id }}, {{ $stage->id }})"
                      @dragend="onDragEnd($event)">
                     
-                    <!-- Top Pill Tag & Arrow (Matching Screenshot 3) -->
+                    <!-- Top Pill Tag & Arrow (Matching React BoardCard.js & Tailwind theme) -->
                     <div class="flex items-center justify-between">
                         @if($contract->type == 'SELL')
-                            <span class="bg-[#ea580c] text-white font-bold text-xs px-3 py-0.5 rounded-full select-none">
+                            <span class="bg-[#F57C00] text-slate-950 font-semibold text-xs px-3.5 py-0.5 rounded-full select-none">
                                 {{ $contract->orderCode }}
                             </span>
                             <div class="flex items-center text-slate-800" title="Sell">
@@ -94,7 +103,7 @@
                                 </svg>
                             </div>
                         @elseif($contract->type == 'BUY')
-                            <span class="bg-[#86efac] text-slate-800 font-bold text-xs px-3 py-0.5 rounded-full select-none">
+                            <span class="bg-[#81C784] text-slate-950 font-semibold text-xs px-3.5 py-0.5 rounded-full select-none">
                                 {{ $contract->orderCode }}
                             </span>
                             <div class="flex items-center text-slate-800" title="Buy">
@@ -103,7 +112,7 @@
                                 </svg>
                             </div>
                         @else
-                            <span class="bg-[#f1f5f9] text-slate-800 font-bold text-xs px-3 py-0.5 rounded-full border border-slate-200 select-none">
+                            <span class="bg-[#f1f5f9] text-slate-800 font-semibold text-xs px-3.5 py-0.5 rounded-full border border-slate-200 select-none">
                                 {{ $contract->orderCode }}
                             </span>
                             <div class="flex items-center text-slate-800 -space-x-1" title="Buy & Sell">
@@ -127,41 +136,41 @@
                         </div>
                     </div>
 
-                    <!-- Contracts of purchase box for SELL contracts (Matching Screenshot 3 & 4) -->
+                    <!-- Contracts of purchase box for SELL contracts (Matching React & Screenshot 3 & 4) -->
                     @if($contract->type == 'SELL')
                     @php
                         $purchaseCodes = $contract->purchaseContractCodes ?? collect();
                         $firstPurchaseCode = $purchaseCodes->first();
                     @endphp
-                    <div class="bg-[#dcfce7] text-[#166534] rounded-lg px-2.5 py-1.5 text-xs">
+                    <div class="bg-[#C8E6C9] text-slate-900 rounded-lg px-2.5 py-1.5 text-xs">
                         <div class="text-[11px] font-normal leading-tight">Contracts of purchase:</div>
                         @if($firstPurchaseCode)
                         <div class="font-bold text-slate-900 mt-0.5 leading-tight">{{ $firstPurchaseCode }}</div>
                         @endif
                     </div>
 
-                    <!-- Products Status Tag for SELL contracts (Matching Screenshot 3 & 4) -->
+                    <!-- Products Status Tag for SELL contracts (Matching React & Screenshot 3 & 4) -->
                     @php
                         $assocStatus = $contract->associationStatus;
                     @endphp
                     <div>
                         @if($assocStatus == 'COMPLETE')
-                        <span class="bg-[#22c55e] text-white text-[10px] font-bold px-3 py-0.5 rounded-full inline-block">
+                        <span class="bg-[#4CAF50] text-slate-950 text-[11px] font-semibold px-3.5 py-0.5 rounded-full inline-block">
                             Products Status: COMPLETE
                         </span>
                         @else
-                        <span class="bg-[#f97316] text-white text-[10px] font-bold px-3 py-0.5 rounded-full inline-block">
+                        <span class="bg-[#FFA726] text-slate-950 text-[11px] font-semibold px-3.5 py-0.5 rounded-full inline-block">
                             Products Status: PENDING
                         </span>
                         @endif
                     </div>
                     @endif
 
-                    <!-- Card Footer: Red Dollar Icon (Screenshot 3 & 4) -->
+                    <!-- Card Footer: Heroicons Currency Dollar Icon (Matching React FuseSvgIcon) -->
                     <div class="pt-0.5 flex items-center justify-start">
-                        <span class="w-4 h-4 rounded-full border border-[#ef4444] text-[#dc2626] flex items-center justify-center text-[10px] font-bold leading-none select-none">
-                            $
-                        </span>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="w-5 h-5 {{ $payColor }}">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
                     </div>
                 </div>
                 @empty
