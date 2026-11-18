@@ -262,7 +262,7 @@ class WebContractController extends Controller
 
     public function store(Request $request)
     {
-        $rawType = $request->input('type', 'BUY');
+        $rawType = $request->input('type', 'BUY_AND_SELL');
         if ($rawType === 'Purchase & Sales' || $rawType === 'BUY_AND_SELL') {
             $type = 'BUY_AND_SELL';
         } elseif ($rawType === 'Purchase' || $rawType === 'BUY') {
@@ -271,67 +271,213 @@ class WebContractController extends Controller
             $type = 'SELL';
         }
 
-        $companyId = $request->input('meta_company_id') ?: Company::first()?->id;
-        $contactId = $request->input('contact_id') ?: Contact::first()?->id;
-        $productId = $request->input('product_id') ?: Product::first()?->id;
-        $currencyId = $request->input('currency_id') ?: Currency::first()?->id;
-        $quantity = (float) ($request->input('quantity') ?: 100);
-        $unitPrice = (float) ($request->input('unit_price') ?: 3000);
-        $total = $quantity * $unitPrice;
-
-        $company = Company::find($companyId);
-        $contact = Contact::with(['addresses', 'representatives'])->find($contactId);
-        $product = Product::find($productId);
-
-        $addressId = $request->input('contact_address_id') ?: $contact?->addresses?->first()?->id;
-        $repId = $request->input('contact_person_id') ?: $contact?->representatives?->first()?->id;
-        $bankAccountId = $request->input('payment_bank_account_id');
-
-        $deal = Deal::create([
-            'meta_company_id' => $companyId,
-            'contact_id' => $contactId,
-            'contact_representative_id' => $repId,
-            'address_id' => $addressId,
-            'bank_account_id' => $bankAccountId,
-            'currency_id' => $currencyId,
-            'dollarConvertionRate' => (float) ($request->input('dollar_conversion') ?: 1.0),
-            'incoterms' => $request->input('incoterms', 'CIF JEDDAH'),
-            'customerOrderNumber' => $request->input('customer_order_number'),
-            'payment_type_id' => $request->input('payment_type_id'),
-            'payment_terms_type_id' => $request->input('payment_terms_type_id'),
-            'paymentTerms' => $request->input('payment_terms', '100%'),
-            'advancedPayment' => $request->input('advanced_payment'),
-            'notes' => $request->input('notes'),
-            'paymentDate' => $request->input('payment_date'),
-            'total' => $total,
-            'netTotal' => $total,
-            'dealPaymentStatus' => 'OPEN',
-        ]);
-
-        $dealProduct = DealProduct::create([
-            'product_id' => $productId,
-            'quantity' => $quantity,
-            'rate' => $unitPrice,
-            'total_price' => $total,
-            'status' => 'PENDING',
-            'active' => true,
-        ]);
-        $deal->products()->attach($dealProduct->id);
-
         $firstStage = Stage::where('model_id', $request->input('model_id', 1))->orderBy('position')->first();
 
+        // Parse due_date
+        $dueDate = now();
+        if ($request->filled('order_date')) {
+            try {
+                $dueDate = \Carbon\Carbon::createFromFormat('d/m/Y h:i A', $request->input('order_date'));
+            } catch (\Throwable $e) {
+                try {
+                    $dueDate = \Carbon\Carbon::parse($request->input('order_date'));
+                } catch (\Throwable $e2) {
+                    $dueDate = now();
+                }
+            }
+        } elseif ($request->filled('due_date')) {
+            try {
+                $dueDate = \Carbon\Carbon::parse($request->input('due_date'));
+            } catch (\Throwable $e) {
+                $dueDate = now();
+            }
+        }
+
+        $purchaseDeal = null;
+        $saleDeal = null;
+
+        // 1. Process Buying from deal (Purchase) if BUY or BUY_AND_SELL
+        if (in_array($type, ['BUY', 'BUY_AND_SELL'])) {
+            $buyingCompanyId = $request->input('buying_meta_company_id') ?: $request->input('meta_company_id') ?: Company::first()?->id;
+            $buyingContactId = $request->input('buying_contact_id') ?: $request->input('contact_id') ?: Contact::first()?->id;
+            $buyingContact = Contact::with(['addresses', 'representatives'])->find($buyingContactId);
+
+            $buyingAddressId = $request->input('buying_contact_address_id') ?: $request->input('contact_address_id') ?: $buyingContact?->addresses?->first()?->id;
+            $buyingRepId = $request->input('buying_contact_person_id') ?: $request->input('contact_person_id') ?: $buyingContact?->representatives?->first()?->id;
+            $buyingCollectionAddressId = $request->input('buying_collection_address_id') ?: $request->input('collection_address_id') ?: $buyingAddressId;
+            $buyingBankAccountId = $request->input('buying_payment_bank_account_id') ?: $request->input('payment_bank_account_id');
+            $buyingCurrencyId = $request->input('buying_currency_id') ?: $request->input('currency_id') ?: Currency::first()?->id;
+            $buyingCountryId = $request->input('buying_country_of_origin_id') ?: $request->input('country_id') ?: Country::first()?->id;
+
+            $buyingPaymentDate = null;
+            if ($request->filled('buying_payment_date') || $request->filled('payment_date')) {
+                $pDate = $request->input('buying_payment_date') ?: $request->input('payment_date');
+                try {
+                    $buyingPaymentDate = \Carbon\Carbon::createFromFormat('d/m/Y', $pDate);
+                } catch (\Throwable $e) {
+                    try {
+                        $buyingPaymentDate = \Carbon\Carbon::parse($pDate);
+                    } catch (\Throwable $e2) {}
+                }
+            }
+
+            $purchaseDeal = Deal::create([
+                'meta_company_id' => $buyingCompanyId,
+                'contact_id' => $buyingContactId,
+                'contact_representative_id' => $buyingRepId,
+                'address_id' => $buyingAddressId,
+                'shipping_address_id' => $buyingCollectionAddressId,
+                'payment_account_id' => $buyingBankAccountId,
+                'currency_id' => $buyingCurrencyId,
+                'country_of_origin_id' => $buyingCountryId,
+                'dollar_convertion_rate' => (float) ($request->input('buying_dollar_conversion') ?: $request->input('dollar_conversion') ?: 1.0),
+                'incoterms' => $request->input('buying_incoterms') ?: $request->input('incoterms') ?: 'CIF JEDDAH',
+                'external_order_number' => $request->input('buying_customer_order_number') ?: $request->input('customer_order_number'),
+                'payment_type_id' => $request->input('buying_payment_type_id') ?: $request->input('payment_type_id'),
+                'payment_terms_type_id' => $request->input('buying_payment_terms_type_id') ?: $request->input('payment_terms_type_id'),
+                'payment_terms' => $request->input('buying_payment_terms') ?: $request->input('payment_terms') ?: '100%',
+                'advanced_payment' => $request->input('buying_advanced_payment') ? (float) $request->input('buying_advanced_payment') : null,
+                'notes' => $request->input('buying_notes') ?: $request->input('notes'),
+                'payment_date' => $buyingPaymentDate,
+                'payment_status' => $buyingPaymentDate ? 'PAID' : 'PENDING',
+            ]);
+
+            // Save buying products
+            $buyingProducts = $request->input('buying_products');
+            if (is_array($buyingProducts) && count($buyingProducts) > 0) {
+                foreach ($buyingProducts as $pData) {
+                    if (empty($pData['product_id'])) continue;
+                    $qty = (float) ($pData['quantity'] ?? 0);
+                    $rate = (float) ($pData['unit_price'] ?? 0);
+                    $dealProduct = DealProduct::create([
+                        'product_id' => $pData['product_id'],
+                        'quantity' => $qty,
+                        'rate' => $rate,
+                        'uom' => $pData['uom'] ?? 'MT',
+                        'total_price' => $qty * $rate,
+                        'pricing_type' => $pData['pricing_type'] ?? 'Fixed',
+                        'status' => 'PENDING',
+                        'active' => true,
+                    ]);
+                    $purchaseDeal->products()->attach($dealProduct->id);
+                }
+            } else {
+                $productId = $request->input('product_id') ?: Product::first()?->id;
+                $quantity = (float) ($request->input('quantity') ?: 0);
+                $unitPrice = (float) ($request->input('unit_price') ?: 0);
+                if ($productId) {
+                    $dealProduct = DealProduct::create([
+                        'product_id' => $productId,
+                        'quantity' => $quantity,
+                        'rate' => $unitPrice,
+                        'uom' => 'MT',
+                        'total_price' => $quantity * $unitPrice,
+                        'pricing_type' => 'Fixed',
+                        'status' => 'PENDING',
+                        'active' => true,
+                    ]);
+                    $purchaseDeal->products()->attach($dealProduct->id);
+                }
+            }
+        }
+
+        // 2. Process Selling to deal (Sale) if SELL or BUY_AND_SELL
+        if (in_array($type, ['SELL', 'BUY_AND_SELL'])) {
+            $sellingCompanyId = $request->input('selling_meta_company_id') ?: $request->input('meta_company_id') ?: Company::first()?->id;
+            $sellingContactId = $request->input('selling_contact_id') ?: $request->input('contact_id') ?: Contact::first()?->id;
+            $sellingContact = Contact::with(['addresses', 'representatives'])->find($sellingContactId);
+
+            $sellingAddressId = $request->input('selling_contact_address_id') ?: $request->input('contact_address_id') ?: $sellingContact?->addresses?->first()?->id;
+            $sellingRepId = $request->input('selling_contact_person_id') ?: $request->input('contact_person_id') ?: $sellingContact?->representatives?->first()?->id;
+            $sellingShippingAddressId = $request->input('selling_shipping_address_id') ?: $request->input('shipping_address_id') ?: $sellingAddressId;
+            $sellingBankAccountId = $request->input('selling_payment_bank_account_id') ?: $request->input('payment_bank_account_id');
+            $sellingCurrencyId = $request->input('selling_currency_id') ?: $request->input('currency_id') ?: Currency::first()?->id;
+            $sellingCountryId = $request->input('selling_country_of_origin_id') ?: $request->input('country_id') ?: Country::first()?->id;
+
+            $sellingPaymentDate = null;
+            if ($request->filled('selling_payment_date')) {
+                try {
+                    $sellingPaymentDate = \Carbon\Carbon::createFromFormat('d/m/Y', $request->input('selling_payment_date'));
+                } catch (\Throwable $e) {
+                    try {
+                        $sellingPaymentDate = \Carbon\Carbon::parse($request->input('selling_payment_date'));
+                    } catch (\Throwable $e2) {}
+                }
+            }
+
+            $saleDeal = Deal::create([
+                'meta_company_id' => $sellingCompanyId,
+                'contact_id' => $sellingContactId,
+                'contact_representative_id' => $sellingRepId,
+                'address_id' => $sellingAddressId,
+                'shipping_address_id' => $sellingShippingAddressId,
+                'payment_account_id' => $sellingBankAccountId,
+                'currency_id' => $sellingCurrencyId,
+                'country_of_origin_id' => $sellingCountryId,
+                'dollar_convertion_rate' => (float) ($request->input('selling_dollar_conversion') ?: 1.0),
+                'incoterms' => $request->input('selling_incoterms') ?: 'CIF JEDDAH',
+                'external_order_number' => $request->input('selling_customer_order_number'),
+                'payment_type_id' => $request->input('selling_payment_type_id') ?: $request->input('payment_type_id'),
+                'payment_terms_type_id' => $request->input('selling_payment_terms_type_id') ?: $request->input('payment_terms_type_id'),
+                'payment_terms' => $request->input('selling_payment_terms') ?: '100%',
+                'advanced_payment' => $request->input('selling_advanced_payment') ? (float) $request->input('selling_advanced_payment') : null,
+                'notes' => $request->input('selling_notes'),
+                'payment_date' => $sellingPaymentDate,
+                'payment_status' => $sellingPaymentDate ? 'PAID' : 'PENDING',
+            ]);
+
+            // Save selling products
+            $sellingProducts = $request->input('selling_products');
+            if (is_array($sellingProducts) && count($sellingProducts) > 0) {
+                foreach ($sellingProducts as $pData) {
+                    if (empty($pData['product_id'])) continue;
+                    $qty = (float) ($pData['quantity'] ?? 0);
+                    $rate = (float) ($pData['unit_price'] ?? 0);
+                    $dealProduct = DealProduct::create([
+                        'product_id' => $pData['product_id'],
+                        'quantity' => $qty,
+                        'rate' => $rate,
+                        'uom' => $pData['uom'] ?? 'MT',
+                        'total_price' => $qty * $rate,
+                        'pricing_type' => $pData['pricing_type'] ?? 'Fixed',
+                        'status' => 'PENDING',
+                        'active' => true,
+                    ]);
+                    $saleDeal->products()->attach($dealProduct->id);
+                }
+            } elseif ($type === 'SELL') {
+                $productId = $request->input('product_id') ?: Product::first()?->id;
+                $quantity = (float) ($request->input('quantity') ?: 0);
+                $unitPrice = (float) ($request->input('unit_price') ?: 0);
+                if ($productId) {
+                    $dealProduct = DealProduct::create([
+                        'product_id' => $productId,
+                        'quantity' => $quantity,
+                        'rate' => $unitPrice,
+                        'uom' => 'MT',
+                        'total_price' => $quantity * $unitPrice,
+                        'pricing_type' => 'Fixed',
+                        'status' => 'PENDING',
+                        'active' => true,
+                    ]);
+                    $saleDeal->products()->attach($dealProduct->id);
+                }
+            }
+        }
+
+        // 3. Create Contract
         $contract = Contract::create([
-            'date' => now(),
+            'due_date' => $dueDate,
             'type' => $type,
             'stage_id' => $firstStage?->id ?? 1,
-            'purchase_id' => in_array($type, ['BUY', 'BUY_AND_SELL']) ? $deal->id : null,
-            'sale_id' => in_array($type, ['SELL', 'BUY_AND_SELL']) ? $deal->id : null,
-            'contractStatus' => $request->input('contractStatus', 'ACTIVE'),
-            'orderDescription' => $request->input('description'),
+            'purchase_id' => $purchaseDeal?->id,
+            'sale_id' => $saleDeal?->id,
+            'status' => 'OPEN',
+            'description' => $request->input('description'),
+            'mode_of_transport' => $request->input('mode_of_transport', 'SEA'),
+            'weight_tolerance' => $request->input('weight_tolerance') ? (float) $request->input('weight_tolerance') : null,
             'active' => true,
-            'loadingDate' => now()->addDays(14),
-            'deliveryTerms' => $request->input('incoterms', 'CIF'),
-            'modeOfPayment' => $request->input('payment_terms', '100%'),
+            'version' => 0,
         ]);
 
         try {

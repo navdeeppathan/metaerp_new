@@ -189,319 +189,611 @@
     </div>
 
     <!-- NEW CONTRACT MODAL (Matching exact screenshots) -->
-    <div x-show="showNewModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+    <div x-show="showNewModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;" @keydown.escape.window="showNewModal = false">
         <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 transition-opacity bg-slate-900/60 backdrop-blur-xs" @click="showNewModal = false"></div>
             
-            <div class="inline-block w-full max-w-5xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white rounded-2xl shadow-2xl border border-slate-200"
-                 x-data="{ sideTab: 'buying', newComment: '', commentsList: [] }">
+            <div class="inline-block w-full max-w-6xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white rounded-2xl shadow-2xl border border-slate-200">
                 
                 <form action="{{ route('contracts.store') }}" method="POST">
                     @csrf
                     
                     <div class="flex">
-                        <!-- Left Main Modal Content Area -->
-                        <div class="flex-1 p-6 space-y-6 max-h-[85vh] overflow-y-auto custom-scrollbar">
+                        <!-- Left Main Modal Content Area (Matching Images 1, 2, 3) -->
+                        <div class="flex-1 p-6 sm:p-8 space-y-6 max-h-[88vh] overflow-y-auto custom-scrollbar">
                             
-                            <!-- Modal Header: New Contract > and Order date -->
-                            <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                            <!-- Modal Header: New Contract > and Order date & Save Button (Screenshot 1) -->
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-slate-100">
                                 <h2 class="text-base font-bold text-slate-900 flex items-center gap-1">
                                     <span>New Contract</span>
                                     <span class="material-icons text-sm text-slate-400">chevron_right</span>
                                 </h2>
 
-                                <!-- Order date notch container -->
-                                <div class="relative border border-slate-300 rounded-md px-3 pt-2 pb-1.5 bg-white flex items-center gap-2">
-                                    <label class="absolute -top-2 left-2 bg-white px-1 text-[11px] text-slate-500 font-medium leading-none">Order date</label>
-                                    <input type="text" name="order_date" value="04/11/2026 09:24 AM" class="text-xs text-slate-800 border-0 p-0 focus:ring-0 w-36 bg-transparent">
-                                    <span class="material-icons text-slate-400 text-sm">calendar_today</span>
+                                <div class="flex items-center gap-4">
+                                    <!-- Order date notch container -->
+                                    <div class="relative border border-slate-300 rounded-md px-3 pt-2 pb-1.5 bg-white min-w-[220px] flex items-center justify-between">
+                                        <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Order date</label>
+                                        <input type="text" name="order_date" value="{{ now()->format('d/m/Y h:i A') }}" class="text-xs text-slate-800 font-normal w-full bg-transparent border-none focus:outline-none p-0 cursor-pointer">
+                                        <span class="material-icons text-slate-400 text-lg ml-2 pointer-events-none">calendar_today</span>
+                                    </div>
+
+                                    <button type="submit" class="bg-[#7c3aed] hover:bg-[#6d28d9] text-white px-6 py-2 rounded-full text-xs font-semibold shadow-xs transition cursor-pointer select-none">
+                                        Save
+                                    </button>
                                 </div>
                             </div>
 
-                            <!-- Field 1: Type -->
+                            <!-- Field 1: Type (Screenshot 1) -->
                             <div>
-                                <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
-                                    <label class="absolute -top-2 left-2 bg-white px-1 text-[11px] text-slate-500 font-medium leading-none">Type</label>
-                                    <select name="type" class="w-full text-xs text-slate-800 bg-transparent border-0 p-0 focus:ring-0 cursor-pointer">
-                                        <option value="Purchase & Sales" selected>Purchase & Sales</option>
-                                        <option value="Purchase">Purchase</option>
-                                        <option value="Sales">Sales</option>
+                                <div class="relative border border-slate-300 rounded-md px-3 pt-2 pb-1.5 bg-white min-h-[46px] flex items-center">
+                                    <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Type</label>
+                                    <select name="type" x-model="contractType" 
+                                            @change="if(contractType === 'SELL') sideTab = 'selling'; else if(contractType === 'BUY') sideTab = 'buying';"
+                                            class="w-full text-xs text-slate-800 font-normal bg-transparent border-none focus:outline-none py-1 cursor-pointer">
+                                        <option value="BUY_AND_SELL" selected>Purchase & Sales</option>
+                                        <option value="BUY">Purchase</option>
+                                        <option value="SELL">Sales</option>
                                     </select>
                                     <span class="material-icons absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none">arrow_drop_down</span>
                                 </div>
                             </div>
 
-                            <!-- Field 2: Description -->
+                            <!-- Field 2: Description (Screenshot 1) -->
                             <div>
-                                <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white">
-                                    <label class="absolute -top-2 left-2 bg-white px-1 text-[11px] text-slate-500 font-medium leading-none">Description</label>
-                                    <textarea name="description" rows="3" class="w-full text-xs text-slate-800 bg-transparent border-0 p-0 focus:ring-0 resize-none"></textarea>
+                                <div class="relative border border-slate-300 rounded-md px-3 pt-2 pb-2 bg-white">
+                                    <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Description</label>
+                                    <textarea name="description" rows="3" class="w-full text-xs text-slate-800 font-normal bg-transparent border-none focus:outline-none p-0 pt-1 resize-y leading-relaxed" placeholder="Description"></textarea>
                                 </div>
                             </div>
 
-                            <!-- Tabs: Buying from / Selling to -->
-                            <div class="flex items-center gap-6 border-b border-slate-200 text-xs font-semibold">
-                                <button type="button" @click="sideTab = 'buying'" :class="sideTab === 'buying' ? 'border-b-2 border-indigo-600 text-indigo-600 pb-2 font-bold' : 'text-slate-500 pb-2 hover:text-slate-700'">
-                                    Buying from
-                                </button>
-                                <button type="button" @click="sideTab = 'selling'" :class="sideTab === 'selling' ? 'border-b-2 border-indigo-600 text-indigo-600 pb-2 font-bold' : 'text-slate-500 pb-2 hover:text-slate-700'">
-                                    Selling to
-                                </button>
-                            </div>
+                            <!-- Tabs: Buying from / Selling to (Screenshot 1 & 3) -->
+                            <div class="border-t-2 border-slate-200/80 pt-4">
+                                <div class="flex items-center gap-8 border-b border-slate-200 text-xs font-semibold">
+                                    <button type="button" 
+                                            @click="if(contractType !== 'SELL') sideTab = 'buying'"
+                                            :class="sideTab === 'buying' ? 'border-b-2 border-indigo-600 text-indigo-600 pb-2.5 font-bold' : (contractType === 'SELL' ? 'text-slate-300 cursor-not-allowed pb-2.5 pointer-events-none' : 'text-slate-500 hover:text-slate-700 pb-2.5 cursor-pointer')">
+                                        Buying from
+                                    </button>
+                                    <button type="button" 
+                                            @click="if(contractType !== 'BUY') sideTab = 'selling'"
+                                            :class="sideTab === 'selling' ? 'border-b-2 border-indigo-600 text-indigo-600 pb-2.5 font-bold' : (contractType === 'BUY' ? 'text-slate-300 cursor-not-allowed pb-2.5 pointer-events-none' : 'text-slate-500 hover:text-slate-700 pb-2.5 cursor-pointer')">
+                                        Selling to
+                                    </button>
+                                </div>
 
-                            <!-- Form Grid: 4 columns -->
-                            <div class="space-y-4">
-                                <!-- Row 1: Meta Company, Payment bank account, Payment Date, Country of origin -->
-                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                    <!-- Meta Company * -->
-                                    <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
-                                        <label class="absolute -top-2 left-2 bg-white px-1 text-[11px] text-slate-500 font-medium leading-none">Meta Company *</label>
-                                        <select name="meta_company_id" class="w-full text-xs text-slate-800 bg-transparent border-0 p-0 focus:ring-0 cursor-pointer">
-                                            @foreach($companies as $comp)
-                                            <option value="{{ $comp->id }}">{{ $comp->name }}</option>
-                                            @endforeach
-                                        </select>
-                                        <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">arrow_drop_down</span>
-                                    </div>
+                                <!-- BUYING FROM TAB CONTENT (Screenshots 1 & 2) -->
+                                <div x-show="sideTab === 'buying'" class="pt-4 space-y-4">
+                                    <!-- Row 1: Meta Company, Payment bank account, Payment Date, Country of origin -->
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                                        <!-- Meta Company * -->
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Meta Company *</label>
+                                            <select name="buying_meta_company_id" x-model="buyingCompanyId" class="w-full text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 cursor-pointer">
+                                                @foreach($companies as $comp)
+                                                <option value="{{ $comp->id }}">{{ $comp->name }}</option>
+                                                @endforeach
+                                            </select>
+                                            <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">arrow_drop_down</span>
+                                        </div>
 
-                                    <!-- Payment bank account * -->
-                                    <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
-                                        <label class="absolute -top-2 left-2 bg-white px-1 text-[11px] text-slate-500 font-medium leading-none">Payment bank account *</label>
-                                        <select name="payment_bank_account_id" class="w-full text-xs text-slate-800 bg-transparent border-0 p-0 focus:ring-0 cursor-pointer">
-                                            @foreach($companies->flatMap->bankAccounts as $ba)
-                                            <option value="{{ $ba->id }}">{{ $ba->description ?? $ba->name ?? 'Bank Account' }}</option>
-                                            @endforeach
-                                            @if($companies->flatMap->bankAccounts->isEmpty())
-                                            <option value="">Virgin Money USD</option>
-                                            @endif
-                                        </select>
-                                        <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">arrow_drop_down</span>
-                                    </div>
+                                        <!-- Payment bank account * -->
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Payment bank account *</label>
+                                            <select name="buying_payment_bank_account_id" class="w-full text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 cursor-pointer truncate">
+                                                <template x-for="ba in getBuyingBankAccounts()" :key="ba.id">
+                                                    <option :value="ba.id" x-text="ba.description || ba.name || 'Bank Account'"></option>
+                                                </template>
+                                                <template x-if="getBuyingBankAccounts().length === 0">
+                                                    <option value="">No bank account available</option>
+                                                </template>
+                                            </select>
+                                            <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">arrow_drop_down</span>
+                                        </div>
 
-                                    <!-- Payment Date -->
-                                    <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
-                                        <label class="absolute -top-2 left-2 bg-white px-1 text-[11px] text-slate-500 font-medium leading-none">Payment Date</label>
-                                        <div class="flex items-center justify-between w-full">
-                                            <input type="text" name="payment_date" placeholder="DD/MM/YYYY" class="text-xs text-slate-800 bg-transparent border-0 p-0 focus:ring-0 w-full placeholder-slate-400">
-                                            <span class="material-icons text-slate-400 text-sm">calendar_today</span>
+                                        <!-- Payment Date -->
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2 pb-1.5 bg-white min-h-[46px] flex items-center justify-between">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Payment Date</label>
+                                            <input type="text" name="buying_payment_date" placeholder="DD/MM/YYYY" class="text-xs text-slate-800 font-normal w-full bg-transparent border-none focus:outline-none p-0 placeholder-slate-400">
+                                            <span class="material-icons text-slate-400 text-base pointer-events-none">calendar_today</span>
+                                        </div>
+
+                                        <!-- Country of origin * -->
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Country of origin *</label>
+                                            <select name="buying_country_of_origin_id" class="w-full text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 cursor-pointer">
+                                                @foreach($countries as $cntry)
+                                                <option value="{{ $cntry->id }}">{{ $cntry->name }}</option>
+                                                @endforeach
+                                            </select>
+                                            <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">arrow_drop_down</span>
                                         </div>
                                     </div>
 
-                                    <!-- Country of origin * -->
-                                    <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
-                                        <label class="absolute -top-2 left-2 bg-white px-1 text-[11px] text-slate-500 font-medium leading-none">Country of origin *</label>
-                                        <select name="country_id" class="w-full text-xs text-slate-800 bg-transparent border-0 p-0 focus:ring-0 cursor-pointer">
-                                            @foreach($countries as $country)
-                                            <option value="{{ $country->id }}">{{ $country->name }}</option>
-                                            @endforeach
-                                        </select>
-                                        <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">arrow_drop_down</span>
+                                    <!-- Row 2: Name, Contact Address, Contact Person, Collection address (Screenshot 1) -->
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                                        <!-- Name * (Contact) -->
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Name *</label>
+                                            <select name="buying_contact_id" x-model="buyingContactId" class="w-full text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 cursor-pointer truncate">
+                                                @foreach($contacts as $cont)
+                                                <option value="{{ $cont->id }}">{{ $cont->name }}</option>
+                                                @endforeach
+                                            </select>
+                                            <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">arrow_drop_down</span>
+                                        </div>
+
+                                        <!-- Contact Address * -->
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Contact Address *</label>
+                                            <select name="buying_contact_address_id" x-model="buyingAddressId" class="w-full text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 cursor-pointer truncate">
+                                                <template x-for="addr in getBuyingAddresses()" :key="addr.id">
+                                                    <option :value="addr.id" x-text="addr.address_name || addr.address_line1 || 'Address'"></option>
+                                                </template>
+                                                <template x-if="getBuyingAddresses().length === 0">
+                                                    <option value="">No address available</option>
+                                                </template>
+                                            </select>
+                                            <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">arrow_drop_down</span>
+                                        </div>
+
+                                        <!-- Contact Person * -->
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Contact Person *</label>
+                                            <select name="buying_contact_person_id" x-model="buyingRepId" class="w-full text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 cursor-pointer truncate">
+                                                <template x-for="rep in getBuyingRepresentatives()" :key="rep.id">
+                                                    <option :value="rep.id" x-text="rep.name"></option>
+                                                </template>
+                                                <template x-if="getBuyingRepresentatives().length === 0">
+                                                    <option value="">No contact person</option>
+                                                </template>
+                                            </select>
+                                            <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">arrow_drop_down</span>
+                                        </div>
+
+                                        <!-- Collection address (Screenshot 1: labeled Collection address) -->
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Collection address</label>
+                                            <select name="buying_collection_address_id" class="w-full text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 cursor-pointer truncate">
+                                                <template x-for="addr in getBuyingAddresses()" :key="addr.id">
+                                                    <option :value="addr.id" x-text="addr.address_name || addr.address_line1 || 'Collection Address'"></option>
+                                                </template>
+                                                <template x-if="getBuyingAddresses().length === 0">
+                                                    <option value="">Select address</option>
+                                                </template>
+                                            </select>
+                                            <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">arrow_drop_down</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Row 3: Currency, Dollar Conversion, Incoterms, Customer Order Number (Screenshot 1) -->
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                                        <!-- Currency * -->
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Currency *</label>
+                                            <select name="buying_currency_id" class="w-full text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 cursor-pointer">
+                                                @foreach($currencies as $cur)
+                                                <option value="{{ $cur->id }}">{{ $cur->description ?? 'USD' }}</option>
+                                                @endforeach
+                                            </select>
+                                            <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">arrow_drop_down</span>
+                                        </div>
+
+                                        <!-- Dollar Conversion -->
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Dollar Conversion</label>
+                                            <input type="text" name="buying_dollar_conversion" class="text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 w-full">
+                                        </div>
+
+                                        <!-- Incoterms * -->
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Incoterms *</label>
+                                            <input type="text" name="buying_incoterms" value="CIF JEDDAH" class="text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 w-full">
+                                        </div>
+
+                                        <!-- Customer Order Number -->
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Customer Order Number</label>
+                                            <input type="text" name="buying_customer_order_number" class="text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 w-full">
+                                        </div>
+                                    </div>
+
+                                    <!-- Row 4: Payment type, Payment Terms type, Payment Terms, Advanced Payment (Screenshot 1) -->
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                                        <!-- Payment type * -->
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Payment type *</label>
+                                            <select name="buying_payment_type_id" class="w-full text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 cursor-pointer">
+                                                @foreach($paymentTypes as $pt)
+                                                <option value="{{ $pt->id }}">{{ $pt->description }}</option>
+                                                @endforeach
+                                            </select>
+                                            <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">arrow_drop_down</span>
+                                        </div>
+
+                                        <!-- Payment Terms type * -->
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Payment Terms type *</label>
+                                            <select name="buying_payment_terms_type_id" class="w-full text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 cursor-pointer">
+                                                @foreach($paymentTerms as $ptt)
+                                                <option value="{{ $ptt->id }}">{{ $ptt->description }}</option>
+                                                @endforeach
+                                            </select>
+                                            <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">arrow_drop_down</span>
+                                        </div>
+
+                                        <!-- Payment Terms * -->
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Payment Terms *</label>
+                                            <input type="text" name="buying_payment_terms" value="100%" class="text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 w-full">
+                                        </div>
+
+                                        <!-- Advanced Payment -->
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Advanced Payment</label>
+                                            <input type="text" name="buying_advanced_payment" class="text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 w-full">
+                                        </div>
+                                    </div>
+
+                                    <!-- Row 5: Notes (Screenshot 2) -->
+                                    <div>
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Notes</label>
+                                            <input type="text" name="buying_notes" class="text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 w-full">
+                                        </div>
+                                    </div>
+
+                                    <!-- Products Section (Screenshot 2) -->
+                                    <div class="pt-4 border-t border-slate-100">
+                                        <div class="flex items-center gap-2 mb-3">
+                                            <span class="material-icons-outlined text-slate-700 text-base">table_chart</span>
+                                            <h4 class="font-bold text-xs text-slate-900">Products</h4>
+                                        </div>
+
+                                        <div class="border border-slate-200 rounded-lg overflow-x-auto">
+                                            <table class="w-full text-xs text-left">
+                                                <thead class="text-slate-700 font-semibold border-b border-slate-200 bg-slate-50/50">
+                                                    <tr>
+                                                        <th class="py-2.5 px-3">Item</th>
+                                                        <th class="py-2.5 px-3">Qty</th>
+                                                        <th class="py-2.5 px-3">UOM</th>
+                                                        <th class="py-2.5 px-3">U. Price</th>
+                                                        <th class="py-2.5 px-3">Total</th>
+                                                        <th class="py-2.5 px-3">Pricing type</th>
+                                                        <th class="py-2.5 px-2"></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="divide-y divide-slate-100 text-slate-700">
+                                                    <template x-for="(prod, idx) in newBuyingProducts" :key="idx">
+                                                        <tr>
+                                                            <td class="py-2 px-3">
+                                                                <input type="hidden" :name="'buying_products[' + idx + '][product_id]'" :value="prod.product_id">
+                                                                <select x-model="prod.product_id" class="text-xs border border-slate-200 rounded p-1 w-full bg-white">
+                                                                    @foreach($products as $p)
+                                                                    <option value="{{ $p->id }}">{{ $p->name }}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </td>
+                                                            <td class="py-2 px-3">
+                                                                <input type="number" step="0.01" :name="'buying_products[' + idx + '][quantity]'" x-model.number="prod.quantity" class="text-xs border border-slate-200 rounded p-1 w-20 bg-white">
+                                                            </td>
+                                                            <td class="py-2 px-3">
+                                                                <input type="text" :name="'buying_products[' + idx + '][uom]'" x-model="prod.uom" class="text-xs border border-slate-200 rounded p-1 w-16 bg-white">
+                                                            </td>
+                                                            <td class="py-2 px-3">
+                                                                <input type="number" step="0.01" :name="'buying_products[' + idx + '][unit_price]'" x-model.number="prod.unitPrice" class="text-xs border border-slate-200 rounded p-1 w-24 bg-white">
+                                                            </td>
+                                                            <td class="py-2 px-3 font-semibold text-slate-800" x-text="(prod.quantity * prod.unitPrice).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})"></td>
+                                                            <td class="py-2 px-3">
+                                                                <input type="hidden" :name="'buying_products[' + idx + '][pricing_type]'" :value="prod.pricing_type">
+                                                                <select x-model="prod.pricing_type" class="text-xs border border-slate-200 rounded p-1 w-full bg-white">
+                                                                    <option value="Fixed">Fixed</option>
+                                                                    <option value="Formula">Formula</option>
+                                                                </select>
+                                                            </td>
+                                                            <td class="py-2 px-2 text-right">
+                                                                <button type="button" @click="removeBuyingProduct(idx)" x-show="newBuyingProducts.length > 1" class="text-slate-400 hover:text-rose-600">
+                                                                    <span class="material-icons text-sm">delete</span>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    </template>
+                                                </tbody>
+                                                <tfoot class="border-t border-slate-200 bg-slate-50/70 font-semibold text-xs text-slate-800">
+                                                    <tr>
+                                                        <td class="py-2.5 px-3">Total Qty: <span x-text="calcBuyingTotalQty()"></span></td>
+                                                        <td colspan="3"></td>
+                                                        <td class="py-2.5 px-3">Total: <span x-text="calcBuyingTotalPrice()"></span></td>
+                                                        <td colspan="2"></td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+
+                                        <button type="button" @click="addBuyingProduct()" class="mt-3 bg-[#0284c7] hover:bg-[#0369a1] text-white px-4 py-1.5 rounded-full font-medium text-xs transition inline-flex items-center gap-1 shadow-2xs">
+                                            Add Product
+                                        </button>
                                     </div>
                                 </div>
 
-                                <!-- Row 2: Name, Contact Address, Contact Person, Collection address -->
-                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                    <!-- Name * (Contact) -->
-                                    <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
-                                        <label class="absolute -top-2 left-2 bg-white px-1 text-[11px] text-slate-500 font-medium leading-none">Name *</label>
-                                        <select name="contact_id" class="w-full text-xs text-slate-800 bg-transparent border-0 p-0 focus:ring-0 cursor-pointer">
-                                            @foreach($contacts as $cont)
-                                            <option value="{{ $cont->id }}">{{ $cont->name }}</option>
-                                            @endforeach
-                                        </select>
-                                        <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">arrow_drop_down</span>
+                                <!-- SELLING TO TAB CONTENT (Screenshot 3) -->
+                                <div x-show="sideTab === 'selling'" class="pt-4 space-y-4">
+                                    <!-- Row 1: Meta Company, Payment bank account, Payment Date, Country of origin -->
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                                        <!-- Meta Company * -->
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Meta Company *</label>
+                                            <select name="selling_meta_company_id" x-model="sellingCompanyId" class="w-full text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 cursor-pointer">
+                                                @foreach($companies as $comp)
+                                                <option value="{{ $comp->id }}">{{ $comp->name }}</option>
+                                                @endforeach
+                                            </select>
+                                            <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">arrow_drop_down</span>
+                                        </div>
+
+                                        <!-- Payment bank account * -->
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Payment bank account *</label>
+                                            <select name="selling_payment_bank_account_id" class="w-full text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 cursor-pointer truncate">
+                                                <template x-for="ba in getSellingBankAccounts()" :key="ba.id">
+                                                    <option :value="ba.id" x-text="ba.description || ba.name || 'Bank Account'"></option>
+                                                </template>
+                                                <template x-if="getSellingBankAccounts().length === 0">
+                                                    <option value="">No bank account available</option>
+                                                </template>
+                                            </select>
+                                            <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">arrow_drop_down</span>
+                                        </div>
+
+                                        <!-- Payment Date -->
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2 pb-1.5 bg-white min-h-[46px] flex items-center justify-between">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Payment Date</label>
+                                            <input type="text" name="selling_payment_date" placeholder="DD/MM/YYYY" class="text-xs text-slate-800 font-normal w-full bg-transparent border-none focus:outline-none p-0 placeholder-slate-400">
+                                            <span class="material-icons text-slate-400 text-base pointer-events-none">calendar_today</span>
+                                        </div>
+
+                                        <!-- Country of origin * -->
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Country of origin *</label>
+                                            <select name="selling_country_of_origin_id" class="w-full text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 cursor-pointer">
+                                                @foreach($countries as $cntry)
+                                                <option value="{{ $cntry->id }}">{{ $cntry->name }}</option>
+                                                @endforeach
+                                            </select>
+                                            <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">arrow_drop_down</span>
+                                        </div>
                                     </div>
 
-                                    <!-- Contact Address * -->
-                                    <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
-                                        <label class="absolute -top-2 left-2 bg-white px-1 text-[11px] text-slate-500 font-medium leading-none">Contact Address *</label>
-                                        <select name="contact_address_id" class="w-full text-xs text-slate-800 bg-transparent border-0 p-0 focus:ring-0 cursor-pointer">
-                                            @foreach($contacts->flatMap->addresses as $addr)
-                                            <option value="{{ $addr->id }}">{{ $addr->addressLine1 ?? 'Address' }}</option>
-                                            @endforeach
-                                            @if($contacts->flatMap->addresses->isEmpty())
-                                            <option value="">10 Collyer Quay</option>
-                                            @endif
-                                        </select>
-                                        <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">arrow_drop_down</span>
+                                    <!-- Row 2: Name, Contact Address, Contact Person, Shipping Address (Screenshot 3: labeled Shipping Address) -->
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                                        <!-- Name * (Contact) -->
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Name *</label>
+                                            <select name="selling_contact_id" x-model="sellingContactId" class="w-full text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 cursor-pointer truncate">
+                                                @foreach($contacts as $cont)
+                                                <option value="{{ $cont->id }}">{{ $cont->name }}</option>
+                                                @endforeach
+                                            </select>
+                                            <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">arrow_drop_down</span>
+                                        </div>
+
+                                        <!-- Contact Address * -->
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Contact Address *</label>
+                                            <select name="selling_contact_address_id" x-model="sellingAddressId" class="w-full text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 cursor-pointer truncate">
+                                                <template x-for="addr in getSellingAddresses()" :key="addr.id">
+                                                    <option :value="addr.id" x-text="addr.address_name || addr.address_line1 || 'Address'"></option>
+                                                </template>
+                                                <template x-if="getSellingAddresses().length === 0">
+                                                    <option value="">No address available</option>
+                                                </template>
+                                            </select>
+                                            <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">arrow_drop_down</span>
+                                        </div>
+
+                                        <!-- Contact Person * -->
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Contact Person *</label>
+                                            <select name="selling_contact_person_id" x-model="sellingRepId" class="w-full text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 cursor-pointer truncate">
+                                                <template x-for="rep in getSellingRepresentatives()" :key="rep.id">
+                                                    <option :value="rep.id" x-text="rep.name"></option>
+                                                </template>
+                                                <template x-if="getSellingRepresentatives().length === 0">
+                                                    <option value="">No contact person</option>
+                                                </template>
+                                            </select>
+                                            <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">arrow_drop_down</span>
+                                        </div>
+
+                                        <!-- Shipping Address (Screenshot 3: labeled Shipping Address) -->
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Shipping Address</label>
+                                            <select name="selling_shipping_address_id" class="w-full text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 cursor-pointer truncate">
+                                                <template x-for="addr in getSellingAddresses()" :key="addr.id">
+                                                    <option :value="addr.id" x-text="addr.address_name || addr.address_line1 || 'Shipping Address'"></option>
+                                                </template>
+                                                <template x-if="getSellingAddresses().length === 0">
+                                                    <option value="">Select address</option>
+                                                </template>
+                                            </select>
+                                            <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">arrow_drop_down</span>
+                                        </div>
                                     </div>
 
-                                    <!-- Contact Person * -->
-                                    <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
-                                        <label class="absolute -top-2 left-2 bg-white px-1 text-[11px] text-slate-500 font-medium leading-none">Contact Person *</label>
-                                        <select name="contact_person_id" class="w-full text-xs text-slate-800 bg-transparent border-0 p-0 focus:ring-0 cursor-pointer">
-                                            @foreach($contacts->flatMap->representatives as $rep)
-                                            <option value="{{ $rep->id }}">{{ $rep->name }}</option>
-                                            @endforeach
-                                            @if($contacts->flatMap->representatives->isEmpty())
-                                            <option value="">Chinmay</option>
-                                            @endif
-                                        </select>
-                                        <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">arrow_drop_down</span>
+                                    <!-- Row 3: Currency, Dollar Conversion, Incoterms, Customer Order Number -->
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                                        <!-- Currency * -->
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Currency *</label>
+                                            <select name="selling_currency_id" class="w-full text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 cursor-pointer">
+                                                @foreach($currencies as $cur)
+                                                <option value="{{ $cur->id }}">{{ $cur->description ?? 'USD' }}</option>
+                                                @endforeach
+                                            </select>
+                                            <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">arrow_drop_down</span>
+                                        </div>
+
+                                        <!-- Dollar Conversion -->
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Dollar Conversion</label>
+                                            <input type="text" name="selling_dollar_conversion" class="text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 w-full">
+                                        </div>
+
+                                        <!-- Incoterms * -->
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Incoterms *</label>
+                                            <input type="text" name="selling_incoterms" value="CIF JEDDAH" class="text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 w-full">
+                                        </div>
+
+                                        <!-- Customer Order Number -->
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Customer Order Number</label>
+                                            <input type="text" name="selling_customer_order_number" class="text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 w-full">
+                                        </div>
                                     </div>
 
-                                    <!-- Collection address -->
-                                    <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
-                                        <label class="absolute -top-2 left-2 bg-white px-1 text-[11px] text-slate-500 font-medium leading-none">Collection address</label>
-                                        <select name="collection_address_id" class="w-full text-xs text-slate-800 bg-transparent border-0 p-0 focus:ring-0 cursor-pointer">
-                                            <option value="">Select address</option>
-                                            @foreach($contacts->flatMap->addresses as $addr)
-                                            <option value="{{ $addr->id }}">{{ $addr->addressLine1 }}</option>
-                                            @endforeach
-                                        </select>
-                                        <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">arrow_drop_down</span>
-                                    </div>
-                                </div>
+                                    <!-- Row 4: Payment type, Payment Terms type, Payment Terms, Advanced Payment -->
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                                        <!-- Payment type * -->
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Payment type *</label>
+                                            <select name="selling_payment_type_id" class="w-full text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 cursor-pointer">
+                                                @foreach($paymentTypes as $pt)
+                                                <option value="{{ $pt->id }}">{{ $pt->description }}</option>
+                                                @endforeach
+                                            </select>
+                                            <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">arrow_drop_down</span>
+                                        </div>
 
-                                <!-- Row 3: Currency, Dollar Conversion, Incoterms, Customer Order Number -->
-                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                    <!-- Currency * -->
-                                    <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
-                                        <label class="absolute -top-2 left-2 bg-white px-1 text-[11px] text-slate-500 font-medium leading-none">Currency *</label>
-                                        <select name="currency_id" class="w-full text-xs text-slate-800 bg-transparent border-0 p-0 focus:ring-0 cursor-pointer">
-                                            @foreach($currencies as $cur)
-                                            <option value="{{ $cur->id }}">{{ $cur->description ?? 'USD' }}</option>
-                                            @endforeach
-                                        </select>
-                                        <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">arrow_drop_down</span>
-                                    </div>
+                                        <!-- Payment Terms type * -->
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Payment Terms type *</label>
+                                            <select name="selling_payment_terms_type_id" class="w-full text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 cursor-pointer">
+                                                @foreach($paymentTerms as $ptt)
+                                                <option value="{{ $ptt->id }}">{{ $ptt->description }}</option>
+                                                @endforeach
+                                            </select>
+                                            <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">arrow_drop_down</span>
+                                        </div>
 
-                                    <!-- Dollar Conversion -->
-                                    <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
-                                        <label class="absolute -top-2 left-2 bg-white px-1 text-[11px] text-slate-500 font-medium leading-none">Dollar Conversion</label>
-                                        <input type="text" name="dollar_conversion" class="text-xs text-slate-800 bg-transparent border-0 p-0 focus:ring-0 w-full">
-                                    </div>
+                                        <!-- Payment Terms * -->
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Payment Terms *</label>
+                                            <input type="text" name="selling_payment_terms" value="100%" class="text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 w-full">
+                                        </div>
 
-                                    <!-- Incoterms * -->
-                                    <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
-                                        <label class="absolute -top-2 left-2 bg-white px-1 text-[11px] text-slate-500 font-medium leading-none">Incoterms *</label>
-                                        <input type="text" name="incoterms" value="CIF JEDDAH" class="text-xs text-slate-800 bg-transparent border-0 p-0 focus:ring-0 w-full">
-                                    </div>
-
-                                    <!-- Customer Order Number -->
-                                    <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
-                                        <label class="absolute -top-2 left-2 bg-white px-1 text-[11px] text-slate-500 font-medium leading-none">Customer Order Number</label>
-                                        <input type="text" name="customer_order_number" class="text-xs text-slate-800 bg-transparent border-0 p-0 focus:ring-0 w-full">
-                                    </div>
-                                </div>
-
-                                <!-- Row 4: Payment type, Payment Terms type, Payment Terms, Advanced Payment -->
-                                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                                    <!-- Payment type * -->
-                                    <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
-                                        <label class="absolute -top-2 left-2 bg-white px-1 text-[11px] text-slate-500 font-medium leading-none">Payment type *</label>
-                                        <select name="payment_type_id" class="w-full text-xs text-slate-800 bg-transparent border-0 p-0 focus:ring-0 cursor-pointer">
-                                            @foreach($paymentTypes as $pt)
-                                            <option value="{{ $pt->id }}">{{ $pt->description }}</option>
-                                            @endforeach
-                                        </select>
-                                        <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">arrow_drop_down</span>
+                                        <!-- Advanced Payment -->
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Advanced Payment</label>
+                                            <input type="text" name="selling_advanced_payment" class="text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 w-full">
+                                        </div>
                                     </div>
 
-                                    <!-- Payment Terms type * -->
-                                    <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
-                                        <label class="absolute -top-2 left-2 bg-white px-1 text-[11px] text-slate-500 font-medium leading-none">Payment Terms type *</label>
-                                        <select name="payment_terms_type_id" class="w-full text-xs text-slate-800 bg-transparent border-0 p-0 focus:ring-0 cursor-pointer">
-                                            @foreach($paymentTerms as $ptt)
-                                            <option value="{{ $ptt->id }}">{{ $ptt->description }}</option>
-                                            @endforeach
-                                        </select>
-                                        <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">arrow_drop_down</span>
+                                    <!-- Row 5: Notes -->
+                                    <div>
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white">
+                                            <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Notes</label>
+                                            <input type="text" name="selling_notes" class="text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 w-full">
+                                        </div>
                                     </div>
 
-                                    <!-- Payment Terms * -->
-                                    <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
-                                        <label class="absolute -top-2 left-2 bg-white px-1 text-[11px] text-slate-500 font-medium leading-none">Payment Terms *</label>
-                                        <input type="text" name="payment_terms" value="100%" class="text-xs text-slate-800 bg-transparent border-0 p-0 focus:ring-0 w-full">
-                                    </div>
+                                    <!-- Products Section (Screenshot 3) -->
+                                    <div class="pt-4 border-t border-slate-100">
+                                        <div class="flex items-center gap-2 mb-3">
+                                            <span class="material-icons-outlined text-slate-700 text-base">table_chart</span>
+                                            <h4 class="font-bold text-xs text-slate-900">Products</h4>
+                                        </div>
 
-                                    <!-- Advanced Payment -->
-                                    <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
-                                        <label class="absolute -top-2 left-2 bg-white px-1 text-[11px] text-slate-500 font-medium leading-none">Advanced Payment</label>
-                                        <input type="text" name="advanced_payment" class="text-xs text-slate-800 bg-transparent border-0 p-0 focus:ring-0 w-full">
-                                    </div>
-                                </div>
+                                        <div class="border border-slate-200 rounded-lg overflow-x-auto">
+                                            <table class="w-full text-xs text-left">
+                                                <thead class="text-slate-700 font-semibold border-b border-slate-200 bg-slate-50/50">
+                                                    <tr>
+                                                        <th class="py-2.5 px-3">Item</th>
+                                                        <th class="py-2.5 px-3">Qty</th>
+                                                        <th class="py-2.5 px-3">UOM</th>
+                                                        <th class="py-2.5 px-3">U. Price</th>
+                                                        <th class="py-2.5 px-3">Total</th>
+                                                        <th class="py-2.5 px-3">Pricing type</th>
+                                                        <th class="py-2.5 px-2"></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="divide-y divide-slate-100 text-slate-700">
+                                                    <template x-for="(prod, idx) in newSellingProducts" :key="idx">
+                                                        <tr>
+                                                            <td class="py-2 px-3">
+                                                                <input type="hidden" :name="'selling_products[' + idx + '][product_id]'" :value="prod.product_id">
+                                                                <select x-model="prod.product_id" class="text-xs border border-slate-200 rounded p-1 w-full bg-white">
+                                                                    @foreach($products as $p)
+                                                                    <option value="{{ $p->id }}">{{ $p->name }}</option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </td>
+                                                            <td class="py-2 px-3">
+                                                                <input type="number" step="0.01" :name="'selling_products[' + idx + '][quantity]'" x-model.number="prod.quantity" class="text-xs border border-slate-200 rounded p-1 w-20 bg-white">
+                                                            </td>
+                                                            <td class="py-2 px-3">
+                                                                <input type="text" :name="'selling_products[' + idx + '][uom]'" x-model="prod.uom" class="text-xs border border-slate-200 rounded p-1 w-16 bg-white">
+                                                            </td>
+                                                            <td class="py-2 px-3">
+                                                                <input type="number" step="0.01" :name="'selling_products[' + idx + '][unit_price]'" x-model.number="prod.unitPrice" class="text-xs border border-slate-200 rounded p-1 w-24 bg-white">
+                                                            </td>
+                                                            <td class="py-2 px-3 font-semibold text-slate-800" x-text="(prod.quantity * prod.unitPrice).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})"></td>
+                                                            <td class="py-2 px-3">
+                                                                <input type="hidden" :name="'selling_products[' + idx + '][pricing_type]'" :value="prod.pricing_type">
+                                                                <select x-model="prod.pricing_type" class="text-xs border border-slate-200 rounded p-1 w-full bg-white">
+                                                                    <option value="Fixed">Fixed</option>
+                                                                    <option value="Formula">Formula</option>
+                                                                </select>
+                                                            </td>
+                                                            <td class="py-2 px-2 text-right">
+                                                                <button type="button" @click="removeSellingProduct(idx)" x-show="newSellingProducts.length > 1" class="text-slate-400 hover:text-rose-600">
+                                                                    <span class="material-icons text-sm">delete</span>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    </template>
+                                                </tbody>
+                                                <tfoot class="border-t border-slate-200 bg-slate-50/70 font-semibold text-xs text-slate-800">
+                                                    <tr>
+                                                        <td class="py-2.5 px-3">Total Qty: <span x-text="calcSellingTotalQty()"></span></td>
+                                                        <td colspan="3"></td>
+                                                        <td class="py-2.5 px-3">Total: <span x-text="calcSellingTotalPrice()"></span></td>
+                                                        <td colspan="2"></td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
 
-                                <!-- Row 5: Notes -->
-                                <div>
-                                    <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white">
-                                        <label class="absolute -top-2 left-2 bg-white px-1 text-[11px] text-slate-500 font-medium leading-none">Notes</label>
-                                        <input type="text" name="notes" class="text-xs text-slate-800 bg-transparent border-0 p-0 focus:ring-0 w-full">
+                                        <button type="button" @click="addSellingProduct()" class="mt-3 bg-[#0284c7] hover:bg-[#0369a1] text-white px-4 py-1.5 rounded-full font-medium text-xs transition inline-flex items-center gap-1 shadow-2xs">
+                                            Add Product
+                                        </button>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Products Section -->
+                            <!-- Transport Section (Screenshot 2) -->
                             <div class="pt-4 border-t border-slate-100">
                                 <div class="flex items-center gap-2 mb-3">
-                                    <span class="material-icons-outlined text-slate-700 text-base">credit_card</span>
-                                    <h4 class="font-bold text-xs text-slate-900">Products</h4>
+                                    <span class="material-icons-outlined text-slate-700 text-base">local_shipping</span>
+                                    <h4 class="font-bold text-xs text-slate-900">Transport</h4>
                                 </div>
-
-                                <div class="border border-slate-200 rounded-lg overflow-x-auto">
-                                    <table class="w-full text-xs text-left">
-                                        <thead class="text-slate-700 font-semibold border-b border-slate-200 bg-slate-50/50">
-                                            <tr>
-                                                <th class="py-2.5 px-3">Item</th>
-                                                <th class="py-2.5 px-3">Qty</th>
-                                                <th class="py-2.5 px-3">UOM</th>
-                                                <th class="py-2.5 px-3">U. Price</th>
-                                                <th class="py-2.5 px-3">Total</th>
-                                                <th class="py-2.5 px-3">Pricing type</th>
-                                                <th class="py-2.5 px-2"></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody class="divide-y divide-slate-100 text-slate-700">
-                                            <template x-for="(prod, idx) in newProducts" :key="idx">
-                                                <tr>
-                                                    <td class="py-2 px-3">
-                                                        <select x-model="prod.product_id" name="product_id" class="text-xs border border-slate-200 rounded p-1 w-full bg-white">
-                                                            @foreach($products as $p)
-                                                            <option value="{{ $p->id }}">{{ $p->name }}</option>
-                                                            @endforeach
-                                                        </select>
-                                                    </td>
-                                                    <td class="py-2 px-3">
-                                                        <input type="number" step="0.01" x-model.number="prod.quantity" name="quantity" class="text-xs border border-slate-200 rounded p-1 w-20 bg-white">
-                                                    </td>
-                                                    <td class="py-2 px-3">
-                                                        <input type="text" x-model="prod.uom" class="text-xs border border-slate-200 rounded p-1 w-16 bg-white" value="MT">
-                                                    </td>
-                                                    <td class="py-2 px-3">
-                                                        <input type="number" step="0.01" x-model.number="prod.unitPrice" name="unit_price" class="text-xs border border-slate-200 rounded p-1 w-24 bg-white">
-                                                    </td>
-                                                    <td class="py-2 px-3 font-semibold text-slate-800" x-text="(prod.quantity * prod.unitPrice).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})"></td>
-                                                    <td class="py-2 px-3">
-                                                        <select x-model="prod.pricing_type" class="text-xs border border-slate-200 rounded p-1 w-full bg-white">
-                                                            <option value="Fixed">Fixed</option>
-                                                            <option value="Formula">Formula</option>
-                                                        </select>
-                                                    </td>
-                                                    <td class="py-2 px-2 text-right">
-                                                        <button type="button" @click="removeProduct(idx)" x-show="newProducts.length > 1" class="text-slate-400 hover:text-rose-600">
-                                                            <span class="material-icons text-sm">delete</span>
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            </template>
-                                        </tbody>
-                                        <tfoot class="border-t border-slate-200 bg-slate-50/70 font-semibold text-xs text-slate-800">
-                                            <tr>
-                                                <td class="py-2.5 px-3">Total Qty: <span x-text="calcTotalQty()"></span></td>
-                                                <td colspan="3"></td>
-                                                <td class="py-2.5 px-3">Total: <span x-text="calcTotalPrice()"></span></td>
-                                                <td colspan="2"></td>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                        <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Mode of transport</label>
+                                        <select name="mode_of_transport" class="w-full text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 cursor-pointer">
+                                            <option value="SEA" selected>SEA</option>
+                                            <option value="ROAD">ROAD</option>
+                                            <option value="SEA/ROAD">SEA/ROAD</option>
+                                        </select>
+                                        <span class="material-icons absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none">arrow_drop_down</span>
+                                    </div>
+                                    <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                                        <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Weight Tolerance (%)</label>
+                                        <input type="number" step="0.01" name="weight_tolerance" placeholder="e.g. 5.0" class="text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 w-full">
+                                    </div>
                                 </div>
-
-                                <button type="button" @click="addProduct()" class="mt-3 bg-[#0284c7] hover:bg-[#0369a1] text-white px-4 py-1.5 rounded-full font-medium text-xs transition inline-flex items-center gap-1 shadow-2xs">
-                                    Add Product
-                                </button>
                             </div>
 
-                            <!-- Comment Section -->
+                            <!-- Comment Section (Screenshot 2) -->
                             <div class="pt-4 border-t border-slate-100">
                                 <div class="flex items-center gap-2 mb-3">
                                     <span class="material-icons-outlined text-slate-700 text-base">chat_bubble_outline</span>
@@ -513,19 +805,19 @@
                                     </div>
                                     <input type="text" x-model="newComment" placeholder="Add comment" class="flex-1 text-xs border border-slate-300 rounded-md px-3 py-2 bg-white focus:outline-none focus:border-indigo-500">
                                 </div>
-                                <button type="button" @click="if (newComment) { commentsList.unshift({ text: newComment, date: 'Just now' }); newComment = ''; }" class="mt-2 ml-11 bg-slate-200 hover:bg-slate-300 text-slate-600 px-4 py-1 rounded-full text-xs font-medium transition">
+                                <button type="button" @click="if (newComment.trim()) { commentsList.unshift({ text: newComment.trim(), date: 'Just now' }); newComment = ''; }" class="mt-2 ml-11 bg-slate-200 hover:bg-slate-300 text-slate-600 px-4 py-1 rounded-full text-xs font-medium transition cursor-pointer">
                                     Add
                                 </button>
 
                                 <template x-for="(c, cIdx) in commentsList" :key="cIdx">
-                                    <div class="ml-11 mt-2 text-xs bg-slate-50 p-2 rounded border border-slate-100 text-slate-700 flex justify-between">
+                                    <div class="ml-11 mt-2 text-xs bg-slate-50 p-2.5 rounded-lg border border-slate-100 text-slate-700 flex justify-between items-center">
                                         <span x-text="c.text"></span>
                                         <span class="text-slate-400 text-[10px]" x-text="c.date"></span>
                                     </div>
                                 </template>
                             </div>
 
-                            <!-- Activities Section -->
+                            <!-- Activities Section (Screenshot 2) -->
                             <div class="pt-4 border-t border-slate-100">
                                 <div class="flex items-center gap-2 mb-3">
                                     <span class="material-icons-outlined text-slate-700 text-base">content_paste</span>
@@ -533,52 +825,46 @@
                                 </div>
                                 <div class="relative pl-36 space-y-4 before:absolute before:left-[178px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">
                                     <div class="relative flex items-center gap-3">
-                                        <span class="absolute -left-36 w-32 text-right text-xs text-slate-500 font-normal">23 Sep 26 15:01:36</span>
+                                        <span class="absolute -left-36 w-32 text-right text-xs text-slate-500 font-normal">{{ now()->format('d M y H:i:s') }}</span>
                                         <div class="w-7 h-7 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center text-xs font-semibold z-10 shrink-0 border-2 border-white shadow-2xs">R</div>
-                                        <span class="text-xs font-medium text-slate-800">Roger</span>
-                                        <span class="px-2.5 py-0.5 text-[11px] font-medium rounded-full bg-slate-100 text-slate-700 border border-slate-200">CHANGE_STAGE</span>
-                                    </div>
-                                    <div class="relative flex items-center gap-3">
-                                        <span class="absolute -left-36 w-32 text-right text-xs text-slate-500 font-normal">23 Sep 26 15:00:58</span>
-                                        <div class="w-7 h-7 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center text-xs font-semibold z-10 shrink-0 border-2 border-white shadow-2xs">R</div>
-                                        <span class="text-xs font-medium text-slate-800">Roger</span>
-                                        <span class="px-2.5 py-0.5 text-[11px] font-medium rounded-full bg-slate-100 text-slate-700 border border-slate-200">UPDATED</span>
+                                        <span class="text-xs font-medium text-slate-800">{{ auth()->user()->name ?? 'Root' }}</span>
+                                        <span class="px-2.5 py-0.5 text-[11px] font-medium rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">NEW_CONTRACT</span>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Modal Submit Footer -->
                             <div class="pt-6 border-t border-slate-100 flex items-center justify-end gap-3">
-                                <button type="button" @click="showNewModal = false" class="px-5 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-full transition">
+                                <button type="button" @click="showNewModal = false" class="px-5 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-full transition cursor-pointer">
                                     Cancel
                                 </button>
-                                <button type="submit" class="px-6 py-2 bg-[#4f46e5] hover:bg-[#4338ca] text-white text-xs font-semibold rounded-full shadow-sm transition">
+                                <button type="submit" class="px-6 py-2 bg-[#7c3aed] hover:bg-[#6d28d9] text-white text-xs font-semibold rounded-full shadow-xs transition cursor-pointer">
                                     Save Contract
                                 </button>
                             </div>
                         </div>
 
-                        <!-- Right Sidebar Toolbar -->
+                        <!-- Right Sidebar Toolbar (Screenshot 1, 2, 3) -->
                         <div class="w-12 bg-slate-50/80 border-l border-slate-200 flex flex-col items-center py-4 gap-6 text-slate-400 shrink-0 select-none">
-                            <button type="button" @click="showNewModal = false" class="hover:text-slate-600 transition" title="Close">
+                            <button type="button" @click="showNewModal = false" class="hover:text-slate-600 transition cursor-pointer" title="Close">
                                 <span class="material-icons text-lg">close</span>
                             </button>
-                            <button type="button" class="hover:text-slate-600 transition" title="Calendar">
+                            <button type="button" class="hover:text-slate-600 transition cursor-pointer" title="Calendar">
                                 <span class="material-icons text-base">calendar_today</span>
                             </button>
-                            <button type="button" class="hover:text-slate-600 transition" title="Tags">
+                            <button type="button" class="hover:text-slate-600 transition cursor-pointer" title="Labels">
                                 <span class="material-icons text-base">label</span>
                             </button>
-                            <button type="button" class="hover:text-slate-600 transition" title="Assignees">
+                            <button type="button" class="hover:text-slate-600 transition cursor-pointer" title="Members">
                                 <span class="material-icons text-base">person</span>
                             </button>
-                            <button type="button" class="hover:text-slate-600 transition" title="Attachments">
+                            <button type="button" class="hover:text-slate-600 transition cursor-pointer" title="Attachments">
                                 <span class="material-icons text-base">attach_file</span>
                             </button>
-                            <button type="button" class="hover:text-slate-600 transition" title="Checklist">
+                            <button type="button" class="hover:text-slate-600 transition cursor-pointer" title="Checklists">
                                 <span class="material-icons text-base">check_circle</span>
                             </button>
-                            <button type="button" class="hover:text-slate-600 transition" title="More">
+                            <button type="button" class="hover:text-slate-600 transition cursor-pointer" title="Options">
                                 <span class="material-icons text-base">more_horiz</span>
                             </button>
                         </div>
@@ -649,26 +935,61 @@ function kanbanBoard() {
                     this.modalLoading = false;
                 });
         },
-        newProducts: [
+        contractType: 'BUY_AND_SELL',
+        sideTab: 'buying',
+        buyingCompanyId: '{{ $companies->first()?->id ?? 1 }}',
+        sellingCompanyId: '{{ $companies->first()?->id ?? 1 }}',
+        buyingContactId: '{{ $contacts->first()?->id ?? 1 }}',
+        sellingContactId: '{{ $contacts->first()?->id ?? 1 }}',
+        buyingAddressId: '',
+        sellingAddressId: '',
+        buyingRepId: '',
+        sellingRepId: '',
+        newComment: '',
+        commentsList: [],
+        companiesData: @js($companies),
+        contactsData: @js($contacts),
+        newBuyingProducts: [
             { product_id: '{{ $products->first()?->id ?? 1 }}', quantity: 0, uom: 'MT', unitPrice: 0, pricing_type: 'Fixed' }
         ],
-        toast: {
-            show: false,
-            message: '',
-            timer: null
-        },
+        newSellingProducts: [
+            { product_id: '{{ $products->first()?->id ?? 1 }}', quantity: 0, uom: 'MT', unitPrice: 0, pricing_type: 'Fixed' }
+        ],
 
-        showToast(message) {
-            this.toast.message = message;
-            this.toast.show = true;
-            clearTimeout(this.toast.timer);
-            this.toast.timer = setTimeout(() => {
-                this.toast.show = false;
-            }, 3000);
+        getBuyingBankAccounts() {
+            const comp = this.companiesData.find(c => c.id == this.buyingCompanyId);
+            return comp && comp.bank_accounts ? comp.bank_accounts : (comp && comp.bankAccounts ? comp.bankAccounts : []);
         },
-
-        addProduct() {
-            this.newProducts.push({
+        getSellingBankAccounts() {
+            const comp = this.companiesData.find(c => c.id == this.sellingCompanyId);
+            return comp && comp.bank_accounts ? comp.bank_accounts : (comp && comp.bankAccounts ? comp.bankAccounts : []);
+        },
+        getBuyingAddresses() {
+            const cont = this.contactsData.find(c => c.id == this.buyingContactId);
+            return cont && cont.addresses ? cont.addresses : [];
+        },
+        getSellingAddresses() {
+            const cont = this.contactsData.find(c => c.id == this.sellingContactId);
+            return cont && cont.addresses ? cont.addresses : [];
+        },
+        getBuyingRepresentatives() {
+            const addrs = this.getBuyingAddresses();
+            if (this.buyingAddressId) {
+                const addr = addrs.find(a => a.id == this.buyingAddressId);
+                if (addr && addr.representatives) return addr.representatives;
+            }
+            return addrs.flatMap(a => a.representatives || []);
+        },
+        getSellingRepresentatives() {
+            const addrs = this.getSellingAddresses();
+            if (this.sellingAddressId) {
+                const addr = addrs.find(a => a.id == this.sellingAddressId);
+                if (addr && addr.representatives) return addr.representatives;
+            }
+            return addrs.flatMap(a => a.representatives || []);
+        },
+        addBuyingProduct() {
+            this.newBuyingProducts.push({
                 product_id: '{{ $products->first()?->id ?? 1 }}',
                 quantity: 0,
                 uom: 'MT',
@@ -676,21 +997,58 @@ function kanbanBoard() {
                 pricing_type: 'Fixed'
             });
         },
-
-        removeProduct(index) {
-            if (this.newProducts.length > 1) {
-                this.newProducts.splice(index, 1);
+        removeBuyingProduct(index) {
+            if (this.newBuyingProducts.length > 1) {
+                this.newBuyingProducts.splice(index, 1);
             }
         },
-
-        calcTotalQty() {
-            const sum = this.newProducts.reduce((acc, p) => acc + (parseFloat(p.quantity) || 0), 0);
+        calcBuyingTotalQty() {
+            const sum = this.newBuyingProducts.reduce((acc, p) => acc + (parseFloat(p.quantity) || 0), 0);
             return sum.toFixed(3);
         },
-
-        calcTotalPrice() {
-            const sum = this.newProducts.reduce((acc, p) => acc + ((parseFloat(p.quantity) || 0) * (parseFloat(p.unitPrice) || 0)), 0);
+        calcBuyingTotalPrice() {
+            const sum = this.newBuyingProducts.reduce((acc, p) => acc + ((parseFloat(p.quantity) || 0) * (parseFloat(p.unitPrice) || 0)), 0);
             return sum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        },
+        addSellingProduct() {
+            this.newSellingProducts.push({
+                product_id: '{{ $products->first()?->id ?? 1 }}',
+                quantity: 0,
+                uom: 'MT',
+                unitPrice: 0,
+                pricing_type: 'Fixed'
+            });
+        },
+        removeSellingProduct(index) {
+            if (this.newSellingProducts.length > 1) {
+                this.newSellingProducts.splice(index, 1);
+            }
+        },
+        calcSellingTotalQty() {
+            const sum = this.newSellingProducts.reduce((acc, p) => acc + (parseFloat(p.quantity) || 0), 0);
+            return sum.toFixed(3);
+        },
+        calcSellingTotalPrice() {
+            const sum = this.newSellingProducts.reduce((acc, p) => acc + ((parseFloat(p.quantity) || 0) * (parseFloat(p.unitPrice) || 0)), 0);
+            return sum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        },
+        toast: {
+            show: false,
+            message: '',
+            timer: null
+        },
+
+        showToast(message) {
+            if (window.showToast) {
+                window.showToast(message, 'success');
+            } else {
+                this.toast.message = message;
+                this.toast.show = true;
+                clearTimeout(this.toast.timer);
+                this.toast.timer = setTimeout(() => {
+                    this.toast.show = false;
+                }, 3000);
+            }
         },
 
         matchesSearch(code, company) {
