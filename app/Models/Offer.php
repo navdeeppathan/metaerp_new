@@ -48,26 +48,6 @@ class Offer extends Model
         'sale_id',
         'contract_id_when_promoted',
         'contract_order_code_when_promoted',
-        'code',
-        'orderCode',
-        'contract_code',
-        'offer_date',
-        'accepted_at',
-        'meta_company_id',
-        'contact_id',
-        'product_id',
-        'quantity',
-        'unitPrice',
-        'total',
-        'currency_id',
-        'address_id',
-        'contact_representative_id',
-        'payment_type_id',
-        'payment_terms_type_id',
-        'paymentTerms',
-        'incoterms',
-        'agree_date',
-        'products_json',
     ];
 
     protected $casts = [
@@ -77,17 +57,28 @@ class Offer extends Model
         'due_date' => 'datetime',
         'loading_date' => 'datetime',
         'sales_invoice_date' => 'datetime',
-        'offer_date' => 'datetime',
-        'accepted_at' => 'datetime',
-        'agree_date' => 'datetime',
-        'products_json' => 'array',
         'transport_price_agreed' => 'double',
         'version' => 'integer',
     ];
 
     public function getCodeAttribute()
     {
-        return $this->attributes['code'] ?? $this->attributes['order_code'] ?? $this->attributes['orderCode'] ?? null;
+        return $this->attributes['order_code'] ?? null;
+    }
+
+    public function getOrderCodeAttribute()
+    {
+        return $this->attributes['order_code'] ?? null;
+    }
+
+    public function getOfferDateAttribute()
+    {
+        return $this->due_date;
+    }
+
+    public function getAgreeDateAttribute()
+    {
+        return $this->active_deal?->payment_date;
     }
 
     public function getContractCodeAttribute()
@@ -112,54 +103,94 @@ class Offer extends Model
         return $this->sale ?? $this->purchase;
     }
 
+    public function getMetaCompanyIdAttribute()
+    {
+        return $this->active_deal?->meta_company_id;
+    }
+
+    public function getContactIdAttribute()
+    {
+        return $this->active_deal?->contact_id;
+    }
+
+    public function getAddressIdAttribute()
+    {
+        return $this->active_deal?->address_id;
+    }
+
+    public function getContactRepresentativeIdAttribute()
+    {
+        return $this->active_deal?->contact_representative_id;
+    }
+
+    public function getCurrencyIdAttribute()
+    {
+        return $this->active_deal?->currency_id;
+    }
+
+    public function getIncotermsAttribute()
+    {
+        return $this->active_deal?->incoterms;
+    }
+
+    public function getPaymentTypeIdAttribute()
+    {
+        return $this->active_deal?->payment_type_id;
+    }
+
+    public function getPaymentTermsTypeIdAttribute()
+    {
+        return $this->active_deal?->payment_terms_type_id;
+    }
+
     public function getEffectiveMetaCompanyIdAttribute()
     {
-        return $this->active_deal?->meta_company_id ?? $this->meta_company_id;
+        return $this->active_deal?->meta_company_id;
     }
 
     public function getEffectiveContactIdAttribute()
     {
-        return $this->active_deal?->contact_id ?? $this->contact_id;
+        return $this->active_deal?->contact_id;
     }
 
     public function getEffectiveAddressIdAttribute()
     {
-        return $this->active_deal?->address_id ?? $this->address_id;
+        return $this->active_deal?->address_id;
     }
 
     public function getEffectiveContactRepresentativeIdAttribute()
     {
-        return $this->active_deal?->contact_representative_id ?? $this->contact_representative_id;
+        return $this->active_deal?->contact_representative_id;
     }
 
     public function getEffectiveCurrencyIdAttribute()
     {
-        return $this->active_deal?->currency_id ?? $this->currency_id;
+        return $this->active_deal?->currency_id;
     }
 
     public function getEffectiveIncotermsAttribute()
     {
-        return $this->active_deal?->incoterms ?? $this->incoterms;
+        return $this->active_deal?->incoterms;
     }
 
     public function getEffectivePaymentTypeIdAttribute()
     {
-        return $this->active_deal?->payment_type_id ?? $this->payment_type_id;
+        return $this->active_deal?->payment_type_id;
     }
 
     public function getEffectivePaymentTermsTypeIdAttribute()
     {
-        return $this->active_deal?->payment_terms_type_id ?? $this->payment_terms_type_id;
+        return $this->active_deal?->payment_terms_type_id;
     }
 
     public function getEffectivePaymentTermsAttribute()
     {
-        return $this->active_deal?->paymentTerms ?? $this->payment_terms ?? $this->paymentTerms;
+        return $this->active_deal?->payment_terms ?? $this->payment_terms;
     }
 
     public function getEffectiveAgreeDateAttribute()
     {
-        return $this->active_deal?->paymentDate ?? $this->agree_date;
+        return $this->active_deal?->payment_date ?? $this->agree_date;
     }
 
     public function getEffectiveProductsListAttribute()
@@ -246,6 +277,26 @@ class Offer extends Model
         }
 
         return collect();
+    }
+
+    public function getMetaCompanyAttribute()
+    {
+        return $this->active_deal?->metaCompany;
+    }
+
+    public function getContactAttribute()
+    {
+        return $this->active_deal?->contact;
+    }
+
+    public function getAddressAttribute()
+    {
+        return $this->active_deal?->address;
+    }
+
+    public function getContactRepresentativeAttribute()
+    {
+        return $this->active_deal?->contactRepresentative;
     }
 
     public function metaCompany()

@@ -181,51 +181,41 @@ class WebOfferController extends Controller
         $offer->status = 'OPEN';
         $offer->type = $validated['type'];
         $offer->subject = $validated['subject'];
-        $offer->code = $code;
-        $offer->orderCode = $code;
-        $offer->offer_date = $request->filled('offer_date') ? date('Y-m-d H:i:s', strtotime(str_replace('/', '-', $request->input('offer_date')))) : now();
+        $offer->order_code = $code;
+        if ($request->filled('offer_date')) {
+            $offer->due_date = date('Y-m-d H:i:s', strtotime(str_replace('/', '-', $request->input('offer_date'))));
+        } else {
+            $offer->due_date = now();
+        }
         $offer->description = $validated['description'] ?? null;
         $offer->internal_notes = $validated['internal_notes'] ?? null;
         $offer->delivery_plan = $validated['delivery_plan'] ?? null;
         $offer->quotational_period = $validated['quotational_period'] ?? null;
         $offer->weights = $validated['weights'] ?? null;
         $offer->payment_description = $validated['payment_description'] ?? null;
+        $offer->payment_terms = $request->input('payment_terms') ?? null;
         $offer->terms = $validated['terms'] ?? null;
         $offer->extra_information = $validated['extra_information'] ?? null;
-
-        // Deal fields
-        $offer->meta_company_id = $request->input('meta_company_id');
-        $offer->contact_id = $request->input('contact_id');
-        $offer->address_id = $request->input('address_id');
-        $offer->contact_representative_id = $request->input('contact_representative_id');
-        $offer->currency_id = $request->input('currency_id');
-        $offer->incoterms = $request->input('incoterms');
-        $offer->payment_type_id = $request->input('payment_type_id');
-        $offer->payment_terms_type_id = $request->input('payment_terms_type_id');
-        $offer->payment_terms = $request->input('payment_terms');
-        if ($request->filled('agree_date')) {
-            $offer->agree_date = date('Y-m-d H:i:s', strtotime(str_replace('/', '-', $request->input('agree_date'))));
-        }
-        if ($request->filled('products_json')) {
-            $offer->products_json = $request->input('products_json');
-        }
+        $offer->active = true;
+        $offer->version = 0;
 
         $offer->save();
 
         // Create associated Deal
         try {
             $deal = new Deal();
-            $deal->meta_company_id = $offer->meta_company_id;
-            $deal->contact_id = $offer->contact_id;
-            $deal->address_id = $offer->address_id;
-            $deal->contact_representative_id = $offer->contact_representative_id;
-            $deal->currency_id = $offer->currency_id;
-            $deal->incoterms = $offer->incoterms;
-            $deal->payment_type_id = $offer->payment_type_id;
-            $deal->payment_terms_type_id = $offer->payment_terms_type_id;
-            $deal->paymentTerms = $offer->payment_terms;
-            if ($offer->agree_date) {
-                $deal->paymentDate = $offer->agree_date->format('Y-m-d');
+            $deal->dollar_convertion_rate = 1.0;
+            $deal->meta_company_id = $request->input('meta_company_id');
+            $deal->contact_id = $request->input('contact_id');
+            $deal->address_id = $request->input('address_id');
+            $deal->contact_representative_id = $request->input('contact_representative_id');
+            $deal->currency_id = $request->input('currency_id');
+            $deal->incoterms = $request->input('incoterms');
+            $deal->payment_type_id = $request->input('payment_type_id');
+            $deal->payment_terms_type_id = $request->input('payment_terms_type_id');
+            $deal->payment_terms = $request->input('payment_terms');
+            if ($request->filled('agree_date')) {
+                $deal->payment_date = date('Y-m-d H:i:s', strtotime(str_replace('/', '-', $request->input('agree_date'))));
             }
             $deal->offer_id = $offer->id;
             $deal->save();
@@ -238,73 +228,47 @@ class WebOfferController extends Controller
             $offer->save();
 
             // Deal products
-            if (!empty($offer->products_json)) {
-                $productsList = is_string($offer->products_json) ? json_decode($offer->products_json, true) : $offer->products_json;
+            if ($request->has('products_json')) {
+                $productsList = is_string($request->input('products_json'))
+                    ? json_decode($request->input('products_json'), true)
+                    : $request->input('products_json');
                 if (is_array($productsList)) {
-                    $dealTotal = 0;
-                    $dealQty = 0;
                     foreach ($productsList as $p) {
                         $qty = (float)($p['quantity'] ?? 0);
                         $price = (float)($p['unit_price'] ?? 0);
                         $total = (float)($p['total'] ?? ($qty * $price));
-                        $dealTotal += $total;
-                        $dealQty += $qty;
 
                         $dp = new DealProduct();
-                        if (\Illuminate\Support\Facades\Schema::hasColumn('deal_product', 'deal_id')) {
-                            $dp->deal_id = $deal->id;
-                        }
-                        $dp->product_id = $p['product_id'] ?? null;
+                        $dp->product_id = !empty($p['product_id']) ? $p['product_id'] : null;
                         $dp->quantity = $qty;
                         $dp->rate = $price;
-                        if (\Illuminate\Support\Facades\Schema::hasColumn('deal_product', 'unitPrice')) {
-                            $dp->unitPrice = $price;
-                        }
                         $dp->total_price = $total;
-                        if (\Illuminate\Support\Facades\Schema::hasColumn('deal_product', 'total')) {
-                            $dp->total = $total;
-                        }
                         $dp->pricing_type = $p['pricing_type'] ?? 'CUSTOM';
-                        if (\Illuminate\Support\Facades\Schema::hasColumn('deal_product', 'pricingType')) {
-                            $dp->pricingType = $p['pricing_type'] ?? 'CUSTOM';
-                        }
                         $dp->uom = $p['uom'] ?? 'MT';
                         $dp->version = 0;
+                        $dp->active = true;
                         $dp->save();
 
-                        if (\Illuminate\Support\Facades\Schema::hasTable('deal_products')) {
-                            DB::table('deal_products')->insert([
-                                'deal_id' => $deal->id,
-                                'products_id' => $dp->id
-                            ]);
-                        }
+                        DB::table('deal_products')->insert([
+                            'deal_id' => $deal->id,
+                            'products_id' => $dp->id
+                        ]);
                     }
-                    $deal->total = $dealTotal;
-                    $deal->netTotal = $dealTotal;
-                    $deal->save();
-
-                    $offer->total = $dealTotal;
-                    $offer->quantity = $dealQty;
-                    $offer->save();
                 }
             }
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Error saving deal in store: ' . $e->getMessage());
+        }
 
         // Log action
         try {
-            $colDataId = \Illuminate\Support\Facades\Schema::hasColumn('logs', 'data_id') ? 'data_id' : 'dataId';
-            $colDateTime = \Illuminate\Support\Facades\Schema::hasColumn('logs', 'date_time') ? 'date_time' : 'dateTime';
-            $colUserId = \Illuminate\Support\Facades\Schema::hasColumn('logs', 'user_id') ? 'user_id' : 'userId';
-
             DB::table('logs')->insert([
                 'module' => 'OFFER',
-                $colDataId => $offer->id,
-                $colDateTime => now(),
-                $colUserId => Auth::id() ?? 1,
+                'data_id' => $offer->id,
+                'date_time' => now(),
+                'user_id' => Auth::id() ?? 1,
                 'action' => 'CREATED',
                 'history' => json_encode(['action' => 'Offer created']),
-                'created_at' => now(),
-                'updated_at' => now(),
             ]);
         } catch (\Throwable $e) {}
 
@@ -315,143 +279,114 @@ class WebOfferController extends Controller
     {
         $offer = Offer::findOrFail($id);
 
-        $data = $request->only([
+        // 1. Only fields that belong to the `offer` table
+        $offerFields = [
             'type', 'subject', 'description', 'internal_notes',
             'delivery_plan', 'quotational_period', 'weights',
             'payment_description', 'terms', 'extra_information',
-            'meta_company_id', 'contact_id', 'address_id',
-            'contact_representative_id', 'currency_id', 'incoterms',
-            'payment_type_id', 'payment_terms_type_id', 'payment_terms',
-        ]);
+            'payment_terms',
+        ];
+        $offerData = $request->only($offerFields);
 
         if ($request->filled('offer_date')) {
-            $data['offer_date'] = date('Y-m-d H:i:s', strtotime(str_replace('/', '-', $request->input('offer_date'))));
+            $offerData['due_date'] = date('Y-m-d H:i:s', strtotime(str_replace('/', '-', $request->input('offer_date'))));
         }
 
-        if ($request->filled('agree_date')) {
-            $data['agree_date'] = date('Y-m-d H:i:s', strtotime(str_replace('/', '-', $request->input('agree_date'))));
-        }
+        $offer->update($offerData);
 
-        if ($request->has('products_json')) {
-            $data['products_json'] = $request->input('products_json');
-        }
-
-        $offer->update($data);
-
-        // Update or create associated Deal
+        // 2. Deal fields belong to the `deal` table
         try {
             $dealId = strtoupper($offer->type ?? '') === 'BUY' ? $offer->purchase_id : $offer->sale_id;
             $deal = $dealId ? Deal::find($dealId) : null;
             if (!$deal) {
                 $deal = new Deal();
+                $deal->dollar_convertion_rate = 1.0;
             }
 
-            $deal->meta_company_id = $data['meta_company_id'] ?? $deal->meta_company_id;
-            $deal->contact_id = $data['contact_id'] ?? $deal->contact_id;
-            $deal->address_id = $data['address_id'] ?? $deal->address_id;
-            $deal->contact_representative_id = $data['contact_representative_id'] ?? $deal->contact_representative_id;
-            $deal->currency_id = $data['currency_id'] ?? $deal->currency_id;
-            $deal->incoterms = $data['incoterms'] ?? $deal->incoterms;
-            $deal->payment_type_id = $data['payment_type_id'] ?? $deal->payment_type_id;
-            $deal->payment_terms_type_id = $data['payment_terms_type_id'] ?? $deal->payment_terms_type_id;
-            $deal->paymentTerms = $data['payment_terms'] ?? $deal->paymentTerms;
-            if (!empty($data['agree_date'])) {
-                $deal->paymentDate = date('Y-m-d', strtotime($data['agree_date']));
+            $deal->meta_company_id = $request->input('meta_company_id');
+            $deal->contact_id = $request->input('contact_id');
+            $deal->address_id = $request->input('address_id');
+            $deal->contact_representative_id = $request->input('contact_representative_id');
+            $deal->currency_id = $request->input('currency_id');
+            $deal->incoterms = $request->input('incoterms');
+            $deal->payment_type_id = $request->input('payment_type_id');
+            $deal->payment_terms_type_id = $request->input('payment_terms_type_id');
+            $deal->payment_terms = $request->input('payment_terms');
+            if ($request->filled('agree_date')) {
+                $deal->payment_date = date('Y-m-d H:i:s', strtotime(str_replace('/', '-', $request->input('agree_date'))));
+            } else {
+                $deal->payment_date = null;
             }
             $deal->offer_id = $offer->id;
             $deal->save();
 
+            // Link deal to offer if not already set or changed
+            $needSave = false;
             if (strtoupper($offer->type ?? '') === 'BUY') {
-                $offer->purchase_id = $deal->id;
+                if ($offer->purchase_id != $deal->id) {
+                    $offer->purchase_id = $deal->id;
+                    $needSave = true;
+                }
             } else {
-                $offer->sale_id = $deal->id;
+                if ($offer->sale_id != $deal->id) {
+                    $offer->sale_id = $deal->id;
+                    $needSave = true;
+                }
             }
-            $offer->save();
+            if ($needSave) {
+                $offer->save();
+            }
 
             // Deal products
-            if (!empty($data['products_json'])) {
-                $productsList = is_string($data['products_json']) ? json_decode($data['products_json'], true) : $data['products_json'];
+            if ($request->has('products_json')) {
+                $rawJson = $request->input('products_json');
+                $productsList = is_string($rawJson) ? json_decode($rawJson, true) : $rawJson;
                 if (is_array($productsList)) {
+                    // Delete existing deal products for this deal
                     try {
-                        if (\Illuminate\Support\Facades\Schema::hasTable('deal_products')) {
-                            $oldDpIds = DB::table('deal_products')->where('deal_id', $deal->id)->pluck('products_id');
-                            if ($oldDpIds->isNotEmpty()) {
-                                DealProduct::whereIn('id', $oldDpIds)->delete();
-                                DB::table('deal_products')->where('deal_id', $deal->id)->delete();
-                            }
+                        $oldDpIds = DB::table('deal_products')->where('deal_id', $deal->id)->pluck('products_id');
+                        if ($oldDpIds->isNotEmpty()) {
+                            DB::table('deal_products')->where('deal_id', $deal->id)->delete();
+                            DealProduct::whereIn('id', $oldDpIds)->delete();
                         }
                     } catch (\Throwable $e) {}
 
-                    try {
-                        if (\Illuminate\Support\Facades\Schema::hasColumn('deal_product', 'deal_id')) {
-                            DealProduct::where('deal_id', $deal->id)->delete();
-                        }
-                    } catch (\Throwable $e) {}
-
-                    $dealTotal = 0;
-                    $dealQty = 0;
                     foreach ($productsList as $p) {
                         $qty = (float)($p['quantity'] ?? 0);
                         $price = (float)($p['unit_price'] ?? 0);
                         $total = (float)($p['total'] ?? ($qty * $price));
-                        $dealTotal += $total;
-                        $dealQty += $qty;
 
                         $dp = new DealProduct();
-                        if (\Illuminate\Support\Facades\Schema::hasColumn('deal_product', 'deal_id')) {
-                            $dp->deal_id = $deal->id;
-                        }
-                        $dp->product_id = $p['product_id'] ?? null;
+                        $dp->product_id = !empty($p['product_id']) ? $p['product_id'] : null;
                         $dp->quantity = $qty;
                         $dp->rate = $price;
-                        if (\Illuminate\Support\Facades\Schema::hasColumn('deal_product', 'unitPrice')) {
-                            $dp->unitPrice = $price;
-                        }
                         $dp->total_price = $total;
-                        if (\Illuminate\Support\Facades\Schema::hasColumn('deal_product', 'total')) {
-                            $dp->total = $total;
-                        }
                         $dp->pricing_type = $p['pricing_type'] ?? 'CUSTOM';
-                        if (\Illuminate\Support\Facades\Schema::hasColumn('deal_product', 'pricingType')) {
-                            $dp->pricingType = $p['pricing_type'] ?? 'CUSTOM';
-                        }
                         $dp->uom = $p['uom'] ?? 'MT';
                         $dp->version = 0;
+                        $dp->active = true;
                         $dp->save();
 
-                        if (\Illuminate\Support\Facades\Schema::hasTable('deal_products')) {
-                            DB::table('deal_products')->insert([
-                                'deal_id' => $deal->id,
-                                'products_id' => $dp->id
-                            ]);
-                        }
+                        DB::table('deal_products')->insert([
+                            'deal_id' => $deal->id,
+                            'products_id' => $dp->id
+                        ]);
                     }
-                    $deal->total = $dealTotal;
-                    $deal->netTotal = $dealTotal;
-                    $deal->save();
-
-                    $offer->total = $dealTotal;
-                    $offer->quantity = $dealQty;
-                    $offer->save();
                 }
             }
-        } catch (\Throwable $e) {}
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Error saving deal in WebOfferController update: ' . $e->getMessage());
+        }
 
         // Log action
         try {
-            $colDataId = \Illuminate\Support\Facades\Schema::hasColumn('logs', 'data_id') ? 'data_id' : 'dataId';
-            $colDateTime = \Illuminate\Support\Facades\Schema::hasColumn('logs', 'date_time') ? 'date_time' : 'dateTime';
-            $colUserId = \Illuminate\Support\Facades\Schema::hasColumn('logs', 'user_id') ? 'user_id' : 'userId';
-
             DB::table('logs')->insert([
                 'module' => 'OFFER',
-                $colDataId => $offer->id,
-                $colDateTime => now(),
-                $colUserId => Auth::id() ?? 1,
+                'data_id' => $offer->id,
+                'date_time' => now(),
+                'user_id' => Auth::id() ?? 1,
                 'action' => 'UPDATED',
                 'history' => json_encode(['action' => 'Offer details updated']),
-                'created_at' => now(),
-                'updated_at' => now(),
             ]);
         } catch (\Throwable $e) {}
 

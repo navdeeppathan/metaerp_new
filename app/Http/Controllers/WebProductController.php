@@ -126,7 +126,10 @@ class WebProductController extends Controller
         if ($request->has('description') || $request->has('itemSpecification') || $request->has('item_specification')) {
             $data['description'] = $request->input('description') ?? $request->input('itemSpecification') ?? $request->input('item_specification');
         }
-        if ($request->has('active')) {
+        if ($request->has('status')) {
+            $val = $request->input('status');
+            $data['active'] = in_array(strtolower((string)$val), ['active', '1', 'true', 'on', 'yes'], true);
+        } else {
             $data['active'] = $request->boolean('active');
         }
 
