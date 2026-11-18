@@ -49,5 +49,10 @@ class Stage extends Model
     {
         $this->attributes['position'] = $value;
     }
+
+    public function getNameAttribute()
+    {
+        return $this->attributes['description'] ?? null;
+    }
 }
 

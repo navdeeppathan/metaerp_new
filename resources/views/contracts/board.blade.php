@@ -52,10 +52,10 @@
              @dragleave="onDragLeave($event, {{ $stage->id }})"
              @drop.prevent="onDrop($event, {{ $stage->id }})">
             
-            <!-- Stage Header -->
+            <!-- Stage Header (Matching Screenshot 3 & 4) -->
             <div class="flex items-center justify-between pb-3 mb-2 px-1">
-                <h3 class="font-bold text-xs text-slate-800 uppercase tracking-wider truncate" title="{{ $stage->name }}">
-                    {{ $stage->name }}
+                <h3 class="font-bold text-xs text-slate-800 uppercase tracking-wider truncate" title="{{ $stage->description ?? $stage->name }}">
+                    {{ $stage->description ?? $stage->name }}
                 </h3>
                 <span id="badge-stage-{{ $stage->id }}" class="w-5 h-5 rounded-full bg-slate-200/80 text-slate-600 text-[11px] font-semibold flex items-center justify-center">
                     {{ $stageContracts->count() }}
@@ -66,15 +66,11 @@
             <div class="flex-1 overflow-y-auto space-y-3 pr-0.5 min-h-[140px]" id="column-stage-{{ $stage->id }}">
                 @forelse($stageContracts as $contract)
                 @php
-                    $meta = json_decode($contract->remarks ?? '{}', true) ?: [];
-                    $purchaseContract = $meta['purchaseContract'] ?? null;
-                    $productsStatus = $meta['productsStatus'] ?? null;
-                    $remainingBalance = $meta['remainingBalance'] ?? false;
                     $companyName = $contract->type == 'BUY' 
                         ? ($contract->purchase?->metaCompany?->name ?? 'MetaZn LTD') 
                         : ($contract->sale?->metaCompany?->name ?? 'Metaenterprices LTD');
                 @endphp
-                <div class="bg-white p-3.5 rounded-xl border {{ $contract->type == 'SELL' ? 'border-[#ea580c]' : ($contract->type == 'BUY' ? 'border-emerald-400' : 'border-slate-200/80') }} shadow-2xs hover:shadow-md transition-all cursor-pointer space-y-2.5 relative group"
+                <div class="bg-white p-3.5 rounded-xl border {{ $contract->type == 'SELL' ? 'border-2 border-[#ea580c]' : ($contract->type == 'BUY' ? 'border-2 border-[#86efac]' : 'border border-slate-200/80') }} shadow-2xs hover:shadow-md transition-all cursor-pointer space-y-2.5 relative group"
                      draggable="true"
                      id="card-contract-{{ $contract->id }}"
                      data-contract-id="{{ $contract->id }}"
@@ -86,76 +82,70 @@
                      @dragstart="onDragStart($event, {{ $contract->id }}, {{ $stage->id }})"
                      @dragend="onDragEnd($event)">
                     
-                    <!-- Top Pill Tag & Arrow (Matching Screenshot 1) -->
+                    <!-- Top Pill Tag & Arrow (Matching Screenshot 3 & 4) -->
                     <div class="flex items-center justify-between">
                         @if($contract->type == 'SELL')
                             <span class="bg-[#ea580c] text-white font-bold text-xs px-3 py-0.5 rounded-full select-none">
                                 {{ $contract->orderCode }}
                             </span>
-                            <span class="text-slate-400 font-bold text-sm leading-none" title="Sell">↗</span>
+                            <span class="text-slate-800 font-bold text-sm leading-none" title="Sell">↗</span>
                         @elseif($contract->type == 'BUY')
-                            <span class="bg-[#16a34a] text-white font-bold text-xs px-3 py-0.5 rounded-full select-none">
+                            <span class="bg-[#86efac] text-slate-800 font-bold text-xs px-3 py-0.5 rounded-full select-none">
                                 {{ $contract->orderCode }}
                             </span>
-                            <span class="text-slate-400 font-bold text-sm leading-none" title="Buy">↙</span>
+                            <span class="text-slate-800 font-bold text-sm leading-none" title="Buy">↙</span>
                         @else
                             <span class="bg-[#f1f5f9] text-slate-800 font-bold text-xs px-3 py-0.5 rounded-full border border-slate-200 select-none">
                                 {{ $contract->orderCode }}
                             </span>
-                            <span class="text-slate-400 font-bold text-xs tracking-tighter leading-none" title="Buy & Sell">↙ ↗</span>
+                            <span class="text-slate-800 font-bold text-xs tracking-tighter leading-none" title="Buy & Sell">↙ ↗</span>
                         @endif
                     </div>
 
-                    <!-- Status & Company -->
-                    <div class="space-y-0.5 text-xs">
-                        <div class="text-slate-700">
-                            Status:<span class="font-bold text-slate-900 ml-0.5">{{ ($contract->contractStatus == 'ACTIVE' || $contract->contractStatus == 'OPEN') ? 'OPEN' : $contract->contractStatus }}</span>
+                    <!-- Status & Company (Matching Screenshot 3 & 4) -->
+                    <div class="space-y-0.5 text-xs text-slate-800 leading-tight">
+                        <div>
+                            Status:<b>{{ strtoupper($contract->status ?? 'OPEN') }}</b>
                         </div>
-                        <div class="text-slate-700 truncate">
-                            Company: <span class="font-semibold text-slate-900">{{ $companyName }}</span>
+                        <div class="truncate">
+                            Company: <b>{{ $companyName }}</b>
                         </div>
                     </div>
 
-                    <!-- Contracts of purchase box if applicable -->
-                    @if($purchaseContract || $contract->type == 'SELL')
-                    <div class="bg-emerald-100/70 text-emerald-900 rounded-lg px-2.5 py-1.5 text-xs">
-                        <div class="text-[11px] text-emerald-800">Contracts of purchase:</div>
-                        @if($purchaseContract)
-                        <div class="font-bold text-emerald-950">{{ $purchaseContract }}</div>
+                    <!-- Contracts of purchase box for SELL contracts (Matching Screenshot 3 & 4) -->
+                    @if($contract->type == 'SELL')
+                    @php
+                        $purchaseCodes = $contract->purchaseContractCodes ?? collect();
+                        $firstPurchaseCode = $purchaseCodes->first();
+                    @endphp
+                    <div class="bg-[#dcfce7] text-[#166534] rounded-lg px-2.5 py-1.5 text-xs">
+                        <div class="text-[11px] font-normal leading-tight">Contracts of purchase:</div>
+                        @if($firstPurchaseCode)
+                        <div class="font-bold text-slate-900 mt-0.5 leading-tight">{{ $firstPurchaseCode }}</div>
                         @endif
                     </div>
-                    @endif
 
-                    <!-- Products Status Tag if applicable -->
-                    @if($productsStatus)
+                    <!-- Products Status Tag for SELL contracts (Matching Screenshot 3 & 4) -->
+                    @php
+                        $assocStatus = $contract->associationStatus;
+                    @endphp
                     <div>
-                        @if($productsStatus == 'COMPLETE')
-                        <span class="bg-emerald-600 text-white text-[10px] font-bold px-3 py-0.5 rounded-full inline-block">
+                        @if($assocStatus == 'COMPLETE')
+                        <span class="bg-[#22c55e] text-white text-[10px] font-bold px-3 py-0.5 rounded-full inline-block">
                             Products Status: COMPLETE
                         </span>
                         @else
-                        <span class="bg-amber-500 text-white text-[10px] font-bold px-3 py-0.5 rounded-full inline-block">
+                        <span class="bg-[#f97316] text-white text-[10px] font-bold px-3 py-0.5 rounded-full inline-block">
                             Products Status: PENDING
                         </span>
                         @endif
                     </div>
                     @endif
 
-                    <!-- Remaining Balance if applicable -->
-                    @if($remainingBalance)
-                    <div class="bg-amber-100/80 text-amber-900 rounded-lg px-2.5 py-1 text-xs font-semibold">
-                        Remaining Balance:
-                    </div>
-                    @endif
-
-                    <!-- Card Footer: Red Dollar Icon (Screenshot 1) -->
-                    <div class="pt-1 flex items-center justify-between">
-                        <span class="w-4 h-4 rounded-full border border-rose-500 text-rose-500 flex items-center justify-center text-[10px] font-bold leading-none select-none">
+                    <!-- Card Footer: Red Dollar Icon (Screenshot 3 & 4) -->
+                    <div class="pt-0.5 flex items-center justify-start">
+                        <span class="w-4 h-4 rounded-full border border-[#ef4444] text-[#dc2626] flex items-center justify-center text-[10px] font-bold leading-none select-none">
                             $
-                        </span>
-
-                        <span class="opacity-0 group-hover:opacity-100 transition text-[11px] text-indigo-600 font-medium">
-                            Click to edit
                         </span>
                     </div>
                 </div>

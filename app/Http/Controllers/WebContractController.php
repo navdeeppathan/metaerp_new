@@ -64,7 +64,7 @@ class WebContractController extends Controller
         $contracts = Contract::with([
             'stage',
             'purchase.metaCompany', 'purchase.contact', 'purchase.products.product',
-            'sale.metaCompany', 'sale.contact', 'sale.products.product',
+            'sale.metaCompany', 'sale.contact', 'sale.products.product', 'sale.products.associatedContract',
             'checklists.checkitems', 'comments'
         ])
         ->where('active', true)

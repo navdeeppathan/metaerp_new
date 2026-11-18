@@ -216,5 +216,62 @@ class Contract extends Model
         }
         return null;
     }
+
+    public function getStatusAttribute()
+    {
+        return $this->attributes['status'] ?? 'OPEN';
+    }
+
+    public function getContractStatusAttribute()
+    {
+        return $this->attributes['status'] ?? 'OPEN';
+    }
+
+    public function getAssociationStatusAttribute()
+    {
+        if ($this->type !== 'SELL') {
+            return 'NOT_APPLY';
+        }
+
+        $saleProducts = $this->sale?->products;
+        if (!$saleProducts || $saleProducts->isEmpty()) {
+            return 'PENDING';
+        }
+
+        $totalProducts = $saleProducts->count();
+        $totalAssociated = $saleProducts->filter(function ($dp) {
+            return !empty($dp->associated_contract_id) || !empty($dp->contract_order_code);
+        })->count();
+
+        if ($totalProducts == $totalAssociated && $totalProducts > 0) {
+            return 'COMPLETE';
+        } elseif ($totalAssociated == 0) {
+            return 'PENDING';
+        } else {
+            return 'PARTIAL';
+        }
+    }
+
+    public function getPurchaseContractCodesAttribute()
+    {
+        if ($this->type !== 'SELL' || !$this->sale) {
+            return collect();
+        }
+
+        $codes = collect();
+        if ($this->sale->products) {
+            foreach ($this->sale->products as $p) {
+                if (!empty($p->contract_order_code)) {
+                    $codes->push($p->contract_order_code);
+                } elseif (!empty($p->associated_contract_id)) {
+                    $assoc = $p->associatedContract;
+                    if ($assoc && !empty($assoc->order_code)) {
+                        $codes->push($assoc->order_code);
+                    }
+                }
+            }
+        }
+        return $codes->unique()->values();
+    }
 }
 
