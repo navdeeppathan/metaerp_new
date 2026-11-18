@@ -48,6 +48,54 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.25); border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.45); }
+
+        /* FUSE Loading Spinner (Matching FuseLoading in React) */
+        .fuse-spinner, #spinner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 56px;
+        }
+
+        .fuse-spinner > div, #spinner > div {
+            width: 12px;
+            height: 12px;
+            background-color: #1E96F7;
+            border-radius: 100%;
+            display: inline-block;
+            -webkit-animation: fuse-bouncedelay 1s infinite ease-in-out both;
+            animation: fuse-bouncedelay 1s infinite ease-in-out both;
+        }
+
+        .fuse-spinner .bounce1, #spinner .bounce1 {
+            -webkit-animation-delay: -0.32s;
+            animation-delay: -0.32s;
+        }
+
+        .fuse-spinner .bounce2, #spinner .bounce2 {
+            -webkit-animation-delay: -0.16s;
+            animation-delay: -0.16s;
+        }
+
+        @-webkit-keyframes fuse-bouncedelay {
+            0%, 80%, 100% {
+                -webkit-transform: scale(0);
+            }
+            40% {
+                -webkit-transform: scale(1.0);
+            }
+        }
+
+        @keyframes fuse-bouncedelay {
+            0%, 80%, 100% {
+                -webkit-transform: scale(0);
+                transform: scale(0);
+            }
+            40% {
+                -webkit-transform: scale(1.0);
+                transform: scale(1.0);
+            }
+        }
     </style>
 </head>
 <body class="h-full flex overflow-hidden text-slate-800 bg-slate-50"
@@ -510,6 +558,28 @@
             </div>
         </div>
 
+        <!-- Global FuseLoading Loader Overlay (Matching FuseLoading in React) -->
+        <div id="global-page-loader"
+             x-data="{ show: false, text: 'Loading' }"
+             @show-loader.window="show = true; text = $event.detail?.text || 'Loading'"
+             @hide-loader.window="show = false"
+             x-cloak
+             x-show="show"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 z-[200] bg-white/80 backdrop-blur-[2px] flex flex-col items-center justify-center select-none pointer-events-auto">
+            <div class="text-base sm:text-lg font-medium text-slate-500 select-none -mb-1" x-text="text">Loading</div>
+            <div class="fuse-spinner mt-4">
+                <div class="bounce1"></div>
+                <div class="bounce2"></div>
+                <div class="bounce3"></div>
+            </div>
+        </div>
+
         <!-- Main Body Content -->
         <main class="flex-1 overflow-y-auto custom-scrollbar p-6 bg-slate-50">
             @yield('content')
@@ -551,6 +621,17 @@
             window.dispatchEvent(new CustomEvent('show-toast', {
                 detail: { message: message, type: type }
             }));
+        };
+
+        // Global FuseLoading Trigger (Matching FuseLoading in React)
+        window.showLoading = function(text = 'Loading') {
+            window.dispatchEvent(new CustomEvent('show-loader', {
+                detail: { text: text }
+            }));
+        };
+
+        window.hideLoading = function() {
+            window.dispatchEvent(new CustomEvent('hide-loader'));
         };
 
         // Global interceptor for all DELETE forms or forms requiring confirmation

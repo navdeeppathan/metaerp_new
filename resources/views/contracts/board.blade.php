@@ -594,10 +594,14 @@
             <div class="fixed inset-0 transition-opacity bg-slate-900/60 backdrop-blur-xs" @click="showCardModal = false"></div>
             
             <div class="inline-block w-full max-w-6xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white rounded-2xl shadow-2xl border border-slate-200">
-                <!-- Modal Loading State -->
-                <div x-show="modalLoading" class="p-16 flex flex-col items-center justify-center space-y-3 min-h-[350px]">
-                    <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
-                    <span class="text-xs text-slate-500 font-medium">Loading contract details...</span>
+                <!-- Modal Loading State (Matching FuseLoading in React) -->
+                <div x-show="modalLoading" class="p-16 flex flex-col items-center justify-center min-h-[350px]">
+                    <div class="text-base sm:text-lg font-medium text-slate-500 select-none -mb-1">Loading</div>
+                    <div class="fuse-spinner mt-4">
+                        <div class="bounce1"></div>
+                        <div class="bounce2"></div>
+                        <div class="bounce3"></div>
+                    </div>
                 </div>
                 
                 <!-- Dynamic Modal Content Injected via AJAX -->
