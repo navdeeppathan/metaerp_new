@@ -18,9 +18,18 @@ class WebOfferController extends Controller
         $search = $request->input('q') ?? $request->input('search');
         if (!empty($search)) {
             $query->where(function($sub) use ($search) {
-                $sub->where('subject', 'like', "%{$search}%")
-                    ->orWhere('order_code', 'like', "%{$search}%")
-                    ->orWhere('id', 'like', "%{$search}%");
+                $sub->where('id', 'like', "%{$search}%");
+
+                $columns = ['subject', 'code', 'order_code', 'orderCode', 'contract_code', 'contract_order_code_when_promoted', 'status', 'type'];
+                foreach ($columns as $column) {
+                    try {
+                        if (\Illuminate\Support\Facades\Schema::hasColumn('offer', $column)) {
+                            $sub->orWhere($column, 'like', "%{$search}%");
+                        }
+                    } catch (\Throwable $e) {
+                        // fallback if schema inspection fails
+                    }
+                }
             });
         }
 

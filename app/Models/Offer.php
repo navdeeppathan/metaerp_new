@@ -48,6 +48,11 @@ class Offer extends Model
         'sale_id',
         'contract_id_when_promoted',
         'contract_order_code_when_promoted',
+        'code',
+        'orderCode',
+        'contract_code',
+        'offer_date',
+        'accepted_at',
     ];
 
     protected $casts = [
@@ -57,9 +62,30 @@ class Offer extends Model
         'due_date' => 'datetime',
         'loading_date' => 'datetime',
         'sales_invoice_date' => 'datetime',
+        'offer_date' => 'datetime',
+        'accepted_at' => 'datetime',
         'transport_price_agreed' => 'double',
         'version' => 'integer',
     ];
+
+    public function getCodeAttribute()
+    {
+        return $this->attributes['code'] ?? $this->attributes['order_code'] ?? $this->attributes['orderCode'] ?? null;
+    }
+
+    public function getContractCodeAttribute()
+    {
+        return $this->attributes['contract_code'] ?? $this->attributes['contract_order_code_when_promoted'] ?? null;
+    }
+
+    public function getAcceptedDateFormattedAttribute()
+    {
+        $date = $this->accepted_at ?? $this->close_date ?? null;
+        if ($date) {
+            return \Carbon\Carbon::parse($date)->format('d M y');
+        }
+        return null;
+    }
 
     public function purchase()
     {

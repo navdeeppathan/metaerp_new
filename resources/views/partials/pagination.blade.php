@@ -28,9 +28,9 @@
             </div>
         </div>
 
-        <!-- Range indicator e.g. 1–10 of 26 -->
+        <!-- Range indicator e.g. 1-10 of 26 -->
         <div class="text-slate-700 font-normal">
-            {{ $from }}–{{ $to }} of {{ $total }}
+            {{ $from }}-{{ $to }} of {{ $total }}
         </div>
 
         <!-- Chevrons -->

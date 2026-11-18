@@ -55,7 +55,7 @@
         <div class="overflow-x-auto flex-1">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="bg-slate-50/60 border-b border-slate-100 text-slate-800 text-xs sm:text-sm font-semibold select-none">
+                    <tr class="bg-white border-b border-slate-100 text-slate-800 text-xs sm:text-sm font-semibold select-none">
                         <th scope="col" class="py-4 px-6 w-14 text-left">
                             <input
                                 type="checkbox"
@@ -103,17 +103,18 @@
                                 {{ $offer->id }}
                             </td>
                             <td class="py-5 px-6 font-normal">
-                                <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold {{ $offer->status === 'ACCEPTED' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-700 border border-slate-200' }}">
-                                    {{ $offer->status }}
-                                </span>
-                            </td>
-                            <td class="py-5 px-6 font-normal">
-                                <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold {{ $offer->type === 'BUY' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-purple-50 text-purple-700 border border-purple-200' }}">
-                                    {{ $offer->type }}
-                                </span>
+                                <div class="text-slate-800 font-normal leading-tight">{{ $offer->status }}</div>
+                                @if(strtoupper($offer->status) === 'ACCEPTED' && $offer->accepted_date_formatted)
+                                    <div class="text-xs text-slate-900 font-bold mt-1 leading-tight">
+                                        {{ $offer->accepted_date_formatted }}
+                                    </div>
+                                @endif
                             </td>
                             <td class="py-5 px-6 text-slate-800 font-normal">
-                                <a href="{{ route('offers.show', $offer->id) }}" class="hover:text-indigo-600 transition font-medium">
+                                {{ $offer->type }}
+                            </td>
+                            <td class="py-5 px-6 text-slate-800 font-normal">
+                                <a href="{{ route('offers.show', $offer->id) }}" class="hover:text-indigo-600 transition">
                                     {{ $offer->subject }}
                                 </a>
                             </td>
