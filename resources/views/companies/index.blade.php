@@ -105,13 +105,13 @@
                                 {{ $company->code }}
                             </td>
                             <td class="py-5 px-6 text-slate-800 font-normal">
-                                {{ $company->vatNumber }}
+                                {{ $company->vatNumber ?? $company->vat_number }}
                             </td>
                             <td class="py-5 px-6 text-slate-800 font-normal">
-                                {{ $company->companyNumber }}
+                                {{ $company->companyNumber ?? $company->company_number }}
                             </td>
                             <td class="py-5 px-6 text-slate-800 font-normal">
-                                {{ $company->phoneNumber }}
+                                {{ $company->phoneNumber ?? $company->phone_number }}
                             </td>
                         </tr>
                     @empty

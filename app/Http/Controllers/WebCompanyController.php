@@ -8,6 +8,7 @@ use App\Models\Address;
 use App\Models\BankAccount;
 use App\Models\Representative;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 class WebCompanyController extends Controller
 {
@@ -19,10 +20,25 @@ class WebCompanyController extends Controller
         if (!empty($search)) {
             $query->where(function($sub) use ($search) {
                 $sub->where('name', 'like', "%{$search}%")
-                    ->orWhere('code', 'like', "%{$search}%")
-                    ->orWhere('vat_number', 'like', "%{$search}%")
-                    ->orWhere('company_number', 'like', "%{$search}%")
-                    ->orWhere('phone_number', 'like', "%{$search}%");
+                    ->orWhere('code', 'like', "%{$search}%");
+                if (Schema::hasColumn('companies', 'vat_number')) {
+                    $sub->orWhere('vat_number', 'like', "%{$search}%");
+                }
+                if (Schema::hasColumn('companies', 'vatNumber')) {
+                    $sub->orWhere('vatNumber', 'like', "%{$search}%");
+                }
+                if (Schema::hasColumn('companies', 'company_number')) {
+                    $sub->orWhere('company_number', 'like', "%{$search}%");
+                }
+                if (Schema::hasColumn('companies', 'companyNumber')) {
+                    $sub->orWhere('companyNumber', 'like', "%{$search}%");
+                }
+                if (Schema::hasColumn('companies', 'phone_number')) {
+                    $sub->orWhere('phone_number', 'like', "%{$search}%");
+                }
+                if (Schema::hasColumn('companies', 'phoneNumber')) {
+                    $sub->orWhere('phoneNumber', 'like', "%{$search}%");
+                }
             });
         }
 
@@ -122,7 +138,10 @@ class WebCompanyController extends Controller
 
         $company->update($request->only([
             'name', 'code', 'companyNumber', 'vatNumber', 'eoriNumber',
-            'phoneNumber', 'faxNumber', 'email', 'domain', 'webSite', 'countryId'
+            'phoneNumber', 'faxNumber', 'email', 'domain', 'webSite', 'countryId',
+            'company_number', 'vat_number', 'eori_number', 'phone_number', 'fax_number',
+            'domain_name', 'web_site', 'website', 'country_id', 'country_company_id',
+            'active',
         ]));
 
         // Address handling

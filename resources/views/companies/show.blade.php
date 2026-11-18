@@ -11,7 +11,7 @@
             </div>
             <div>
                 <h1 class="text-2xl font-bold text-slate-800">{{ $company->name }}</h1>
-                <p class="text-sm text-slate-500 font-mono">Code: {{ $company->code }} | VAT: {{ $company->vatNumber ?? 'N/A' }}</p>
+                <p class="text-sm text-slate-500 font-mono">Code: {{ $company->code }} | VAT: {{ $company->vatNumber ?? $company->vat_number ?? 'N/A' }}</p>
             </div>
         </div>
         <a href="{{ route('companies.index') }}" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg">
@@ -25,8 +25,8 @@
             <h3 class="font-bold text-sm uppercase text-slate-700 border-b pb-2">Company Information</h3>
             <div class="space-y-2 text-xs">
                 <div><span class="text-slate-400">Email:</span> <span class="font-medium text-slate-700">{{ $company->email ?? 'N/A' }}</span></div>
-                <div><span class="text-slate-400">Phone:</span> <span class="font-medium text-slate-700">{{ $company->phone ?? 'N/A' }}</span></div>
-                <div><span class="text-slate-400">Website:</span> <span class="font-medium text-slate-700">{{ $company->website ?? 'N/A' }}</span></div>
+                <div><span class="text-slate-400">Phone:</span> <span class="font-medium text-slate-700">{{ $company->phoneNumber ?? $company->phone_number ?? 'N/A' }}</span></div>
+                <div><span class="text-slate-400">Website:</span> <span class="font-medium text-slate-700">{{ $company->webSite ?? $company->web_site ?? $company->website ?? 'N/A' }}</span></div>
                 <div><span class="text-slate-400">Status:</span> <span class="font-bold text-emerald-600">{{ $company->active ? 'ACTIVE' : 'INACTIVE' }}</span></div>
             </div>
         </div>
