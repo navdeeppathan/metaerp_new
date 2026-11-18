@@ -86,13 +86,6 @@
             </div>
         </div>
 
-        @if (session('success'))
-            <div class="p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700 text-xs flex items-start gap-2 mb-3">
-                <span class="material-icons-outlined text-base text-emerald-600 mt-0.5">check_circle</span>
-                <div>{{ session('success') }}</div>
-            </div>
-        @endif
-
         @if (isset($errors) && $errors->any())
             <div class="p-3.5 bg-red-50 border border-red-200 rounded-lg text-red-700 text-xs flex items-start gap-2">
                 <span class="material-icons-outlined text-base text-red-500 mt-0.5">error_outline</span>

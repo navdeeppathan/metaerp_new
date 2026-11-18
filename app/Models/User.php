@@ -46,8 +46,6 @@ class User extends Authenticatable
     ];
 
     protected $casts = [
-        'active' => 'boolean',
-        'enable2fa' => 'boolean',
         'version' => 'integer',
     ];
 
@@ -57,6 +55,47 @@ class User extends Authenticatable
         'signature_file',
         'signatureFile',
     ];
+
+    private function parseBooleanValue($value): bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+        if (is_null($value)) {
+            return false;
+        }
+        if (is_int($value) || is_float($value)) {
+            return (int) $value !== 0;
+        }
+        if (is_string($value)) {
+            if ($value === "\x01" || $value === "\x00" || $value === "\0" || $value === chr(1) || $value === chr(0)) {
+                return ord($value) === 1;
+            }
+            $trimmed = strtolower(trim($value));
+            return in_array($trimmed, ['1', 'true', 'active', 'on', 'yes'], true);
+        }
+        return (bool) $value;
+    }
+
+    public function getActiveAttribute($value): bool
+    {
+        return $this->parseBooleanValue($value ?? ($this->attributes['active'] ?? null));
+    }
+
+    public function setActiveAttribute($value): void
+    {
+        $this->attributes['active'] = $this->parseBooleanValue($value) ? 1 : 0;
+    }
+
+    public function getEnable2faAttribute($value): bool
+    {
+        return $this->parseBooleanValue($value ?? ($this->attributes['enable2fa'] ?? null));
+    }
+
+    public function setEnable2faAttribute($value): void
+    {
+        $this->attributes['enable2fa'] = $this->parseBooleanValue($value) ? 1 : 0;
+    }
 
     public function getTableColumns(): array
     {
@@ -151,7 +190,7 @@ class User extends Authenticatable
 
     public function setStatusAttribute($value): void
     {
-        $this->attributes['active'] = in_array(strtolower((string)$value), ['active', '1', 'true', 'on', 'yes'], true) ? 1 : 0;
+        $this->setActiveAttribute($value);
     }
 
     public function archiveSignature()
