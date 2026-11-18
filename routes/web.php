@@ -115,14 +115,17 @@ Route::middleware('auth')->group(function () {
 
     // Detached Notes
     Route::get('/detached-notes', [WebDetachedNoteController::class, 'index'])->name('detached-notes.index');
+    Route::post('/detached-notes', [WebDetachedNoteController::class, 'store'])->name('detached-notes.store');
+    Route::get('/detached-notes/{id}', [WebDetachedNoteController::class, 'show'])->name('detached-notes.show');
+    Route::get('/detached-notes/{id}/document', [WebDetachedNoteController::class, 'downloadDocument'])->name('detached-notes.document');
+    Route::get('/detached-notes/contract/{id}/products', [WebDetachedNoteController::class, 'getProducts'])->name('detached-notes.contract-products');
+    Route::delete('/detached-notes/{id}', [WebDetachedNoteController::class, 'destroy'])->name('detached-notes.destroy');
 
     // Templates
     Route::get('/templates', [WebTemplateController::class, 'index'])->name('templates.index');
     Route::get('/templates/{id}', [WebTemplateController::class, 'show'])->name('templates.show');
     Route::put('/templates/{id}', [WebTemplateController::class, 'update'])->name('templates.update');
     Route::post('/templates/{id}', [WebTemplateController::class, 'update']);
-    Route::post('/detached-notes', [WebDetachedNoteController::class, 'store'])->name('detached-notes.store');
-    Route::delete('/detached-notes/{id}', [WebDetachedNoteController::class, 'destroy'])->name('detached-notes.destroy');
 
     // System Settings Lookups
     // Countries (Screenshots 1 & 2)
