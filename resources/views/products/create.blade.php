@@ -23,7 +23,7 @@
             <div class="flex items-center gap-3">
                 @if($product->exists)
                     <!-- Remove Button with Trash Icon -->
-                    <form id="delete-form" method="POST" action="{{ route('products.destroy', $product->id) }}" onsubmit="return confirm('Are you sure you want to remove this product?');" class="inline">
+                    <form id="delete-form" method="POST" action="{{ route('products.destroy', $product->id) }}" class="inline">
                         @csrf
                         @method('DELETE')
                         <button

@@ -69,6 +69,6 @@ class WebTemplateController extends Controller
             ]);
         }
 
-        return redirect()->route('templates.show', $template->id)->with('success', 'Template updated successfully.');
+        return redirect()->route('templates.show', $template->id)->with('success', 'Template data have been saved');
     }
 }

@@ -66,7 +66,7 @@
             <div class="flex items-center gap-3">
                 @if($company->exists)
                     <!-- Remove Button with Trash Icon -->
-                    <form id="delete-form" method="POST" action="{{ route('companies.destroy', $company->id) }}" onsubmit="return confirm('Are you sure you want to remove this company?');" class="inline">
+                    <form id="delete-form" method="POST" action="{{ route('companies.destroy', $company->id) }}" class="inline">
                         @csrf
                         @method('DELETE')
                         <button

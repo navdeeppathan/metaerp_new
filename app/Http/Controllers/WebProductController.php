@@ -95,7 +95,7 @@ class WebProductController extends Controller
             'active' => $request->has('active') ? $request->boolean('active') : true,
         ]);
 
-        return redirect()->route('products.show', $product->id)->with('success', 'Product created successfully');
+        return redirect()->route('products.show', $product->id)->with('success', 'Product data have been saved');
     }
 
     public function update(Request $request, $id)
@@ -135,13 +135,13 @@ class WebProductController extends Controller
 
         $product->update($data);
 
-        return redirect()->route('products.show', $product->id)->with('success', 'Product updated successfully');
+        return redirect()->route('products.show', $product->id)->with('success', 'Product data have been saved');
     }
 
     public function destroy($id)
     {
         $product = Product::findOrFail($id);
         $product->update(['active' => false]);
-        return redirect()->route('products.index')->with('success', 'Product removed successfully');
+        return redirect()->route('products.index')->with('success', 'Product data have been removed');
     }
 }

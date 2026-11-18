@@ -392,36 +392,123 @@
             </div>
         </header>
 
-        <!-- Flash Messages -->
-        @if (session('success'))
-            <div class="bg-emerald-50 border-b border-emerald-200 px-6 py-2.5 flex items-center justify-between text-emerald-800 text-sm">
-                <div class="flex items-center gap-2">
-                    <span class="material-icons-outlined text-emerald-600 text-lg">check_circle</span>
-                    <span>{{ session('success') }}</span>
-                </div>
-                <button type="button" @click="$el.parentElement.remove()" class="text-emerald-500 hover:text-emerald-700">&times;</button>
+        <!-- Global Toast / Snackbar Notification (Matching Image 1) -->
+        <div x-data="{
+            show: false,
+            message: '',
+            type: 'success',
+            timeout: null,
+            showToast(msg, toastType = 'success') {
+                this.message = msg;
+                this.type = toastType;
+                this.show = true;
+                clearTimeout(this.timeout);
+                this.timeout = setTimeout(() => { this.show = false; }, 5000);
+            }
+        }"
+        x-init="
+            @if (session('success'))
+                showToast(@js(session('success')), 'success');
+            @elseif (session('error'))
+                showToast(@js(session('error')), 'error');
+            @elseif (session('info'))
+                showToast(@js(session('info')), 'info');
+            @elseif (session('warning'))
+                showToast(@js(session('warning')), 'warning');
+            @endif
+        "
+        @show-toast.window="showToast($event.detail.message, $event.detail.type || 'success')"
+        x-cloak
+        x-show="show"
+        x-transition:enter="transition ease-out duration-300 transform"
+        x-transition:enter-start="-translate-y-4 opacity-0"
+        x-transition:enter-end="translate-y-0 opacity-100"
+        x-transition:leave="transition ease-in duration-200 transform"
+        x-transition:leave-start="translate-y-0 opacity-100"
+        x-transition:leave-end="-translate-y-4 opacity-0"
+        class="fixed top-4 left-1/2 -translate-x-1/2 z-[110] select-none pointer-events-auto">
+            <div :class="{
+                    'bg-[#43a047]': type === 'success',
+                    'bg-[#d32f2f]': type === 'error',
+                    'bg-[#1976d2]': type === 'info',
+                    'bg-[#ed6c02]': type === 'warning'
+                 }"
+                 class="flex items-center min-w-[280px] max-w-lg px-4 py-2.5 rounded-md shadow-lg shadow-black/25 text-white">
+                <span class="material-icons text-xl leading-none text-white mr-2.5"
+                      x-text="type === 'success' ? 'check_circle' : (type === 'error' ? 'error_outline' : (type === 'warning' ? 'warning' : 'info'))">
+                    check_circle
+                </span>
+                <span class="text-xs sm:text-sm font-medium text-white tracking-wide flex-1 mr-2" x-text="message"></span>
+                <button type="button" 
+                        @click="show = false" 
+                        class="text-white/80 hover:text-white transition-colors p-0.5 rounded leading-none flex items-center justify-center cursor-pointer">
+                    <span class="material-icons text-base leading-none">close</span>
+                </button>
             </div>
-        @endif
+        </div>
 
-        @if (session('error'))
-            <div class="bg-red-50 border-b border-red-200 px-6 py-2.5 flex items-center justify-between text-red-800 text-sm">
-                <div class="flex items-center gap-2">
-                    <span class="material-icons-outlined text-red-600 text-lg">error_outline</span>
-                    <span>{{ session('error') }}</span>
-                </div>
-                <button type="button" @click="$el.parentElement.remove()" class="text-red-500 hover:text-red-700">&times;</button>
-            </div>
-        @endif
+        <!-- Global Confirmation Modal (Matching Image 2) -->
+        <div x-data="{
+            open: false,
+            title: 'Confirmation',
+            message: 'Do you want to delete?',
+            confirmForm: null,
+            confirmCallback: null,
+            openDialog(detail) {
+                this.title = detail.title || 'Confirmation';
+                this.message = detail.message || 'Do you want to delete?';
+                this.confirmForm = detail.form || null;
+                this.confirmCallback = detail.onConfirm || null;
+                this.open = true;
+            },
+            confirm() {
+                this.open = false;
+                if (this.confirmForm) {
+                    this.confirmForm.dataset.confirmed = 'true';
+                    this.confirmForm.submit();
+                } else if (this.confirmCallback) {
+                    this.confirmCallback();
+                }
+            },
+            cancel() {
+                this.open = false;
+                this.confirmForm = null;
+                this.confirmCallback = null;
+            }
+        }"
+        @open-confirmation-modal.window="openDialog($event.detail)"
+        x-cloak
+        x-show="open"
+        class="fixed inset-0 z-[120] flex items-center justify-center p-4">
+            <!-- Backdrop -->
+            <div class="fixed inset-0 bg-black/50 transition-opacity" @click="cancel()"></div>
 
-        @if (session('info'))
-            <div class="bg-blue-50 border-b border-blue-200 px-6 py-2.5 flex items-center justify-between text-blue-800 text-sm">
-                <div class="flex items-center gap-2">
-                    <span class="material-icons-outlined text-blue-600 text-lg">info</span>
-                    <span>{{ session('info') }}</span>
+            <!-- Dialog Box Matching Image 2 -->
+            <div class="relative bg-white rounded-xl shadow-2xl p-6 w-full max-w-[340px] z-10 transform transition-all select-none"
+                 x-show="open"
+                 x-transition:enter="transition ease-out duration-200 transform"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100"
+                 x-transition:leave="transition ease-in duration-150 transform"
+                 x-transition:leave-start="opacity-100 scale-100"
+                 x-transition:leave-end="opacity-0 scale-95">
+                <h3 class="text-base font-semibold text-slate-800 tracking-tight" x-text="title">Confirmation</h3>
+                <p class="text-xs sm:text-sm text-slate-600 mt-3 font-normal" x-text="message">Do you want to delete?</p>
+                
+                <div class="flex items-center justify-end gap-3 mt-6">
+                    <button type="button" 
+                            @click="confirm()" 
+                            class="text-xs sm:text-sm font-semibold text-[#4f46e5] hover:text-[#4338ca] hover:bg-indigo-50 px-3.5 py-1.5 rounded transition cursor-pointer">
+                        Yes
+                    </button>
+                    <button type="button" 
+                            @click="cancel()" 
+                            class="text-xs sm:text-sm font-semibold text-[#4f46e5] hover:text-[#4338ca] hover:bg-indigo-50 px-3.5 py-1.5 rounded transition cursor-pointer">
+                        No
+                    </button>
                 </div>
-                <button type="button" @click="$el.parentElement.remove()" class="text-blue-500 hover:text-blue-700">&times;</button>
             </div>
-        @endif
+        </div>
 
         <!-- Main Body Content -->
         <main class="flex-1 overflow-y-auto custom-scrollbar p-6 bg-slate-50">
@@ -437,5 +524,60 @@
 
     @stack('modals')
     @stack('scripts')
+
+    <script>
+        // Global Confirmation Dialog Helpers (Matching Image 2)
+        window.openConfirmDialog = function(options) {
+            window.dispatchEvent(new CustomEvent('open-confirmation-modal', {
+                detail: {
+                    title: options.title || 'Confirmation',
+                    message: options.message || 'Do you want to delete?',
+                    form: options.form || null,
+                    onConfirm: options.onConfirm || null
+                }
+            }));
+        };
+
+        window.confirmDelete = function(formOrCallback, message = 'Do you want to delete?', title = 'Confirmation') {
+            if (typeof formOrCallback === 'function') {
+                window.openConfirmDialog({ title: title, message: message, onConfirm: formOrCallback });
+            } else {
+                window.openConfirmDialog({ title: title, message: message, form: formOrCallback });
+            }
+        };
+
+        // Global Toast Trigger
+        window.showToast = function(message, type = 'success') {
+            window.dispatchEvent(new CustomEvent('show-toast', {
+                detail: { message: message, type: type }
+            }));
+        };
+
+        // Global interceptor for all DELETE forms or forms requiring confirmation
+        document.addEventListener('submit', function(e) {
+            const form = e.target;
+            if (form.dataset && form.dataset.confirmed === 'true') {
+                return true;
+            }
+
+            const methodInput = form.querySelector('input[name="_method"]');
+            const isDelete = (methodInput && methodInput.value.toUpperCase() === 'DELETE') || form.hasAttribute('data-confirm');
+
+            if (isDelete) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                
+                const title = form.getAttribute('data-confirm-title') || 'Confirmation';
+                const message = form.getAttribute('data-confirm-message') || 'Do you want to delete?';
+
+                window.openConfirmDialog({
+                    title: title,
+                    message: message,
+                    form: form
+                });
+                return false;
+            }
+        }, true);
+    </script>
 </body>
 </html>

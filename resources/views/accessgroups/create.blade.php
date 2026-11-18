@@ -19,7 +19,7 @@
 
         <div class="flex items-center gap-3">
             @if(isset($group))
-            <form action="{{ route('accessgroups.destroy', $group->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to remove this Access Group?')">
+            <form action="{{ route('accessgroups.destroy', $group->id) }}" method="POST">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="bg-[#4f46e5] hover:bg-rose-600 text-white px-5 py-1.5 rounded-full font-semibold text-xs shadow-2xs transition flex items-center gap-1.5">

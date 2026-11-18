@@ -72,7 +72,7 @@ class WebSettingsController extends Controller
 
         Country::create($data);
 
-        return redirect()->route('settings.countries')->with('success', 'Country created successfully.');
+        return redirect()->route('settings.countries')->with('success', 'Country data have been saved');
     }
 
     public function updateCountry(Request $request, $id)
@@ -89,7 +89,7 @@ class WebSettingsController extends Controller
 
         $country->update($data);
 
-        return redirect()->route('settings.countries')->with('success', 'Country updated successfully.');
+        return redirect()->route('settings.countries')->with('success', 'Country data have been saved');
     }
 
     public function destroyCountry($id)
@@ -97,7 +97,7 @@ class WebSettingsController extends Controller
         $country = Country::findOrFail($id);
         $country->delete();
 
-        return redirect()->route('settings.countries')->with('success', 'Country deleted successfully.');
+        return redirect()->route('settings.countries')->with('success', 'Country data have been removed');
     }
 
     // ==========================================
@@ -253,7 +253,7 @@ class WebSettingsController extends Controller
             Type::create($data);
         }
 
-        return redirect()->route('settings.companyTypes')->with('success', 'Company type created successfully.');
+        return redirect()->route('settings.companyTypes')->with('success', 'CompanyType data have been saved');
     }
 
     public function updateCompanyType(Request $request, $id)
@@ -277,7 +277,7 @@ class WebSettingsController extends Controller
             $type->update($data);
         }
 
-        return redirect()->route('settings.companyTypes')->with('success', 'Company type updated successfully.');
+        return redirect()->route('settings.companyTypes')->with('success', 'CompanyType data have been saved');
     }
 
     public function destroyCompanyType($id)
@@ -291,7 +291,7 @@ class WebSettingsController extends Controller
             }
         }
 
-        return redirect()->route('settings.companyTypes')->with('success', 'Company type deleted successfully.');
+        return redirect()->route('settings.companyTypes')->with('success', 'CompanyType data have been removed');
     }
 
     // ==========================================
@@ -338,7 +338,7 @@ class WebSettingsController extends Controller
 
         CreditDebitType::create($data);
 
-        return redirect()->route('settings.creditDebitTypes')->with('success', 'Credit/Debit type created successfully.');
+        return redirect()->route('settings.creditDebitTypes')->with('success', 'Credit/Debit type data have been saved');
     }
 
     public function updateCreditDebitType(Request $request, $id)
@@ -351,7 +351,7 @@ class WebSettingsController extends Controller
 
         $type->update($data);
 
-        return redirect()->route('settings.creditDebitTypes')->with('success', 'Credit/Debit type updated successfully.');
+        return redirect()->route('settings.creditDebitTypes')->with('success', 'Credit/Debit type data have been saved');
     }
 
     public function destroyCreditDebitType($id)
@@ -359,7 +359,7 @@ class WebSettingsController extends Controller
         $type = CreditDebitType::findOrFail($id);
         $type->delete();
 
-        return redirect()->route('settings.creditDebitTypes')->with('success', 'Credit/Debit type deleted successfully.');
+        return redirect()->route('settings.creditDebitTypes')->with('success', 'Credit/Debit type data have been removed');
     }
 
     // ==========================================
@@ -417,7 +417,7 @@ class WebSettingsController extends Controller
 
         Currency::create($data);
 
-        return redirect()->route('settings.currencies')->with('success', 'Currency created successfully.');
+        return redirect()->route('settings.currencies')->with('success', 'Currency data have been saved');
     }
 
     public function updateCurrency(Request $request, $id)
@@ -435,7 +435,7 @@ class WebSettingsController extends Controller
 
         $currency->update($data);
 
-        return redirect()->route('settings.currencies')->with('success', 'Currency updated successfully.');
+        return redirect()->route('settings.currencies')->with('success', 'Currency data have been saved');
     }
 
     public function destroyCurrency($id)
@@ -443,7 +443,7 @@ class WebSettingsController extends Controller
         $currency = Currency::findOrFail($id);
         $currency->delete();
 
-        return redirect()->route('settings.currencies')->with('success', 'Currency deleted successfully.');
+        return redirect()->route('settings.currencies')->with('success', 'Currency data have been removed');
     }
 
     // ==========================================
@@ -497,7 +497,7 @@ class WebSettingsController extends Controller
             'version' => 0,
         ]);
 
-        return redirect()->route('settings.departments')->with('success', 'Department created successfully.');
+        return redirect()->route('settings.departments')->with('success', 'Department data have been saved');
     }
 
     public function updateDepartment(Request $request, $id)
@@ -513,7 +513,7 @@ class WebSettingsController extends Controller
             'description' => $desc,
         ]);
 
-        return redirect()->route('settings.departments')->with('success', 'Department updated successfully.');
+        return redirect()->route('settings.departments')->with('success', 'Department data have been saved');
     }
 
     public function destroyDepartment($id)
@@ -521,7 +521,7 @@ class WebSettingsController extends Controller
         $department = Department::findOrFail($id);
         $department->delete();
 
-        return redirect()->route('settings.departments')->with('success', 'Department deleted successfully.');
+        return redirect()->route('settings.departments')->with('success', 'Department data have been removed');
     }
 
     // ==========================================
@@ -568,7 +568,7 @@ class WebSettingsController extends Controller
 
         PackType::create($data);
 
-        return redirect()->route('settings.packTypes')->with('success', 'Pack type created successfully.');
+        return redirect()->route('settings.packTypes')->with('success', 'Pack type data have been saved');
     }
 
     public function updatePackType(Request $request, $id)
@@ -580,7 +580,7 @@ class WebSettingsController extends Controller
 
         $packType->update($data);
 
-        return redirect()->route('settings.packTypes')->with('success', 'Pack type updated successfully.');
+        return redirect()->route('settings.packTypes')->with('success', 'Pack type data have been saved');
     }
 
     public function destroyPackType($id)
@@ -588,7 +588,7 @@ class WebSettingsController extends Controller
         $packType = PackType::findOrFail($id);
         $packType->delete();
 
-        return redirect()->route('settings.packTypes')->with('success', 'Pack type deleted successfully.');
+        return redirect()->route('settings.packTypes')->with('success', 'Pack type data have been removed');
     }
 
     // ==========================================
@@ -635,7 +635,7 @@ class WebSettingsController extends Controller
 
         PaymentType::create($data);
 
-        return redirect()->route('settings.paymentTypes')->with('success', 'Payment type created successfully.');
+        return redirect()->route('settings.paymentTypes')->with('success', 'Payment type data have been saved');
     }
 
     public function updatePaymentType(Request $request, $id)
@@ -647,7 +647,7 @@ class WebSettingsController extends Controller
 
         $paymentType->update($data);
 
-        return redirect()->route('settings.paymentTypes')->with('success', 'Payment type updated successfully.');
+        return redirect()->route('settings.paymentTypes')->with('success', 'Payment type data have been saved');
     }
 
     public function destroyPaymentType($id)
@@ -655,7 +655,7 @@ class WebSettingsController extends Controller
         $paymentType = PaymentType::findOrFail($id);
         $paymentType->delete();
 
-        return redirect()->route('settings.paymentTypes')->with('success', 'Payment type deleted successfully.');
+        return redirect()->route('settings.paymentTypes')->with('success', 'Payment type data have been removed');
     }
 
     // ==========================================
@@ -702,7 +702,7 @@ class WebSettingsController extends Controller
 
         PaymentTermsType::create($data);
 
-        return redirect()->route('settings.paymentTerms')->with('success', 'Payment terms type created successfully.');
+        return redirect()->route('settings.paymentTerms')->with('success', 'Payment terms data have been saved');
     }
 
     public function updatePaymentTerm(Request $request, $id)
@@ -714,7 +714,7 @@ class WebSettingsController extends Controller
 
         $paymentTerm->update($data);
 
-        return redirect()->route('settings.paymentTerms')->with('success', 'Payment terms type updated successfully.');
+        return redirect()->route('settings.paymentTerms')->with('success', 'Payment terms data have been saved');
     }
 
     public function destroyPaymentTerm($id)
@@ -722,6 +722,6 @@ class WebSettingsController extends Controller
         $paymentTerm = PaymentTermsType::findOrFail($id);
         $paymentTerm->delete();
 
-        return redirect()->route('settings.paymentTerms')->with('success', 'Payment terms type deleted successfully.');
+        return redirect()->route('settings.paymentTerms')->with('success', 'Payment terms data have been removed');
     }
 }

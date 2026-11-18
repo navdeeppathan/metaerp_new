@@ -198,7 +198,7 @@ class WebDetachedNoteController extends Controller
         }
 
         return redirect()->route('detached-notes.index', ['code' => $contract->orderCode])
-            ->with('success', 'Detached ' . strtolower($validated['kind']) . ' note created successfully');
+            ->with('success', 'Detached note data have been saved');
     }
 
     public function destroy($id)
@@ -212,7 +212,7 @@ class WebDetachedNoteController extends Controller
         $redirectParam = $contractCode ? ['code' => $contractCode] : [];
 
         return redirect()->route('detached-notes.index', $redirectParam)
-            ->with('success', 'Detached note deleted successfully');
+            ->with('success', 'Detached note data have been removed');
     }
 
     public function downloadDocument($id)

@@ -272,7 +272,7 @@ class WebOfferController extends Controller
             ]);
         } catch (\Throwable $e) {}
 
-        return redirect()->route('offers.show', $offer->id)->with('success', 'Offer created successfully!');
+        return redirect()->route('offers.show', $offer->id)->with('success', 'Offer data have been saved');
     }
 
     public function update(Request $request, $id)
@@ -390,7 +390,7 @@ class WebOfferController extends Controller
             ]);
         } catch (\Throwable $e) {}
 
-        return redirect()->route('offers.show', $offer->id)->with('success', 'Offer details updated successfully!');
+        return redirect()->route('offers.show', $offer->id)->with('success', 'Offer data have been saved');
     }
 
     public function destroy($id)
@@ -398,7 +398,7 @@ class WebOfferController extends Controller
         $offer = Offer::findOrFail($id);
         $offer->delete();
 
-        return redirect()->route('offers.index')->with('success', 'Offer deleted successfully!');
+        return redirect()->route('offers.index')->with('success', 'Offer data have been removed');
     }
 
     public function convertToContract($id)

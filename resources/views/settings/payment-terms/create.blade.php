@@ -20,7 +20,7 @@
         <div class="flex items-center gap-3">
             @if($paymentTerm)
             <!-- Remove Button with Trash Icon Matching Screenshot -->
-            <form action="{{ route('settings.paymentTerms.destroy', $paymentTerm->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to remove this payment term?')">
+            <form action="{{ route('settings.paymentTerms.destroy', $paymentTerm->id) }}" method="POST" class="inline">
                 @csrf
                 @method('DELETE')
                 <button type="submit" 

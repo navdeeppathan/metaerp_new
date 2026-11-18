@@ -64,7 +64,7 @@
                 </form>
             </div>
             @else
-            <form action="{{ route('profile.toggle-2fa') }}" method="POST" onsubmit="return confirm('Disable 2FA?')">
+            <form action="{{ route('profile.toggle-2fa') }}" method="POST" data-confirm="true" data-confirm-message="Do you want to disable 2FA?">
                 @csrf
                 <button type="submit" class="w-full py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg">
                     Disable Two-Factor Authentication

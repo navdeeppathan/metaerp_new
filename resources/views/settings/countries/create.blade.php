@@ -26,7 +26,7 @@
         <div class="flex items-center gap-3">
             @if($country)
             <!-- Remove Button with Trash Icon Matching Screenshot -->
-            <form action="{{ route('settings.countries.destroy', $country->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to remove this country?')">
+            <form action="{{ route('settings.countries.destroy', $country->id) }}" method="POST" class="inline">
                 @csrf
                 @method('DELETE')
                 <button type="submit" 

@@ -188,7 +188,7 @@
                                         <span class="material-icons text-base">visibility</span>
                                     </button>
 
-                                    <form action="{{ route('detached-notes.destroy', $note->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this detached note?')">
+                                    <form action="{{ route('detached-notes.destroy', $note->id) }}" method="POST" class="inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="text-rose-500 hover:text-rose-700 p-1.5 rounded-md hover:bg-rose-50 transition" title="Delete">

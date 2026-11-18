@@ -135,7 +135,7 @@ class WebContactController extends Controller
             }
         }
 
-        return redirect()->route('contacts.show', $contact->id)->with('success', "Contact {$contact->name} created successfully!");
+        return redirect()->route('contacts.show', $contact->id)->with('success', 'Contact data have been saved');
     }
 
     public function update(Request $request, $id)
@@ -267,13 +267,13 @@ class WebContactController extends Controller
             }
         }
 
-        return redirect()->route('contacts.show', $contact->id)->with('success', 'Contact details updated successfully!');
+        return redirect()->route('contacts.show', $contact->id)->with('success', 'Contact data have been updated');
     }
 
     public function destroy($id)
     {
         $contact = Contact::findOrFail($id);
         $contact->update(['active' => 0]);
-        return redirect()->route('contacts.index')->with('success', 'Contact removed successfully!');
+        return redirect()->route('contacts.index')->with('success', 'Contact data have been removed');
     }
 }

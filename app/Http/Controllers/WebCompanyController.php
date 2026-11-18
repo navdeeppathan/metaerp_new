@@ -129,7 +129,7 @@ class WebCompanyController extends Controller
             ]);
         }
 
-        return redirect()->route('companies.show', $company->id)->with('success', "Company {$company->name} created successfully!");
+        return redirect()->route('companies.show', $company->id)->with('success', 'Meta group data have been saved');
     }
 
     public function update(Request $request, $id)
@@ -202,14 +202,14 @@ class WebCompanyController extends Controller
             }
         }
 
-        return redirect()->route('companies.show', $company->id)->with('success', 'Company details updated successfully!');
+        return redirect()->route('companies.show', $company->id)->with('success', 'Meta group data have been saved');
     }
 
     public function destroy($id)
     {
         $company = Company::findOrFail($id);
         $company->update(['active' => 0]);
-        return redirect()->route('companies.index')->with('success', 'Company removed successfully!');
+        return redirect()->route('companies.index')->with('success', 'Meta group data have been removed');
     }
 
     public function uploadMedia(Request $request, $id)

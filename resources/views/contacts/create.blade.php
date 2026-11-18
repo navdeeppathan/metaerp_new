@@ -143,7 +143,7 @@
 
                 @if($contact->exists)
                     <!-- Remove Button with Trash Icon -->
-                    <form id="delete-form" method="POST" action="{{ route('contacts.destroy', $contact->id) }}" onsubmit="return confirm('Are you sure you want to remove this contact?');" class="inline">
+                    <form id="delete-form" method="POST" action="{{ route('contacts.destroy', $contact->id) }}" class="inline">
                         @csrf
                         @method('DELETE')
                         <button

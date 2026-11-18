@@ -113,7 +113,7 @@ class WebAccessGroupController extends Controller
             }
         }
 
-        return redirect()->route('accessgroups.index')->with('success', 'Access group created successfully');
+        return redirect()->route('accessgroups.index')->with('success', 'AccessGroup data have been saved');
     }
 
     public function update(Request $request, $id)
@@ -156,7 +156,7 @@ class WebAccessGroupController extends Controller
             }
         }
 
-        return redirect()->route('accessgroups.index')->with('success', 'Access group updated successfully');
+        return redirect()->route('accessgroups.index')->with('success', 'AccessGroup data have been saved');
     }
 
     public function destroy($id)
@@ -164,6 +164,6 @@ class WebAccessGroupController extends Controller
         $group = AccessGroup::findOrFail($id);
         $group->update(['active' => false]);
 
-        return redirect()->route('accessgroups.index')->with('success', 'Access group deleted successfully');
+        return redirect()->route('accessgroups.index')->with('success', 'AccessGroup data have been removed');
     }
 }

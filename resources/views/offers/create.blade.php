@@ -151,9 +151,9 @@
         },
 
         deleteProduct(index) {
-            if (confirm('Do you want to delete this product?')) {
+            window.confirmDelete(() => {
                 this.products.splice(index, 1);
-            }
+            });
         }
     }"
     @click.away="showOptionsMenu = false; showDocActions = false; showDuePopover = false"
@@ -172,7 +172,7 @@
         <div class="flex items-center gap-3">
             @if($offer->exists)
                 <!-- Remove Button Matching Screenshot -->
-                <form id="delete-form" method="POST" action="{{ route('offers.destroy', $offer->id) }}" onsubmit="return confirm('Are you sure you want to remove this offer?');" class="inline">
+                <form id="delete-form" method="POST" action="{{ route('offers.destroy', $offer->id) }}" class="inline">
                     @csrf
                     @method('DELETE')
                     <button
