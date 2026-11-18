@@ -24,23 +24,23 @@
 
         <div class="flex items-center gap-3">
             <!-- Contract Code Search / Dropdown Pill -->
-            <div class="relative w-64 sm:w-72" @click.outside="dropdownOpen = false">
-                <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none">search</span>
+            <div class="relative w-64 sm:w-80" @click.outside="dropdownOpen = false">
+                <span class="material-icons-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg pointer-events-none">search</span>
                 <input type="text" 
                        x-model="contractQuery" 
                        @focus="dropdownOpen = true"
                        @input="dropdownOpen = true"
                        placeholder="type a contract code" 
-                       class="w-full bg-white border border-slate-200 rounded-full pl-9 pr-14 py-2 text-xs text-slate-700 placeholder-slate-400 focus:outline-none focus:border-indigo-500 shadow-2xs transition">
+                       class="w-full bg-white border border-slate-200/90 rounded-full pl-11 pr-14 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs transition">
                 
-                <div class="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                <div class="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
                     <template x-if="contractQuery">
                         <button type="button" @click="clearContract()" class="text-slate-400 hover:text-slate-600 focus:outline-none">
                             <span class="material-icons text-xs leading-none">close</span>
                         </button>
                     </template>
                     <button type="button" @click="dropdownOpen = !dropdownOpen" class="text-slate-400 hover:text-slate-600 focus:outline-none flex items-center">
-                        <span class="material-icons text-sm leading-none">arrow_drop_down</span>
+                        <span class="material-icons text-base leading-none">arrow_drop_down</span>
                     </button>
                 </div>
 
@@ -67,8 +67,8 @@
             <!-- + Add Button -->
             <button type="button"
                     @click="openAddModal()"
-                    class="bg-[#4f46e5] hover:bg-[#4338ca] text-white px-5 py-2 rounded-full font-semibold text-xs shadow-2xs transition cursor-pointer select-none whitespace-nowrap flex items-center gap-1.5">
-                <span class="text-sm font-bold leading-none">+</span>
+                    class="bg-[#4f46e5] hover:bg-[#4338ca] text-white px-6 py-2.5 rounded-full font-semibold text-sm shadow-xs transition-colors cursor-pointer select-none whitespace-nowrap flex items-center justify-center gap-1.5">
+                <span class="material-icons text-base font-bold leading-none">add</span>
                 <span>Add</span>
             </button>
         </div>

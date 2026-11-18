@@ -11,13 +11,13 @@
         </div>
 
         <!-- Search Input Pill Matching Screenshot -->
-        <form method="GET" action="{{ route('templates.index') }}" class="relative w-full sm:w-80">
-            <span class="material-icons-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none">search</span>
+        <form method="GET" action="{{ route('templates.index') }}" class="relative w-full sm:w-80 md:w-96">
+            <span class="material-icons-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg pointer-events-none">search</span>
             <input type="text" 
                    name="search" 
                    value="{{ request('search') }}"
                    placeholder="Search template name" 
-                   class="w-full pl-9 pr-4 py-2 bg-white border border-slate-200/90 rounded-full text-xs text-slate-800 placeholder-slate-400 shadow-2xs focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                   class="w-full pl-11 pr-5 py-2.5 bg-white border border-slate-200/90 rounded-full text-sm text-slate-800 placeholder-slate-400 shadow-2xs focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition">
         </form>
     </div>
 

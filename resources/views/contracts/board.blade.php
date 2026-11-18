@@ -10,17 +10,17 @@
             <span class="sr-only">Contract Pipeline</span>
         </div>
 
-        <!-- Search Bar and Add a Contract Button -->
+        <!-- Search Bar and Add a Contract Button (Matching Screenshot Exactly) -->
         <div class="flex items-center gap-3">
-            <div class="relative w-64">
-                <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">search</span>
+            <div class="relative w-72 sm:w-80">
+                <span class="material-icons-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg pointer-events-none">search</span>
                 <input type="text" 
                        x-model="searchQuery"
                        placeholder="Search by code or contact" 
-                       class="w-full bg-white border border-slate-200 rounded-full pl-9 pr-4 py-1.5 text-xs text-slate-700 placeholder-slate-400 focus:outline-none focus:border-indigo-500 shadow-2xs transition">
+                       class="w-full bg-white border border-slate-200/90 rounded-full pl-11 pr-5 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs transition">
             </div>
 
-            <button @click="showNewModal = true" class="bg-[#4f46e5] hover:bg-[#4338ca] text-white px-5 py-1.5 rounded-full font-semibold text-xs shadow-2xs transition whitespace-nowrap">
+            <button @click="showNewModal = true" class="bg-[#4f46e5] hover:bg-[#4338ca] text-white px-7 py-2.5 rounded-full font-semibold text-sm shadow-xs transition-colors whitespace-nowrap cursor-pointer flex items-center justify-center">
                 Add a contract
             </button>
         </div>

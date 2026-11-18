@@ -11,18 +11,18 @@
         </div>
 
         <div class="flex items-center gap-3">
-            <form method="GET" action="{{ route('settings.companyTypes') }}" class="relative w-full sm:w-72">
-                <span class="material-icons-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none">search</span>
+            <form method="GET" action="{{ route('settings.companyTypes') }}" class="relative w-full sm:w-72 md:w-80">
+                <span class="material-icons-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg pointer-events-none">search</span>
                 <input type="text" 
                        name="search" 
                        value="{{ request('search') }}"
                        placeholder="Search company type" 
-                       class="w-full pl-9 pr-4 py-2 bg-white border border-slate-200/90 rounded-full text-xs text-slate-800 placeholder-slate-400 shadow-2xs focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                       class="w-full pl-11 pr-5 py-2.5 bg-white border border-slate-200/90 rounded-full text-sm text-slate-800 placeholder-slate-400 shadow-2xs focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition">
             </form>
 
             <a href="{{ route('settings.companyTypes.create') }}" 
-               class="px-5 py-2 bg-[#4f46e5] hover:bg-[#4338ca] text-white rounded-full text-xs font-semibold flex items-center gap-1.5 shadow-xs transition-colors shrink-0 cursor-pointer">
-                <span class="material-icons text-sm font-bold leading-none">add</span>
+               class="px-6 py-2.5 bg-[#4f46e5] hover:bg-[#4338ca] text-white rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 shadow-xs transition-colors shrink-0 cursor-pointer whitespace-nowrap">
+                <span class="material-icons text-base font-bold leading-none">add</span>
                 <span>Add</span>
             </a>
         </div>
