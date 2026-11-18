@@ -17,8 +17,8 @@
     <!-- Top Header: Back Link, Title, Subtitle, Save Button (Matching Screenshot 2) -->
     <div class="flex items-start justify-between">
         <div>
-            <a href="{{ route('templates.index') }}" class="text-xs font-semibold text-slate-700 hover:text-indigo-600 flex items-center gap-1.5 transition select-none">
-                <span class="text-sm">←</span>
+            <a href="{{ route('templates.index') }}" class="inline-flex items-center gap-1.5 text-slate-700 hover:text-slate-900 text-xs font-semibold transition-colors select-none">
+                <span class="material-icons-outlined text-base">arrow_back</span>
                 <span>Template</span>
             </a>
             <h1 class="text-2xl sm:text-[26px] font-bold text-slate-900 mt-2 tracking-tight">

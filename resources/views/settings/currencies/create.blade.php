@@ -7,8 +7,8 @@
     <!-- Top Header: Back Link, Title, Subtitle, Save Button -->
     <div class="flex items-start justify-between">
         <div>
-            <a href="{{ route('settings.currencies') }}" class="text-xs font-semibold text-slate-700 hover:text-indigo-600 flex items-center gap-1 transition select-none">
-                <span>←</span>
+            <a href="{{ route('settings.currencies') }}" class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 hover:text-indigo-600 transition select-none">
+                <span class="material-icons-outlined text-base">arrow_back</span>
                 <span>Currencies</span>
             </a>
             <h1 class="text-2xl font-bold text-slate-900 mt-2">

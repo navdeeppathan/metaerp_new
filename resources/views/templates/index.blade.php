@@ -36,7 +36,7 @@
                         <th scope="col" class="py-4 px-6 font-semibold text-slate-800 text-xs sm:text-sm">
                             <span class="inline-flex items-center gap-1 cursor-pointer">
                                 <span>Name</span>
-                                <span class="text-slate-500 text-xs font-bold leading-none">↑</span>
+                                <span class="material-icons text-sm text-slate-500 leading-none">arrow_upward</span>
                             </span>
                         </th>
                         <th scope="col" class="py-4 px-6 font-semibold text-slate-800 text-xs sm:text-sm">
