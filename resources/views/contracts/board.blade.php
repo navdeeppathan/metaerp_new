@@ -82,23 +82,38 @@
                      @dragstart="onDragStart($event, {{ $contract->id }}, {{ $stage->id }})"
                      @dragend="onDragEnd($event)">
                     
-                    <!-- Top Pill Tag & Arrow (Matching Screenshot 3 & 4) -->
+                    <!-- Top Pill Tag & Arrow (Matching Screenshot 3) -->
                     <div class="flex items-center justify-between">
                         @if($contract->type == 'SELL')
                             <span class="bg-[#ea580c] text-white font-bold text-xs px-3 py-0.5 rounded-full select-none">
                                 {{ $contract->orderCode }}
                             </span>
-                            <span class="text-slate-800 font-bold text-sm leading-none" title="Sell">↗</span>
+                            <div class="flex items-center text-slate-800" title="Sell">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25" />
+                                </svg>
+                            </div>
                         @elseif($contract->type == 'BUY')
                             <span class="bg-[#86efac] text-slate-800 font-bold text-xs px-3 py-0.5 rounded-full select-none">
                                 {{ $contract->orderCode }}
                             </span>
-                            <span class="text-slate-800 font-bold text-sm leading-none" title="Buy">↙</span>
+                            <div class="flex items-center text-slate-800" title="Buy">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 4.5-15 15m0 0h11.25m-11.25 0V8.25" />
+                                </svg>
+                            </div>
                         @else
                             <span class="bg-[#f1f5f9] text-slate-800 font-bold text-xs px-3 py-0.5 rounded-full border border-slate-200 select-none">
                                 {{ $contract->orderCode }}
                             </span>
-                            <span class="text-slate-800 font-bold text-xs tracking-tighter leading-none" title="Buy & Sell">↙ ↗</span>
+                            <div class="flex items-center text-slate-800 -space-x-1" title="Buy & Sell">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 4.5-15 15m0 0h11.25m-11.25 0V8.25" />
+                                </svg>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 19.5 15-15m0 0H8.25m11.25 0v11.25" />
+                                </svg>
+                            </div>
                         @endif
                     </div>
 
