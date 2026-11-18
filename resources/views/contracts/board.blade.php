@@ -213,7 +213,7 @@
                                     <!-- Order date notch container -->
                                     <div class="relative border border-slate-300 rounded-md px-3 pt-2 pb-1.5 bg-white min-w-[220px] flex items-center justify-between">
                                         <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Order date</label>
-                                        <input type="text" name="order_date" value="{{ now()->format('d/m/Y h:i A') }}" class="text-xs text-slate-800 font-normal w-full bg-transparent border-none focus:outline-none p-0 cursor-pointer">
+                                        <input type="text" name="order_date" x-model="orderDateValue" class="text-xs text-slate-800 font-normal w-full bg-transparent border-none focus:outline-none p-0 cursor-pointer">
                                         <span class="material-icons text-slate-400 text-lg ml-2 pointer-events-none">calendar_today</span>
                                     </div>
 
@@ -244,6 +244,104 @@
                                     <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Description</label>
                                     <textarea name="description" rows="3" class="w-full text-xs text-slate-800 font-normal bg-transparent border-none focus:outline-none p-0 pt-1 resize-y leading-relaxed" placeholder="Description"></textarea>
                                 </div>
+                            </div>
+
+                            <!-- Dynamic Selected Labels Display (from Toolbar Labels icon) -->
+                            <div x-show="selectedLabels.length > 0" class="flex flex-wrap items-center gap-2 pt-1" x-cloak>
+                                <span class="text-xs font-semibold text-slate-500 flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-slate-400 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
+                                    Labels:
+                                </span>
+                                <template x-for="lbl in selectedLabels" :key="lbl.id">
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium shadow-2xs" :class="lbl.class">
+                                        <span x-text="lbl.title"></span>
+                                        <button type="button" @click="toggleLabel(lbl)" class="hover:opacity-75 cursor-pointer ml-1 text-xs">✕</button>
+                                        <input type="hidden" name="labels[]" :value="lbl.title">
+                                    </span>
+                                </template>
+                            </div>
+
+                            <!-- Dynamic Selected Members Display (from Toolbar Members icon) -->
+                            <div x-show="selectedMembers.length > 0" class="flex flex-wrap items-center gap-2 pt-1" x-cloak>
+                                <span class="text-xs font-semibold text-slate-500 flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-slate-400 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    Members:
+                                </span>
+                                <template x-for="mem in selectedMembers" :key="mem.id">
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200">
+                                        <span class="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[10px] font-bold" x-text="(mem.name || mem.username || 'U').charAt(0).toUpperCase()"></span>
+                                        <span x-text="mem.name || mem.username"></span>
+                                        <button type="button" @click="toggleMember(mem)" class="hover:text-red-500 text-slate-400 cursor-pointer ml-0.5">✕</button>
+                                        <input type="hidden" name="member_ids[]" :value="mem.id">
+                                    </span>
+                                </template>
+                            </div>
+
+                            <!-- Dynamic Attached Files Display (from Toolbar Attachments icon) -->
+                            <div x-show="attachedFiles.length > 0" class="space-y-2 pt-2 border-t border-slate-100" x-cloak>
+                                <div class="flex items-center gap-1.5 text-xs font-semibold text-slate-700">
+                                    <svg class="w-4 h-4 text-slate-400 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                                    <span>Attachments</span>
+                                    <span class="text-slate-400 font-normal" x-text="'(' + attachedFiles.length + ')'"></span>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                                    <template x-for="(file, idx) in attachedFiles" :key="idx">
+                                        <div class="border border-slate-200 rounded-lg p-2.5 flex items-center justify-between bg-slate-50/50 hover:bg-slate-50 transition">
+                                            <div class="flex items-center gap-2 min-w-0">
+                                                <span class="material-icons text-slate-400 text-base shrink-0">insert_drive_file</span>
+                                                <div class="truncate">
+                                                    <p class="text-xs font-medium text-slate-800 truncate" x-text="file.name"></p>
+                                                    <p class="text-[10px] text-slate-400" x-text="file.size"></p>
+                                                </div>
+                                            </div>
+                                            <button type="button" @click="removeAttachedFile(idx)" class="text-slate-400 hover:text-red-500 p-1 cursor-pointer" title="Remove attachment">✕</button>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <!-- Dynamic Checklists Display (from Toolbar Checklist icon) -->
+                            <div x-show="checklists.length > 0" class="space-y-4 pt-2 border-t border-slate-100" x-cloak>
+                                <template x-for="(chk, cIndex) in checklists" :key="chk.id">
+                                    <div class="border border-slate-200 rounded-xl p-4 bg-slate-50/30 space-y-3">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center gap-2">
+                                                <svg class="w-5 h-5 text-indigo-600 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                <span class="font-semibold text-xs text-slate-800" x-text="chk.name"></span>
+                                            </div>
+                                            <div class="flex items-center gap-3">
+                                                <span class="text-xs font-semibold text-slate-500" x-text="getChecklistProgress(chk) + '%'"></span>
+                                                <button type="button" @click="removeChecklist(chk.id)" class="text-slate-400 hover:text-red-500 text-xs transition cursor-pointer" title="Delete checklist">
+                                                    <span class="material-icons text-base">delete_outline</span>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Progress Bar -->
+                                        <div class="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
+                                            <div class="bg-indigo-600 h-1.5 rounded-full transition-all duration-300" :style="'width: ' + getChecklistProgress(chk) + '%'"></div>
+                                        </div>
+
+                                        <!-- Check Items -->
+                                        <div class="space-y-1.5">
+                                            <template x-for="(item, iIndex) in chk.checkItems" :key="item.id">
+                                                <div class="flex items-center justify-between group py-1 px-2 rounded-md hover:bg-white transition">
+                                                    <label class="flex items-center gap-2.5 text-xs text-slate-700 cursor-pointer flex-1">
+                                                        <input type="checkbox" x-model="item.checked" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                                                        <span :class="item.checked ? 'line-through text-slate-400' : 'text-slate-800'" x-text="item.name"></span>
+                                                    </label>
+                                                    <button type="button" @click="removeChecklistItem(chk, item.id)" class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 text-xs transition cursor-pointer">✕</button>
+                                                </div>
+                                            </template>
+                                        </div>
+
+                                        <!-- Add an item input -->
+                                        <div class="flex items-center gap-2 pt-1">
+                                            <input type="text" x-model="chk.newItemName" placeholder="Add an item" @keydown.enter.prevent="addChecklistItem(chk)" class="flex-1 text-xs border border-slate-300 rounded-md px-3 py-1.5 focus:outline-none focus:border-indigo-500 bg-white">
+                                            <button type="button" @click="addChecklistItem(chk)" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-md transition cursor-pointer">Add</button>
+                                        </div>
+                                    </div>
+                                </template>
                             </div>
 
                             <!-- Tabs: Buying from / Selling to (Screenshot 1 & 3) -->
@@ -846,29 +944,160 @@
                             </div>
                         </div>
 
-                        <!-- Right Sidebar Toolbar (Screenshot 1, 2, 3) -->
-                        <div class="w-12 bg-slate-50/80 border-l border-slate-200 flex flex-col items-center py-4 gap-6 text-slate-400 shrink-0 select-none">
-                            <button type="button" @click="showNewModal = false" class="hover:text-slate-600 transition cursor-pointer" title="Close">
-                                <span class="material-icons text-lg">close</span>
-                            </button>
-                            <button type="button" class="hover:text-slate-600 transition cursor-pointer" title="Calendar">
-                                <span class="material-icons text-base">calendar_today</span>
-                            </button>
-                            <button type="button" class="hover:text-slate-600 transition cursor-pointer" title="Labels">
-                                <span class="material-icons text-base">label</span>
-                            </button>
-                            <button type="button" class="hover:text-slate-600 transition cursor-pointer" title="Members">
-                                <span class="material-icons text-base">person</span>
-                            </button>
-                            <button type="button" class="hover:text-slate-600 transition cursor-pointer" title="Attachments">
-                                <span class="material-icons text-base">attach_file</span>
-                            </button>
-                            <button type="button" class="hover:text-slate-600 transition cursor-pointer" title="Checklists">
-                                <span class="material-icons text-base">check_circle</span>
-                            </button>
-                            <button type="button" class="hover:text-slate-600 transition cursor-pointer" title="Options">
-                                <span class="material-icons text-base">more_horiz</span>
-                            </button>
+                        <!-- Right Sidebar Toolbar (Matching Screenshots 1 & 2 exact capsule & icons) -->
+                        <div class="shrink-0 p-3 sm:p-4 flex items-start select-none">
+                            <!-- Hidden File Upload for Attachments -->
+                            <input type="file" multiple x-ref="newContractFileInput" @change="handleFileUpload($event)" class="hidden">
+
+                            <div class="w-11 bg-[#f0f4f8] rounded-2xl py-3.5 px-1.5 flex flex-col items-center gap-5 text-slate-500 shadow-2xs relative">
+                                <!-- 1. Close Button (X) -->
+                                <button type="button" @click="showNewModal = false" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-800 hover:text-slate-950 hover:bg-slate-200/60 transition cursor-pointer" title="Close">
+                                    <svg class="w-5 h-5 stroke-[2.2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+
+                                <!-- 2. Due Date (Calendar) -->
+                                <div class="relative">
+                                    <button type="button" @click="openToolbarMenu = (openToolbarMenu === 'due' ? null : 'due')" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-200/60 transition cursor-pointer" :class="openToolbarMenu === 'due' ? 'bg-slate-200/80 text-slate-800' : ''" title="Due Date">
+                                        <svg class="w-5 h-5 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        </svg>
+                                    </button>
+                                    <!-- Due Date Popover -->
+                                    <div x-show="openToolbarMenu === 'due'" @click.outside="openToolbarMenu = null" x-cloak class="absolute right-12 top-0 z-50 w-72 bg-white rounded-xl shadow-xl border border-slate-200 p-4 text-slate-800 text-left">
+                                        <div class="flex items-center justify-between pb-2 mb-3 border-b border-slate-100">
+                                            <span class="text-xs font-bold text-slate-800">Due Date</span>
+                                            <button type="button" @click="openToolbarMenu = null" class="text-slate-400 hover:text-slate-600 text-xs cursor-pointer">✕</button>
+                                        </div>
+                                        <div class="space-y-3">
+                                            <div>
+                                                <label class="block text-[11px] font-medium text-slate-500 mb-1">Set due date</label>
+                                                <input type="datetime-local" x-model="dueDateInput" @change="orderDateValue = formatDueDate(dueDateInput); openToolbarMenu = null; showToast('Due date updated');" class="w-full text-xs border border-slate-300 rounded-md px-2.5 py-1.5 focus:outline-none focus:border-indigo-500">
+                                            </div>
+                                            <template x-if="orderDateValue">
+                                                <button type="button" @click="orderDateValue = ''; dueDateInput = ''; openToolbarMenu = null; showToast('Due date removed');" class="w-full py-1.5 text-center text-xs text-red-600 hover:bg-red-50 rounded-md font-medium transition cursor-pointer">
+                                                    Remove Due Date
+                                                </button>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 3. Labels (Tag) -->
+                                <div class="relative">
+                                    <button type="button" @click="openToolbarMenu = (openToolbarMenu === 'labels' ? null : 'labels')" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-200/60 transition cursor-pointer" :class="openToolbarMenu === 'labels' ? 'bg-slate-200/80 text-slate-800' : ''" title="Labels">
+                                        <svg class="w-5 h-5 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                                        </svg>
+                                    </button>
+                                    <!-- Labels Popover -->
+                                    <div x-show="openToolbarMenu === 'labels'" @click.outside="openToolbarMenu = null" x-cloak class="absolute right-12 top-0 z-50 w-64 bg-white rounded-xl shadow-xl border border-slate-200 p-3 text-slate-800 text-left">
+                                        <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                                            <span class="text-xs font-bold text-slate-800">Labels</span>
+                                            <button type="button" @click="openToolbarMenu = null" class="text-slate-400 hover:text-slate-600 text-xs cursor-pointer">✕</button>
+                                        </div>
+                                        <div class="space-y-1 max-h-56 overflow-y-auto">
+                                            <template x-for="lbl in availableLabels" :key="lbl.id">
+                                                <button type="button" @click="toggleLabel(lbl)" class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-slate-50 transition cursor-pointer text-left">
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="w-3 h-3 rounded-full" :style="'background-color: ' + lbl.color"></span>
+                                                        <span class="text-xs font-medium text-slate-700" x-text="lbl.title"></span>
+                                                    </div>
+                                                    <span class="text-xs" :class="isLabelSelected(lbl.id) ? 'text-indigo-600 font-bold' : 'text-transparent'">✓</span>
+                                                </button>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 4. Members (User Circle) -->
+                                <div class="relative">
+                                    <button type="button" @click="openToolbarMenu = (openToolbarMenu === 'members' ? null : 'members')" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-200/60 transition cursor-pointer" :class="openToolbarMenu === 'members' ? 'bg-slate-200/80 text-slate-800' : ''" title="Members">
+                                        <svg class="w-5 h-5 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                    </button>
+                                    <!-- Members Popover -->
+                                    <div x-show="openToolbarMenu === 'members'" @click.outside="openToolbarMenu = null" x-cloak class="absolute right-12 top-0 z-50 w-72 bg-white rounded-xl shadow-xl border border-slate-200 p-3 text-slate-800 text-left">
+                                        <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+                                            <span class="text-xs font-bold text-slate-800">Members</span>
+                                            <button type="button" @click="openToolbarMenu = null" class="text-slate-400 hover:text-slate-600 text-xs cursor-pointer">✕</button>
+                                        </div>
+                                        <div class="space-y-1 max-h-56 overflow-y-auto">
+                                            <template x-for="mem in availableMembers" :key="mem.id">
+                                                <button type="button" @click="toggleMember(mem)" class="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg hover:bg-slate-50 transition cursor-pointer text-left">
+                                                    <div class="flex items-center gap-2 min-w-0">
+                                                        <div class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0" x-text="(mem.name || mem.username || 'U').charAt(0).toUpperCase()"></div>
+                                                        <span class="text-xs font-medium text-slate-700 truncate" x-text="mem.name || mem.username"></span>
+                                                    </div>
+                                                    <span class="text-xs" :class="isMemberSelected(mem.id) ? 'text-indigo-600 font-bold' : 'text-transparent'">✓</span>
+                                                </button>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 5. Attachments (Paperclip) -->
+                                <div>
+                                    <button type="button" @click="$refs.newContractFileInput.click()" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-200/60 transition cursor-pointer" title="Attachments">
+                                        <svg class="w-5 h-5 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                <!-- 6. Checklist (Check Circle) -->
+                                <div class="relative">
+                                    <button type="button" @click="openToolbarMenu = (openToolbarMenu === 'checklist' ? null : 'checklist')" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-200/60 transition cursor-pointer" :class="openToolbarMenu === 'checklist' ? 'bg-slate-200/80 text-slate-800' : ''" title="Checklist">
+                                        <svg class="w-5 h-5 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                    </button>
+                                    <!-- Checklist Popover -->
+                                    <div x-show="openToolbarMenu === 'checklist'" @click.outside="openToolbarMenu = null" x-cloak class="absolute right-12 top-0 z-50 w-72 bg-white rounded-xl shadow-xl border border-slate-200 p-4 text-slate-800 text-left">
+                                        <div class="flex items-center justify-between pb-2 mb-3 border-b border-slate-100">
+                                            <span class="text-xs font-bold text-slate-800">Add Checklist</span>
+                                            <button type="button" @click="openToolbarMenu = null" class="text-slate-400 hover:text-slate-600 text-xs cursor-pointer">✕</button>
+                                        </div>
+                                        <div class="space-y-3">
+                                            <div>
+                                                <label class="block text-[11px] font-medium text-slate-500 mb-1">Checklist title</label>
+                                                <input type="text" x-model="newChecklistTitle" placeholder="Checklist title" @keydown.enter.prevent="addChecklist()" class="w-full text-xs border border-slate-300 rounded-md px-2.5 py-1.5 focus:outline-none focus:border-indigo-500">
+                                            </div>
+                                            <div class="flex items-center justify-end gap-2 pt-1">
+                                                <button type="button" @click="openToolbarMenu = null" class="px-3 py-1.5 text-xs text-slate-500 hover:bg-slate-100 rounded-md font-medium transition cursor-pointer">Cancel</button>
+                                                <button type="button" @click="addChecklist()" class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md text-xs font-semibold shadow-xs transition cursor-pointer">Add</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 7. Options (Dots Horizontal) -->
+                                <div class="relative">
+                                    <button type="button" @click="openToolbarMenu = (openToolbarMenu === 'options' ? null : 'options')" class="w-8 h-8 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-200/60 transition cursor-pointer" :class="openToolbarMenu === 'options' ? 'bg-slate-200/80 text-slate-800' : ''" title="Options">
+                                        <svg class="w-5 h-5 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"></path>
+                                        </svg>
+                                    </button>
+                                    <!-- Options Popover -->
+                                    <div x-show="openToolbarMenu === 'options'" @click.outside="openToolbarMenu = null" x-cloak class="absolute right-12 bottom-0 z-50 w-52 bg-white rounded-xl shadow-xl border border-slate-200 py-1.5 text-slate-800 text-left">
+                                        <button type="button" @click="finishContract()" class="w-full px-4 py-2 text-left text-xs text-slate-700 hover:bg-slate-50 hover:text-indigo-600 transition flex items-center gap-2 cursor-pointer">
+                                            <span class="material-icons text-sm text-slate-400">task_alt</span>
+                                            <span>Finish contract</span>
+                                        </button>
+                                        <button type="button" @click="duplicateContract()" class="w-full px-4 py-2 text-left text-xs text-slate-700 hover:bg-slate-50 hover:text-indigo-600 transition flex items-center gap-2 cursor-pointer">
+                                            <span class="material-icons text-sm text-slate-400">content_copy</span>
+                                            <span>Duplicate Contract</span>
+                                        </button>
+                                        <div class="h-px bg-slate-100 my-1"></div>
+                                        <button type="button" @click="cancelContract()" class="w-full px-4 py-2 text-left text-xs text-red-600 hover:bg-red-50 transition flex items-center gap-2 cursor-pointer">
+                                            <span class="material-icons text-sm text-red-500">cancel</span>
+                                            <span>Cancel contract</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -951,6 +1180,126 @@ function kanbanBoard() {
         commentsList: [],
         companiesData: @js($companies),
         contactsData: @js($contacts),
+
+        // Floating Toolbar State & Actions
+        openToolbarMenu: null,
+        orderDateValue: '{{ now()->format("d/m/Y h:i A") }}',
+        dueDateInput: '',
+        selectedLabels: [],
+        availableLabels: [
+            { id: 1, title: 'High Priority', class: 'bg-red-500 text-white', color: '#ef4444' },
+            { id: 2, title: 'Design', class: 'bg-blue-500 text-white', color: '#3b82f6' },
+            { id: 3, title: 'App', class: 'bg-emerald-500 text-white', color: '#10b981' },
+            { id: 4, title: 'Feature', class: 'bg-purple-500 text-white', color: '#8b5cf6' },
+            { id: 5, title: 'Urgent', class: 'bg-amber-500 text-white', color: '#f59e0b' }
+        ],
+        selectedMembers: [],
+        availableMembers: @js($users ?? []),
+        attachedFiles: [],
+        checklists: [],
+        newChecklistTitle: '',
+
+        formatDueDate(val) {
+            if (!val) return '';
+            const d = new Date(val);
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const year = d.getFullYear();
+            let hours = d.getHours();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            const strHours = String(hours).padStart(2, '0');
+            const minutes = String(d.getMinutes()).padStart(2, '0');
+            return `${day}/${month}/${year} ${strHours}:${minutes} ${ampm}`;
+        },
+        toggleLabel(lbl) {
+            const idx = this.selectedLabels.findIndex(l => l.id === lbl.id);
+            if (idx >= 0) {
+                this.selectedLabels.splice(idx, 1);
+            } else {
+                this.selectedLabels.push(lbl);
+            }
+        },
+        isLabelSelected(id) {
+            return this.selectedLabels.some(l => l.id === id);
+        },
+        toggleMember(mem) {
+            const idx = this.selectedMembers.findIndex(m => m.id === mem.id);
+            if (idx >= 0) {
+                this.selectedMembers.splice(idx, 1);
+            } else {
+                this.selectedMembers.push(mem);
+            }
+        },
+        isMemberSelected(id) {
+            return this.selectedMembers.some(m => m.id === id);
+        },
+        handleFileUpload(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+            for (let i = 0; i < files.length; i++) {
+                const f = files[i];
+                const sizeFormatted = (f.size / 1024).toFixed(1) + ' KB';
+                this.attachedFiles.push({
+                    name: f.name,
+                    size: sizeFormatted
+                });
+            }
+            this.showToast(files.length + ' file(s) attached');
+            event.target.value = '';
+        },
+        removeAttachedFile(index) {
+            this.attachedFiles.splice(index, 1);
+        },
+        addChecklist() {
+            if (!this.newChecklistTitle || !this.newChecklistTitle.trim()) {
+                this.newChecklistTitle = 'Checklist';
+            }
+            this.checklists.push({
+                id: Date.now(),
+                name: this.newChecklistTitle.trim(),
+                newItemName: '',
+                checkItems: []
+            });
+            this.newChecklistTitle = '';
+            this.openToolbarMenu = null;
+            this.showToast('Checklist added');
+        },
+        removeChecklist(id) {
+            this.checklists = this.checklists.filter(c => c.id !== id);
+        },
+        addChecklistItem(checklist) {
+            if (!checklist.newItemName || !checklist.newItemName.trim()) return;
+            if (!checklist.checkItems) checklist.checkItems = [];
+            checklist.checkItems.push({
+                id: Date.now(),
+                name: checklist.newItemName.trim(),
+                checked: false
+            });
+            checklist.newItemName = '';
+        },
+        removeChecklistItem(checklist, itemId) {
+            checklist.checkItems = checklist.checkItems.filter(item => item.id !== itemId);
+        },
+        getChecklistProgress(checklist) {
+            if (!checklist.checkItems || checklist.checkItems.length === 0) return 0;
+            const checked = checklist.checkItems.filter(i => i.checked).length;
+            return Math.round((checked / checklist.checkItems.length) * 100);
+        },
+        duplicateContract() {
+            this.openToolbarMenu = null;
+            this.showToast('Contract form duplicated');
+        },
+        finishContract() {
+            this.openToolbarMenu = null;
+            this.showToast('Contract finished');
+        },
+        cancelContract() {
+            this.openToolbarMenu = null;
+            this.showNewModal = false;
+            this.showToast('Contract creation cancelled');
+        },
         newBuyingProducts: [
             { product_id: '{{ $products->first()?->id ?? 1 }}', quantity: 0, uom: 'MT', unitPrice: 0, pricing_type: 'Fixed' }
         ],

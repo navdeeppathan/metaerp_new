@@ -80,11 +80,12 @@ class WebContractController extends Controller
         $paymentTypes = PaymentType::all();
         $paymentTerms = PaymentTermsType::all();
         $countries = Country::all();
+        $users = User::all();
 
         return view('contracts.board', compact(
             'models', 'currentModel', 'stages', 'contracts',
             'companies', 'contacts', 'products', 'currencies',
-            'packTypes', 'paymentTypes', 'paymentTerms', 'countries'
+            'packTypes', 'paymentTypes', 'paymentTerms', 'countries', 'users'
         ));
     }
 
@@ -131,6 +132,7 @@ class WebContractController extends Controller
         $paymentTypes = PaymentType::all();
         $paymentTerms = PaymentTermsType::all();
         $countries = Country::all();
+        $users = User::all();
 
         $activities = Log::with('user')
             ->where('module', 'CONTRACT')
@@ -141,7 +143,7 @@ class WebContractController extends Controller
         return view('contracts.partials.card-modal', compact(
             'contract', 'stages', 'templates', 'companies', 'contacts', 
             'products', 'currencies', 'packTypes', 'paymentTypes', 'paymentTerms', 
-            'countries', 'activities'
+            'countries', 'activities', 'users'
         ));
     }
 
