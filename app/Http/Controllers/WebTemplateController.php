@@ -9,7 +9,7 @@ class WebTemplateController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Template::with('language');
+        $query = Template::with(['language', 'country']);
 
         if ($request->filled('search')) {
             $search = $request->input('search');
@@ -21,7 +21,6 @@ class WebTemplateController extends Controller
                   });
             });
         } else {
-            // Default to ANNEX_VII templates if present to match the exact view
             $hasAnnex = Template::where('name', 'like', 'ANNEX%')->exists();
             if ($hasAnnex) {
                 $query->where('name', 'like', 'ANNEX%');
@@ -40,7 +39,7 @@ class WebTemplateController extends Controller
 
     public function show($id)
     {
-        $template = Template::with('language')->findOrFail($id);
+        $template = Template::with(['language', 'country'])->findOrFail($id);
 
         return view('templates.show', compact('template'));
     }
@@ -49,11 +48,18 @@ class WebTemplateController extends Controller
     {
         $template = Template::findOrFail($id);
 
-        $template->update([
-            'html' => $request->input('html', $template->html),
-            'name' => $request->input('name', $template->name),
-            'type' => $request->input('type', $template->type),
-        ]);
+        $html = $request->input('html', $request->input('content', ''));
+        
+        $template->html = $html;
+
+        if ($request->filled('name')) {
+            $template->name = $request->input('name');
+        }
+        if ($request->filled('type')) {
+            $template->type = $request->input('type');
+        }
+        
+        $template->save();
 
         if ($request->wantsJson()) {
             return response()->json([
