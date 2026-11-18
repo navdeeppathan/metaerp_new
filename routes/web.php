@@ -41,6 +41,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/contracts/{id}', [WebContractController::class, 'show'])->name('contracts.show');
     Route::get('/findContracts/{id}', [WebContractController::class, 'show']);
     Route::post('/contracts', [WebContractController::class, 'store'])->name('contracts.store');
+    Route::match(['post', 'put'], '/contracts/{id}', [WebContractController::class, 'update'])->name('contracts.update');
     Route::match(['post', 'put'], '/contracts/{id}/move', [WebContractController::class, 'moveStage'])->name('contracts.move');
     Route::match(['post', 'put'], '/contracts/{id}/move-stage', [WebContractController::class, 'moveStage'])->name('contracts.move-stage');
     Route::match(['post', 'put'], '/contracts/{id}/cancel', [WebContractController::class, 'cancel'])->name('contracts.cancel');

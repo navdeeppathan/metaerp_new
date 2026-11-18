@@ -74,7 +74,7 @@
                         ? ($contract->purchase?->metaCompany?->name ?? 'MetaZn LTD') 
                         : ($contract->sale?->metaCompany?->name ?? 'Metaenterprices LTD');
                 @endphp
-                <div class="bg-white p-3.5 rounded-xl border border-slate-200/80 shadow-2xs hover:shadow-md transition-all cursor-grab active:cursor-grabbing space-y-2.5 relative group"
+                <div class="bg-white p-3.5 rounded-xl border {{ $contract->type == 'SELL' ? 'border-[#ea580c]' : ($contract->type == 'BUY' ? 'border-emerald-400' : 'border-slate-200/80') }} shadow-2xs hover:shadow-md transition-all cursor-pointer space-y-2.5 relative group"
                      draggable="true"
                      id="card-contract-{{ $contract->id }}"
                      data-contract-id="{{ $contract->id }}"
@@ -82,24 +82,25 @@
                      data-order-code="{{ strtolower($contract->orderCode ?? '') }}"
                      data-company="{{ strtolower($companyName) }}"
                      x-show="matchesSearch('{{ strtolower($contract->orderCode ?? '') }}', '{{ strtolower($companyName) }}')"
+                     @click="openCardModal({{ $contract->id }})"
                      @dragstart="onDragStart($event, {{ $contract->id }}, {{ $stage->id }})"
                      @dragend="onDragEnd($event)">
                     
-                    <!-- Top Pill Tag & Arrow -->
+                    <!-- Top Pill Tag & Arrow (Matching Screenshot 1) -->
                     <div class="flex items-center justify-between">
                         @if($contract->type == 'SELL')
-                            <span class="bg-[#ea580c] text-white font-bold text-xs px-3 py-0.5 rounded-full">
-                                <a href="{{ route('contracts.show', $contract->id) }}" class="hover:underline">{{ $contract->orderCode }}</a>
+                            <span class="bg-[#ea580c] text-white font-bold text-xs px-3 py-0.5 rounded-full select-none">
+                                {{ $contract->orderCode }}
                             </span>
                             <span class="text-slate-400 font-bold text-sm leading-none" title="Sell">↗</span>
                         @elseif($contract->type == 'BUY')
-                            <span class="bg-[#16a34a] text-white font-bold text-xs px-3 py-0.5 rounded-full">
-                                <a href="{{ route('contracts.show', $contract->id) }}" class="hover:underline">{{ $contract->orderCode }}</a>
+                            <span class="bg-[#16a34a] text-white font-bold text-xs px-3 py-0.5 rounded-full select-none">
+                                {{ $contract->orderCode }}
                             </span>
                             <span class="text-slate-400 font-bold text-sm leading-none" title="Buy">↙</span>
                         @else
-                            <span class="bg-[#f1f5f9] text-slate-800 font-bold text-xs px-3 py-0.5 rounded-full border border-slate-200">
-                                <a href="{{ route('contracts.show', $contract->id) }}" class="hover:underline">{{ $contract->orderCode }}</a>
+                            <span class="bg-[#f1f5f9] text-slate-800 font-bold text-xs px-3 py-0.5 rounded-full border border-slate-200 select-none">
+                                {{ $contract->orderCode }}
                             </span>
                             <span class="text-slate-400 font-bold text-xs tracking-tighter leading-none" title="Buy & Sell">↙ ↗</span>
                         @endif
@@ -147,15 +148,15 @@
                     </div>
                     @endif
 
-                    <!-- Card Footer: Red Dollar Icon -->
+                    <!-- Card Footer: Red Dollar Icon (Screenshot 1) -->
                     <div class="pt-1 flex items-center justify-between">
                         <span class="w-4 h-4 rounded-full border border-rose-500 text-rose-500 flex items-center justify-center text-[10px] font-bold leading-none select-none">
                             $
                         </span>
 
-                        <a href="{{ route('contracts.show', $contract->id) }}" class="opacity-0 group-hover:opacity-100 transition text-[11px] text-indigo-600 hover:underline">
-                            View details
-                        </a>
+                        <span class="opacity-0 group-hover:opacity-100 transition text-[11px] text-indigo-600 font-medium">
+                            Click to edit
+                        </span>
                     </div>
                 </div>
                 @empty
@@ -572,16 +573,64 @@
             </div>
         </div>
     </div>
+
+    <!-- CARD DETAIL POPUP MODAL (Matching exact screenshots 2, 3, 4) -->
+    <div x-show="showCardModal" class="fixed inset-0 z-50 overflow-y-auto" style="display: none;" @keydown.escape.window="showCardModal = false">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+            <div class="fixed inset-0 transition-opacity bg-slate-900/60 backdrop-blur-xs" @click="showCardModal = false"></div>
+            
+            <div class="inline-block w-full max-w-6xl my-8 overflow-hidden text-left align-middle transition-all transform bg-white rounded-2xl shadow-2xl border border-slate-200">
+                <!-- Modal Loading State -->
+                <div x-show="modalLoading" class="p-16 flex flex-col items-center justify-center space-y-3 min-h-[350px]">
+                    <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
+                    <span class="text-xs text-slate-500 font-medium">Loading contract details...</span>
+                </div>
+                
+                <!-- Dynamic Modal Content Injected via AJAX -->
+                <div id="cardModalContent" x-show="!modalLoading"></div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
 function kanbanBoard() {
     return {
         showNewModal: false,
+        showCardModal: false,
+        modalLoading: false,
+        activeContractId: null,
         searchQuery: '',
         draggingContractId: null,
         draggingSourceStageId: null,
         dropTargetStageId: null,
+
+        openCardModal(id) {
+            this.activeContractId = id;
+            this.showCardModal = true;
+            this.modalLoading = true;
+            const content = document.getElementById('cardModalContent');
+            if (content) content.innerHTML = '';
+            
+            fetch(`/contracts/${id}/modal`)
+                .then(res => {
+                    if (!res.ok) throw new Error('Failed to load contract modal');
+                    return res.text();
+                })
+                .then(html => {
+                    if (content) {
+                        content.innerHTML = html;
+                        if (window.Alpine) {
+                            Alpine.initTree(content);
+                        }
+                    }
+                    this.modalLoading = false;
+                })
+                .catch(err => {
+                    console.error('Failed to load contract modal:', err);
+                    this.modalLoading = false;
+                });
+        },
         newProducts: [
             { product_id: '{{ $products->first()?->id ?? 1 }}', quantity: 0, uom: 'MT', unitPrice: 0, pricing_type: 'Fixed' }
         ],

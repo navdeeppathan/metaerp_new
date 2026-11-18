@@ -92,11 +92,27 @@ class WebContractController extends Controller
     {
         $contract = Contract::with([
             'stage',
-            'purchase.metaCompany', 'purchase.contact.types', 'purchase.address.country',
-            'purchase.currency', 'purchase.paymentType', 'purchase.paymentTermsType', 'purchase.paymentAccount',
+            'purchase.metaCompany.bankAccounts',
+            'purchase.contact.addresses.representatives',
+            'purchase.address',
+            'purchase.contactRepresentative',
+            'purchase.shippingAddress',
+            'purchase.countryOfOrigin',
+            'purchase.currency',
+            'purchase.paymentType',
+            'purchase.paymentTermsType',
+            'purchase.paymentAccount',
             'purchase.products.product',
-            'sale.metaCompany', 'sale.contact.types', 'sale.address.country',
-            'sale.currency', 'sale.paymentType', 'sale.paymentTermsType', 'sale.paymentAccount',
+            'sale.metaCompany.bankAccounts',
+            'sale.contact.addresses.representatives',
+            'sale.address',
+            'sale.contactRepresentative',
+            'sale.shippingAddress',
+            'sale.countryOfOrigin',
+            'sale.currency',
+            'sale.paymentType',
+            'sale.paymentTermsType',
+            'sale.paymentAccount',
             'sale.products.product',
             'packingLists.packs.packType',
             'generatedFiles.template',
@@ -107,8 +123,104 @@ class WebContractController extends Controller
 
         $stages = Stage::where('model_id', $contract->stage?->model_id ?? 1)->orderBy('position')->get();
         $templates = Template::all();
+        $companies = Company::with('bankAccounts')->where('active', true)->get();
+        $contacts = Contact::with(['addresses.representatives'])->where('active', true)->get();
+        $products = Product::where('active', true)->get();
+        $currencies = Currency::all();
+        $packTypes = PackType::all();
+        $paymentTypes = PaymentType::all();
+        $paymentTerms = PaymentTermsType::all();
+        $countries = Country::all();
 
-        return view('contracts.partials.card-modal', compact('contract', 'stages', 'templates'));
+        $activities = Log::with('user')
+            ->where('module', 'CONTRACT')
+            ->where('data_id', $contract->id)
+            ->orderBy('date_time', 'desc')
+            ->get();
+
+        return view('contracts.partials.card-modal', compact(
+            'contract', 'stages', 'templates', 'companies', 'contacts', 
+            'products', 'currencies', 'packTypes', 'paymentTypes', 'paymentTerms', 
+            'countries', 'activities'
+        ));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $contract = Contract::with(['purchase', 'sale'])->findOrFail($id);
+
+        if ($request->has('dueDate') || $request->has('due_date')) {
+            $rawDate = $request->input('dueDate') ?: $request->input('due_date');
+            if (is_numeric($rawDate)) {
+                $contract->due_date = \Carbon\Carbon::createFromTimestamp($rawDate);
+            } else {
+                $contract->due_date = \Carbon\Carbon::parse($rawDate);
+            }
+        }
+        if ($request->has('type')) {
+            $contract->type = $request->input('type');
+        }
+        if ($request->has('description')) {
+            $contract->description = $request->input('description');
+        }
+        if ($request->has('weight_tolerance') || $request->has('weightTolerance')) {
+            $contract->weight_tolerance = $request->input('weight_tolerance') ?: $request->input('weightTolerance');
+        }
+        if ($request->has('mode_of_transport') || $request->has('modeOfTransport')) {
+            $contract->mode_of_transport = $request->input('mode_of_transport') ?: $request->input('modeOfTransport');
+        }
+        if ($request->has('port_of_loading') || $request->has('portOfLoading')) {
+            $contract->port_of_loading = $request->input('port_of_loading') ?: $request->input('portOfLoading');
+        }
+        if ($request->has('port_of_delivery') || $request->has('portOfDelivery')) {
+            $contract->port_of_delivery = $request->input('port_of_delivery') ?: $request->input('portOfDelivery');
+        }
+        $contract->save();
+
+        // Update active deal (Purchase or Sale)
+        $dealTarget = null;
+        if (in_array($contract->type, ['BUY', 'BUY_AND_SELL']) && $contract->purchase) {
+            $dealTarget = $contract->purchase;
+        } elseif ($contract->sale) {
+            $dealTarget = $contract->sale;
+        }
+
+        if ($dealTarget) {
+            $dealFields = [];
+            if ($request->filled('meta_company_id')) $dealFields['meta_company_id'] = $request->input('meta_company_id');
+            if ($request->filled('payment_account_id')) $dealFields['payment_account_id'] = $request->input('payment_account_id');
+            if ($request->filled('payment_date')) $dealFields['payment_date'] = $request->input('payment_date');
+            if ($request->filled('country_of_origin_id')) $dealFields['country_of_origin_id'] = $request->input('country_of_origin_id');
+            if ($request->filled('contact_id')) $dealFields['contact_id'] = $request->input('contact_id');
+            if ($request->filled('address_id')) $dealFields['address_id'] = $request->input('address_id');
+            if ($request->filled('contact_representative_id')) $dealFields['contact_representative_id'] = $request->input('contact_representative_id');
+            if ($request->filled('shipping_address_id')) $dealFields['shipping_address_id'] = $request->input('shipping_address_id');
+            if ($request->filled('currency_id')) $dealFields['currency_id'] = $request->input('currency_id');
+            if ($request->filled('dollar_convertion_rate')) $dealFields['dollar_convertion_rate'] = $request->input('dollar_convertion_rate');
+            if ($request->filled('incoterms')) $dealFields['incoterms'] = $request->input('incoterms');
+            if ($request->filled('external_order_number')) $dealFields['external_order_number'] = $request->input('external_order_number');
+            if ($request->filled('payment_type_id')) $dealFields['payment_type_id'] = $request->input('payment_type_id');
+            if ($request->filled('payment_terms_type_id')) $dealFields['payment_terms_type_id'] = $request->input('payment_terms_type_id');
+            if ($request->filled('payment_terms')) $dealFields['payment_terms'] = $request->input('payment_terms');
+            if ($request->filled('advanced_payment')) $dealFields['advanced_payment'] = $request->input('advanced_payment');
+            if ($request->filled('notes')) $dealFields['notes'] = $request->input('notes');
+
+            if (!empty($dealFields)) {
+                $dealTarget->update($dealFields);
+            }
+        }
+
+        $this->auditService->register('CONTRACT', $contract->id, 'UPDATED', json_encode($request->all()));
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Contract updated successfully',
+                'contract' => $contract
+            ]);
+        }
+
+        return back()->with('success', 'Contract updated successfully');
     }
 
     public function moveStage(Request $request, $contractId)
