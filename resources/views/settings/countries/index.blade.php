@@ -30,12 +30,6 @@
         </div>
     </div>
 
-    <!-- Feedback messages -->
-    @if(session('success'))
-        <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700 text-xs font-medium">
-            {{ session('success') }}
-        </div>
-    @endif
 
     <!-- Countries Data Table Card -->
     <div class="bg-white rounded-xl shadow-xs border border-slate-200/70 overflow-hidden min-h-[calc(100vh-210px)] flex flex-col justify-between">

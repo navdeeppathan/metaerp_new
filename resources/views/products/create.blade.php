@@ -48,12 +48,6 @@
         </div>
     </div>
 
-    <!-- Feedback messages -->
-    @if(session('success'))
-        <div class="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700 text-xs font-medium">
-            {{ session('success') }}
-        </div>
-    @endif
 
     @if(isset($errors) && $errors->any())
         <div class="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-xs font-medium">
