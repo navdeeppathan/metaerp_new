@@ -20,6 +20,7 @@ use App\Models\Template;
 use App\Models\Log;
 use App\Models\GeneratedFile;
 use App\Models\Country;
+use App\Models\User;
 use App\Services\OrderCodeService;
 use App\Services\ContractActionService;
 use App\Services\ContractAssociationService;
