@@ -53,6 +53,21 @@ class Offer extends Model
         'contract_code',
         'offer_date',
         'accepted_at',
+        'meta_company_id',
+        'contact_id',
+        'product_id',
+        'quantity',
+        'unitPrice',
+        'total',
+        'currency_id',
+        'address_id',
+        'contact_representative_id',
+        'payment_type_id',
+        'payment_terms_type_id',
+        'paymentTerms',
+        'incoterms',
+        'agree_date',
+        'products_json',
     ];
 
     protected $casts = [
@@ -64,6 +79,8 @@ class Offer extends Model
         'sales_invoice_date' => 'datetime',
         'offer_date' => 'datetime',
         'accepted_at' => 'datetime',
+        'agree_date' => 'datetime',
+        'products_json' => 'array',
         'transport_price_agreed' => 'double',
         'version' => 'integer',
     ];
@@ -85,6 +102,185 @@ class Offer extends Model
             return \Carbon\Carbon::parse($date)->format('d M y');
         }
         return null;
+    }
+
+    public function getActiveDealAttribute()
+    {
+        if (strtoupper($this->type ?? '') === 'BUY') {
+            return $this->purchase;
+        }
+        return $this->sale ?? $this->purchase;
+    }
+
+    public function getEffectiveMetaCompanyIdAttribute()
+    {
+        return $this->active_deal?->meta_company_id ?? $this->meta_company_id;
+    }
+
+    public function getEffectiveContactIdAttribute()
+    {
+        return $this->active_deal?->contact_id ?? $this->contact_id;
+    }
+
+    public function getEffectiveAddressIdAttribute()
+    {
+        return $this->active_deal?->address_id ?? $this->address_id;
+    }
+
+    public function getEffectiveContactRepresentativeIdAttribute()
+    {
+        return $this->active_deal?->contact_representative_id ?? $this->contact_representative_id;
+    }
+
+    public function getEffectiveCurrencyIdAttribute()
+    {
+        return $this->active_deal?->currency_id ?? $this->currency_id;
+    }
+
+    public function getEffectiveIncotermsAttribute()
+    {
+        return $this->active_deal?->incoterms ?? $this->incoterms;
+    }
+
+    public function getEffectivePaymentTypeIdAttribute()
+    {
+        return $this->active_deal?->payment_type_id ?? $this->payment_type_id;
+    }
+
+    public function getEffectivePaymentTermsTypeIdAttribute()
+    {
+        return $this->active_deal?->payment_terms_type_id ?? $this->payment_terms_type_id;
+    }
+
+    public function getEffectivePaymentTermsAttribute()
+    {
+        return $this->active_deal?->paymentTerms ?? $this->payment_terms ?? $this->paymentTerms;
+    }
+
+    public function getEffectiveAgreeDateAttribute()
+    {
+        return $this->active_deal?->paymentDate ?? $this->agree_date;
+    }
+
+    public function getEffectiveProductsListAttribute()
+    {
+        if ($this->active_deal) {
+            // 1. Check deal_products pivot table (as defined in metaerp.sql production schema)
+            try {
+                if (\Illuminate\Support\Facades\Schema::hasTable('deal_products')) {
+                    $dpIds = \Illuminate\Support\Facades\DB::table('deal_products')
+                        ->where('deal_id', $this->active_deal->id)
+                        ->pluck('products_id');
+                    if ($dpIds->isNotEmpty()) {
+                        $dealProducts = DealProduct::whereIn('id', $dpIds)->with('product')->get();
+                        if ($dealProducts->isNotEmpty()) {
+                            return $dealProducts->map(function($dp) {
+                                return [
+                                    'id' => $dp->id,
+                                    'product_id' => $dp->product_id,
+                                    'item_name' => $dp->product?->name ?? 'Product #' . $dp->product_id,
+                                    'quantity' => (float)($dp->quantity ?? 0),
+                                    'uom' => $dp->uom ?? $dp->product?->uom ?? $dp->product?->unitOfMeasurement ?? 'MT',
+                                    'unit_price' => (float)($dp->rate ?? $dp->unitPrice ?? 0),
+                                    'total' => (float)($dp->total_price ?? $dp->total ?? (($dp->quantity ?? 0) * ($dp->rate ?? $dp->unitPrice ?? 0))),
+                                    'pricing_type' => $dp->pricing_type ?? $dp->pricingType ?? 'CUSTOM',
+                                ];
+                            });
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {}
+
+            // 2. Direct column on deal_product
+            try {
+                if (\Illuminate\Support\Facades\Schema::hasColumn('deal_product', 'deal_id')) {
+                    $dealProducts = DealProduct::where('deal_id', $this->active_deal->id)->with('product')->get();
+                    if ($dealProducts->isNotEmpty()) {
+                        return $dealProducts->map(function($dp) {
+                            return [
+                                'id' => $dp->id,
+                                'product_id' => $dp->product_id,
+                                'item_name' => $dp->product?->name ?? 'Product #' . $dp->product_id,
+                                'quantity' => (float)($dp->quantity ?? 0),
+                                'uom' => $dp->uom ?? $dp->product?->uom ?? $dp->product?->unitOfMeasurement ?? 'MT',
+                                'unit_price' => (float)($dp->rate ?? $dp->unitPrice ?? 0),
+                                'total' => (float)($dp->total_price ?? $dp->total ?? (($dp->quantity ?? 0) * ($dp->rate ?? $dp->unitPrice ?? 0))),
+                                'pricing_type' => $dp->pricing_type ?? $dp->pricingType ?? 'CUSTOM',
+                            ];
+                        });
+                    }
+                }
+            } catch (\Throwable $e) {}
+        }
+
+        if (!empty($this->products_json)) {
+            $decoded = is_string($this->products_json) ? json_decode($this->products_json, true) : $this->products_json;
+            if (is_array($decoded) && count($decoded) > 0) {
+                return collect($decoded)->map(function($p) {
+                    return [
+                        'id' => $p['id'] ?? 1,
+                        'product_id' => $p['product_id'] ?? null,
+                        'item_name' => $p['item_name'] ?? 'Product',
+                        'quantity' => (float)($p['quantity'] ?? 0),
+                        'uom' => $p['uom'] ?? 'MT',
+                        'unit_price' => (float)($p['unit_price'] ?? 0),
+                        'total' => (float)($p['total'] ?? (($p['quantity'] ?? 0) * ($p['unit_price'] ?? 0))),
+                        'pricing_type' => $p['pricing_type'] ?? 'CUSTOM',
+                    ];
+                });
+            }
+        }
+
+        if ($this->product_id) {
+            $prod = Product::find($this->product_id);
+            return collect([[
+                'id' => 1,
+                'product_id' => $this->product_id,
+                'item_name' => $prod?->name ?? 'Product #' . $this->product_id,
+                'quantity' => (float)($this->quantity ?? 0),
+                'uom' => $prod?->uom ?? $prod?->unitOfMeasurement ?? 'MT',
+                'unit_price' => (float)($this->unitPrice ?? $this->rate ?? 0),
+                'total' => (float)($this->total ?? (($this->quantity ?? 0) * ($this->unitPrice ?? 0))),
+                'pricing_type' => 'CUSTOM',
+            ]]);
+        }
+
+        return collect();
+    }
+
+    public function metaCompany()
+    {
+        return $this->belongsTo(Company::class, 'meta_company_id', 'id');
+    }
+
+    public function contact()
+    {
+        return $this->belongsTo(Contact::class, 'contact_id', 'id');
+    }
+
+    public function address()
+    {
+        return $this->belongsTo(Address::class, 'address_id', 'id');
+    }
+
+    public function contactRepresentative()
+    {
+        return $this->belongsTo(Representative::class, 'contact_representative_id', 'id');
+    }
+
+    public function currencyRel()
+    {
+        return $this->belongsTo(Currency::class, 'currency_id', 'id');
+    }
+
+    public function paymentType()
+    {
+        return $this->belongsTo(PaymentType::class, 'payment_type_id', 'id');
+    }
+
+    public function paymentTermsType()
+    {
+        return $this->belongsTo(PaymentTermsType::class, 'payment_terms_type_id', 'id');
     }
 
     public function purchase()
