@@ -6,6 +6,7 @@ use App\Models\Contract;
 use App\Models\Company;
 use App\Models\Contact;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class WebSearchController extends Controller
 {
@@ -13,11 +14,46 @@ class WebSearchController extends Controller
     {
         $status = $request->input('status', 'OPEN');
         $type = $request->input('type', 'ALL');
-        $fromDate = $request->input('from_date', '2026-09-05');
-        $toDate = $request->input('to_date', '2026-11-04');
 
-        $query = Contract::with(['stage', 'purchase.contact', 'purchase.metaCompany', 'sale.contact', 'sale.metaCompany'])
-            ->where('active', true);
+        // Default date range: 60 days before today to today (matches screenshot: 19/09/2026 - 18/11/2026)
+        $defaultFrom = Carbon::now()->subDays(60)->format('d/m/Y');
+        $defaultTo = Carbon::now()->format('d/m/Y');
+
+        $fromDateRaw = $request->input('from_date', $request->input('startDate', $defaultFrom));
+        $toDateRaw = $request->input('to_date', $request->input('endDate', $defaultTo));
+
+        $fromDate = null;
+        $toDate = null;
+
+        if (!empty($fromDateRaw)) {
+            try {
+                $fromDate = Carbon::createFromFormat('d/m/Y', trim($fromDateRaw))->startOfDay();
+            } catch (\Throwable $e) {
+                try {
+                    $fromDate = Carbon::parse($fromDateRaw)->startOfDay();
+                } catch (\Throwable $e2) {}
+            }
+        }
+
+        if (!empty($toDateRaw)) {
+            try {
+                $toDate = Carbon::createFromFormat('d/m/Y', trim($toDateRaw))->endOfDay();
+            } catch (\Throwable $e) {
+                try {
+                    $toDate = Carbon::parse($toDateRaw)->endOfDay();
+                } catch (\Throwable $e2) {}
+            }
+        }
+
+        $query = Contract::with([
+            'stage',
+            'purchase.contact',
+            'purchase.metaCompany',
+            'sale.contact',
+            'sale.metaCompany'
+        ])->where(function($q) {
+            $q->where('active', true)->orWhereNull('active');
+        });
 
         if ($request->filled('q')) {
             $q = $request->input('q');
@@ -29,26 +65,35 @@ class WebSearchController extends Controller
             });
         }
 
-        if ($status && $status !== 'ALL') {
-            $query->where('status', $status);
+        if ($status && strtoupper($status) !== 'ALL') {
+            $query->where('status', strtoupper($status));
         }
 
-        if ($type && $type !== 'ALL') {
-            $query->where('type', $type);
+        if ($type && strtoupper($type) !== 'ALL') {
+            $query->where('type', strtoupper($type));
         }
 
         if ($fromDate) {
-            $query->whereDate('due_date', '>=', $fromDate);
+            $query->where('due_date', '>=', $fromDate);
         }
 
         if ($toDate) {
-            $query->whereDate('due_date', '<=', $toDate);
+            $query->where('due_date', '<=', $toDate);
         }
 
-        $contracts = $query->orderBy('order_code', 'asc')->paginate(10);
+        $perPage = (int) $request->input('per_page', 10);
+        if (!in_array($perPage, [10, 25, 50, 100])) {
+            $perPage = 10;
+        }
+
+        // Ordered by due_date desc as shown in standard view
+        $contracts = $query->orderBy('due_date', 'desc')->paginate($perPage)->withQueryString();
         $companies = Company::where('active', true)->get();
         $contacts = Contact::where('active', true)->get();
 
-        return view('contracts.search', compact('contracts', 'companies', 'contacts', 'status', 'type', 'fromDate', 'toDate'));
+        return view('contracts.search', compact(
+            'contracts', 'companies', 'contacts', 'status', 'type',
+            'fromDateRaw', 'toDateRaw', 'perPage'
+        ));
     }
 }

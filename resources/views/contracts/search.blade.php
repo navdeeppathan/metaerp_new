@@ -3,46 +3,83 @@
 @section('title', 'Find Contracts')
 
 @section('content')
-<div class="space-y-6">
-    <!-- Header with Title & Filter Bar -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Find Contracts</h1>
+<!-- Flatpickr CDN for interactive date range selection -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<div class="w-full space-y-6">
+    <!-- Header with Title & Filter Bar Matching Screenshot -->
+    <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-4 pt-1">
+        <h1 class="text-2xl sm:text-[28px] font-extrabold text-[#0f172a] tracking-tight">Find Contracts</h1>
 
         <!-- Filter Bar -->
-        <form action="{{ route('contracts.search') }}" method="GET" class="flex flex-wrap items-center gap-3">
-            <!-- Date range pill -->
-            <div class="flex items-center gap-2 bg-white border border-slate-200 rounded-full px-4 py-1.5 shadow-xs text-xs text-slate-600">
-                <span>05/09/2026</span>
-                <span class="material-icons text-slate-400 text-sm">calendar_today</span>
-                <span class="text-slate-300">-</span>
-                <span>04/11/2026</span>
-                <span class="material-icons text-slate-400 text-sm">calendar_today</span>
+        <form action="{{ route('contracts.search') }}" method="GET" id="searchFilterForm" class="flex flex-wrap items-center gap-2.5 sm:gap-3">
+            <input type="hidden" name="per_page" id="per_page_input" value="{{ $perPage ?? 10 }}">
+
+            <!-- Date Range Picker Pill -->
+            <div class="flex items-center bg-white border border-slate-200 rounded-full px-4 py-2 shadow-2xs text-xs sm:text-[13px] text-slate-700">
+                <input
+                    type="text"
+                    name="from_date"
+                    id="from_date"
+                    value="{{ $fromDateRaw }}"
+                    class="w-24 bg-transparent text-slate-800 text-xs sm:text-[13px] focus:outline-none cursor-pointer text-center"
+                    placeholder="DD/MM/YYYY"
+                    readonly
+                />
+                <button type="button" id="from_calendar_btn" class="text-slate-400 hover:text-slate-600 focus:outline-none ml-1 flex items-center">
+                    <span class="material-icons-outlined text-[17px]">calendar_today</span>
+                </button>
+                <span class="text-slate-400 mx-2">-</span>
+                <input
+                    type="text"
+                    name="to_date"
+                    id="to_date"
+                    value="{{ $toDateRaw }}"
+                    class="w-24 bg-transparent text-slate-800 text-xs sm:text-[13px] focus:outline-none cursor-pointer text-center"
+                    placeholder="DD/MM/YYYY"
+                    readonly
+                />
+                <button type="button" id="to_calendar_btn" class="text-slate-400 hover:text-slate-600 focus:outline-none ml-1 flex items-center">
+                    <span class="material-icons-outlined text-[17px]">calendar_today</span>
+                </button>
             </div>
 
             <!-- Status Dropdown Pill -->
-            <div class="relative">
-                <select name="status" onchange="this.form.submit()" class="appearance-none bg-white border border-slate-200 rounded-full pl-4 pr-8 py-1.5 shadow-xs text-xs font-normal text-slate-700 focus:outline-none focus:border-indigo-500 cursor-pointer">
-                    <option value="OPEN" {{ ($status ?? 'OPEN') == 'OPEN' ? 'selected' : '' }}>Status: OPEN</option>
-                    <option value="ALL" {{ ($status ?? '') == 'ALL' ? 'selected' : '' }}>Status: ALL</option>
-                    <option value="CLOSED" {{ ($status ?? '') == 'CLOSED' ? 'selected' : '' }}>Status: CLOSED</option>
-                    <option value="CANCELLED" {{ ($status ?? '') == 'CANCELLED' ? 'selected' : '' }}>Status: CANCELLED</option>
+            <div class="relative flex items-center bg-white border border-slate-200 rounded-full px-4 py-2 shadow-2xs">
+                <select
+                    name="status"
+                    id="status"
+                    class="appearance-none bg-transparent pr-5 text-xs sm:text-[13px] font-normal text-slate-700 focus:outline-none cursor-pointer"
+                >
+                    <option value="OPEN" {{ ($status ?? 'OPEN') === 'OPEN' ? 'selected' : '' }}>Status: OPEN</option>
+                    <option value="ALL" {{ ($status ?? '') === 'ALL' ? 'selected' : '' }}>Status: ALL</option>
+                    <option value="CLOSED" {{ ($status ?? '') === 'CLOSED' ? 'selected' : '' }}>Status: CLOSED</option>
+                    <option value="CANCELLED" {{ ($status ?? '') === 'CANCELLED' ? 'selected' : '' }}>Status: CANCELLED</option>
                 </select>
-                <span class="material-icons absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none">arrow_drop_down</span>
+                <span class="material-icons absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-base pointer-events-none">arrow_drop_down</span>
             </div>
 
             <!-- Type Dropdown Pill -->
-            <div class="relative">
-                <select name="type" onchange="this.form.submit()" class="appearance-none bg-white border border-slate-200 rounded-full pl-4 pr-8 py-1.5 shadow-xs text-xs font-normal text-slate-700 focus:outline-none focus:border-indigo-500 cursor-pointer">
-                    <option value="ALL" {{ ($type ?? 'ALL') == 'ALL' ? 'selected' : '' }}>Type: ALL</option>
-                    <option value="BUY_AND_SELL" {{ ($type ?? '') == 'BUY_AND_SELL' ? 'selected' : '' }}>Type: BUY_AND_SELL</option>
-                    <option value="BUY" {{ ($type ?? '') == 'BUY' ? 'selected' : '' }}>Type: BUY</option>
-                    <option value="SELL" {{ ($type ?? '') == 'SELL' ? 'selected' : '' }}>Type: SELL</option>
+            <div class="relative flex items-center bg-white border border-slate-200 rounded-full px-4 py-2 shadow-2xs">
+                <select
+                    name="type"
+                    id="type"
+                    class="appearance-none bg-transparent pr-5 text-xs sm:text-[13px] font-normal text-slate-700 focus:outline-none cursor-pointer"
+                >
+                    <option value="ALL" {{ ($type ?? 'ALL') === 'ALL' ? 'selected' : '' }}>Type: ALL</option>
+                    <option value="BUY_AND_SELL" {{ ($type ?? '') === 'BUY_AND_SELL' ? 'selected' : '' }}>Type: BUY & SELL</option>
+                    <option value="BUY" {{ ($type ?? '') === 'BUY' ? 'selected' : '' }}>Type: BUY</option>
+                    <option value="SELL" {{ ($type ?? '') === 'SELL' ? 'selected' : '' }}>Type: SELL</option>
                 </select>
-                <span class="material-icons absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm pointer-events-none">arrow_drop_down</span>
+                <span class="material-icons absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-base pointer-events-none">arrow_drop_down</span>
             </div>
 
-            <!-- Purple Search Button -->
-            <button type="submit" class="bg-[#4f46e5] hover:bg-[#4338ca] text-white px-6 py-1.5 rounded-full font-medium text-xs shadow-xs transition">
+            <!-- Search Button -->
+            <button
+                type="submit"
+                class="bg-[#4f46e5] hover:bg-[#4338ca] text-white px-6 py-2 rounded-full font-medium text-xs sm:text-[13px] shadow-xs transition-colors cursor-pointer"
+            >
                 Search
             </button>
         </form>
@@ -50,39 +87,86 @@
 
     <!-- Contracts Table -->
     <div class="bg-white rounded-lg overflow-x-auto min-h-[380px]">
-        <table class="w-full text-left text-xs border-collapse">
+        <table class="w-full text-left text-xs sm:text-sm border-collapse">
             <thead>
-                <tr class="border-b border-slate-200 text-slate-900 font-bold text-[13px]">
-                    <th class="py-3 px-4 font-bold">Order Code</th>
-                    <th class="py-3 px-4 font-bold">Status</th>
-                    <th class="py-3 px-4 font-bold">Type</th>
-                    <th class="py-3 px-4 font-bold">Date</th>
-                    <th class="py-3 px-4 font-bold">Purchase</th>
-                    <th class="py-3 px-4 font-bold">Sale</th>
-                    <th class="py-3 px-4 font-bold">Finish Date</th>
-                    <th class="py-3 px-4 font-bold">Cancellation Date</th>
+                <tr class="border-b border-slate-100 text-slate-800 font-semibold select-none">
+                    <th class="py-3 px-4 font-semibold">Order Code</th>
+                    <th class="py-3 px-4 font-semibold">Status</th>
+                    <th class="py-3 px-4 font-semibold">Type</th>
+                    <th class="py-3 px-4 font-semibold">Date</th>
+                    <th class="py-3 px-4 font-semibold">Purchase</th>
+                    <th class="py-3 px-4 font-semibold">Sale</th>
+                    <th class="py-3 px-4 font-semibold">Finish Date</th>
+                    <th class="py-3 px-4 font-semibold">Cancellation Date</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100 text-slate-700 text-xs">
+            <tbody class="divide-y divide-slate-100 text-slate-800 text-xs sm:text-sm">
                 @forelse($contracts as $c)
-                <tr class="hover:bg-slate-50/70 transition">
-                    <td class="py-4 px-4">
-                        <a href="{{ route('contracts.show', $c->id) }}" class="text-blue-600 hover:underline">
-                            {{ $c->orderCode }}
-                        </a>
+                <tr
+                    onclick="window.location='{{ route('contracts.show', $c->id) }}'"
+                    class="hover:bg-slate-50/70 transition-colors cursor-pointer"
+                >
+                    <td class="py-4 sm:py-5 px-4 font-normal text-slate-800 whitespace-nowrap">
+                        {{ $c->orderCode ?? $c->order_code }}
                     </td>
-                    <td class="py-4 px-4">{{ ($c->contractStatus == 'ACTIVE' || $c->contractStatus == 'OPEN') ? 'OPEN' : $c->contractStatus }}</td>
-                    <td class="py-4 px-4">{{ $c->type }}</td>
-                    <td class="py-4 px-4">{{ $c->date ? $c->date->format('d M y') : '' }}</td>
-                    <td class="py-4 px-4 text-slate-800">{{ $c->purchase?->contact?->name ?? '' }}</td>
-                    <td class="py-4 px-4 text-slate-800">{{ $c->sale?->contact?->name ?? '' }}</td>
-                    <td class="py-4 px-4">{{ $c->finishDate ? \Carbon\Carbon::parse($c->finishDate)->format('d M y') : '' }}</td>
-                    <td class="py-4 px-4">{{ $c->cancellationDate ? \Carbon\Carbon::parse($c->cancellationDate)->format('d M y') : '' }}</td>
+                    <td class="py-4 sm:py-5 px-4 font-normal text-slate-800 whitespace-nowrap">
+                        {{ $c->status }}
+                    </td>
+                    <td class="py-4 sm:py-5 px-4 font-normal text-slate-800 whitespace-nowrap">
+                        {{ $c->type }}
+                    </td>
+                    <td class="py-4 sm:py-5 px-4 font-normal text-slate-800 whitespace-nowrap">
+                        @if($c->formatted_due_date)
+                            <div class="leading-tight">
+                                <div>{{ $c->formatted_due_date['day_month'] }}</div>
+                                <div>{{ $c->formatted_due_date['year'] }}</div>
+                            </div>
+                        @elseif($c->due_date)
+                            <div class="leading-tight">
+                                <div>{{ \Carbon\Carbon::parse($c->due_date)->format('d M') }}</div>
+                                <div>{{ \Carbon\Carbon::parse($c->due_date)->format('y') }}</div>
+                            </div>
+                        @else
+                            -
+                        @endif
+                    </td>
+                    <td class="py-4 sm:py-5 px-4 font-normal text-slate-800">
+                        {{ $c->purchase?->contact?->name ?? '' }}
+                    </td>
+                    <td class="py-4 sm:py-5 px-4 font-normal text-slate-800">
+                        {{ $c->sale?->contact?->name ?? '' }}
+                    </td>
+                    <td class="py-4 sm:py-5 px-4 font-normal text-slate-800 whitespace-nowrap">
+                        @if($c->formatted_close_date)
+                            <div class="leading-tight">
+                                <div>{{ $c->formatted_close_date['day_month'] }}</div>
+                                <div>{{ $c->formatted_close_date['year'] }}</div>
+                            </div>
+                        @elseif($c->close_date)
+                            <div class="leading-tight">
+                                <div>{{ \Carbon\Carbon::parse($c->close_date)->format('d M') }}</div>
+                                <div>{{ \Carbon\Carbon::parse($c->close_date)->format('y') }}</div>
+                            </div>
+                        @endif
+                    </td>
+                    <td class="py-4 sm:py-5 px-4 font-normal text-slate-800 whitespace-nowrap">
+                        @if($c->formatted_cancellation_date)
+                            <div class="leading-tight">
+                                <div>{{ $c->formatted_cancellation_date['day_month'] }}</div>
+                                <div>{{ $c->formatted_cancellation_date['year'] }}</div>
+                            </div>
+                        @elseif($c->cancellation_date)
+                            <div class="leading-tight">
+                                <div>{{ \Carbon\Carbon::parse($c->cancellation_date)->format('d M') }}</div>
+                                <div>{{ \Carbon\Carbon::parse($c->cancellation_date)->format('y') }}</div>
+                            </div>
+                        @endif
+                    </td>
                 </tr>
                 @empty
                 <tr>
                     <td colspan="8" class="py-12 text-center text-slate-400">
-                        No contracts found matching criteria.
+                        There are no contracts!
                     </td>
                 </tr>
                 @endforelse
@@ -90,26 +174,79 @@
         </table>
     </div>
 
-    <!-- Pagination Footer -->
-    <div class="flex items-center justify-end gap-6 text-xs text-slate-600 pt-4 pb-2">
+    <!-- Pagination Footer Matching Screenshot -->
+    <div class="flex items-center justify-end gap-6 text-xs text-slate-600 pt-3 pb-2 select-none">
         <div class="flex items-center gap-2">
             <span>Rows per page:</span>
-            <div class="flex items-center gap-0.5 cursor-pointer">
-                <span>10</span>
-                <span class="material-icons text-sm text-slate-400">arrow_drop_down</span>
+            <div class="relative inline-flex items-center">
+                <select
+                    onchange="changePerPage(this.value)"
+                    class="appearance-none bg-transparent pr-4 font-medium text-slate-700 cursor-pointer focus:outline-none"
+                >
+                    <option value="10" {{ ($perPage ?? 10) == 10 ? 'selected' : '' }}>10</option>
+                    <option value="25" {{ ($perPage ?? 10) == 25 ? 'selected' : '' }}>25</option>
+                    <option value="50" {{ ($perPage ?? 10) == 50 ? 'selected' : '' }}>50</option>
+                    <option value="100" {{ ($perPage ?? 10) == 100 ? 'selected' : '' }}>100</option>
+                </select>
+                <span class="material-icons absolute right-0 top-1/2 -translate-y-1/2 text-sm text-slate-400 pointer-events-none">arrow_drop_down</span>
             </div>
         </div>
+
         <div>
-            1-{{ $contracts->count() }} of {{ $contracts->total() }}
+            @if($contracts->total() > 0)
+                {{ ($contracts->currentPage() - 1) * $contracts->perPage() + 1 }}-{{ min($contracts->currentPage() * $contracts->perPage(), $contracts->total()) }} of {{ $contracts->total() }}
+            @else
+                0 of 0
+            @endif
         </div>
-        <div class="flex items-center gap-2 text-slate-400">
-            <button class="hover:text-slate-600 disabled:opacity-40" {{ $contracts->onFirstPage() ? 'disabled' : '' }}>
-                <span class="material-icons text-sm">chevron_left</span>
-            </button>
-            <button class="hover:text-slate-600 disabled:opacity-40" {{ !$contracts->hasMorePages() ? 'disabled' : '' }}>
-                <span class="material-icons text-sm">chevron_right</span>
-            </button>
+
+        <div class="flex items-center gap-1">
+            @if($contracts->onFirstPage())
+                <span class="p-1 text-slate-300 cursor-not-allowed">
+                    <span class="material-icons text-base">chevron_left</span>
+                </span>
+            @else
+                <a href="{{ $contracts->previousPageUrl() }}" class="p-1 text-slate-600 hover:text-slate-900 transition">
+                    <span class="material-icons text-base">chevron_left</span>
+                </a>
+            @endif
+
+            @if($contracts->hasMorePages())
+                <a href="{{ $contracts->nextPageUrl() }}" class="p-1 text-slate-600 hover:text-slate-900 transition">
+                    <span class="material-icons text-base">chevron_right</span>
+                </a>
+            @else
+                <span class="p-1 text-slate-300 cursor-not-allowed">
+                    <span class="material-icons text-base">chevron_right</span>
+                </span>
+            @endif
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const fpConfig = {
+            dateFormat: "d/m/Y",
+            allowInput: true,
+            disableMobile: "true"
+        };
+
+        const fromPicker = flatpickr("#from_date", fpConfig);
+        const toPicker = flatpickr("#to_date", fpConfig);
+
+        document.getElementById('from_calendar_btn')?.addEventListener('click', function() {
+            fromPicker.open();
+        });
+
+        document.getElementById('to_calendar_btn')?.addEventListener('click', function() {
+            toPicker.open();
+        });
+    });
+
+    function changePerPage(val) {
+        document.getElementById('per_page_input').value = val;
+        document.getElementById('searchFilterForm').submit();
+    }
+</script>
 @endsection

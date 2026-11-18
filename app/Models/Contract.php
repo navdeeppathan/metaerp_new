@@ -180,5 +180,41 @@ class Contract extends Model
     {
         $this->attributes['order_code'] = $value;
     }
+
+    public function getFormattedDueDateAttribute()
+    {
+        if ($this->due_date) {
+            return [
+                'day_month' => $this->due_date->format('d M'),
+                'year' => $this->due_date->format('y'),
+                'full' => $this->due_date->format('d M y'),
+            ];
+        }
+        return null;
+    }
+
+    public function getFormattedCloseDateAttribute()
+    {
+        if ($this->close_date) {
+            return [
+                'day_month' => $this->close_date->format('d M'),
+                'year' => $this->close_date->format('y'),
+                'full' => $this->close_date->format('d M y'),
+            ];
+        }
+        return null;
+    }
+
+    public function getFormattedCancellationDateAttribute()
+    {
+        if ($this->cancellation_date) {
+            return [
+                'day_month' => $this->cancellation_date->format('d M'),
+                'year' => $this->cancellation_date->format('y'),
+                'full' => $this->cancellation_date->format('d M y'),
+            ];
+        }
+        return null;
+    }
 }
 
