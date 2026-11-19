@@ -30,12 +30,13 @@ class Access extends Model
 
     public function getAccessTypeAttribute()
     {
-        return $this->attributes['access_type'] ?? null;
+        return $this->attributes['access_type'] ?? $this->attributes['accessType'] ?? null;
     }
 
     public function setAccessTypeAttribute($value)
     {
         $this->attributes['access_type'] = $value;
+        $this->attributes['accessType'] = $value;
     }
 }
 

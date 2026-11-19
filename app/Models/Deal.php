@@ -123,12 +123,18 @@ class Deal extends Model
 
     public function products()
     {
-        return $this->belongsToMany(DealProduct::class, 'deal_products', 'deal_id', 'products_id');
+        if (\Illuminate\Support\Facades\Schema::hasTable('deal_products')) {
+            return $this->belongsToMany(DealProduct::class, 'deal_products', 'deal_id', 'products_id');
+        }
+        return $this->hasMany(DealProduct::class, 'deal_id', 'id');
     }
 
     public function dealProducts()
     {
-        return $this->belongsToMany(DealProduct::class, 'deal_products', 'deal_id', 'products_id');
+        if (\Illuminate\Support\Facades\Schema::hasTable('deal_products')) {
+            return $this->belongsToMany(DealProduct::class, 'deal_products', 'deal_id', 'products_id');
+        }
+        return $this->hasMany(DealProduct::class, 'deal_id', 'id');
     }
 
     public function getContractAttribute()

@@ -118,7 +118,8 @@ class WebDashboardController extends Controller
 
         foreach ($companies as $idx => $company) {
             $companySalesContracts = $contracts->filter(function ($c) use ($company) {
-                return (int) $c->salesCompany === (int) $company->id;
+                $comp = (int) ($c->sale?->meta_company_id ?? $c->salesCompany);
+                return $comp === (int) $company->id;
             });
 
             $totalAmount = 0.0;
@@ -170,7 +171,9 @@ class WebDashboardController extends Controller
 
             foreach ($companies as $c) {
                 $num = $stageContracts->filter(function ($con) use ($c) {
-                    return (int) $con->salesCompany === (int) $c->id || (int) $con->purchaseCompany === (int) $c->id;
+                    $saleComp = (int) ($con->sale?->meta_company_id ?? $con->salesCompany);
+                    $purchComp = (int) ($con->purchase?->meta_company_id ?? $con->purchaseCompany);
+                    return $saleComp === (int) $c->id || $purchComp === (int) $c->id;
                 })->count();
 
                 $counts[] = $num;

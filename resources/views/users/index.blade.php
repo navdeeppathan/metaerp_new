@@ -24,6 +24,7 @@
             </form>
 
             <!-- Add User Pill Button -->
+            @fullAccess('USERS')
             <a
                 href="{{ route('users.create') }}"
                 class="rounded-full bg-[#4f46e5] hover:bg-[#4338ca] text-white px-6 py-2.5 text-sm font-semibold flex items-center justify-center gap-1.5 shadow-xs transition-colors shrink-0 cursor-pointer whitespace-nowrap"
@@ -31,6 +32,7 @@
                 <span class="material-icons text-base font-bold leading-none">add</span>
                 <span>Add</span>
             </a>
+            @endfullAccess
         </div>
     </div>
 

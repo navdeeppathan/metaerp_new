@@ -92,12 +92,17 @@ class DealProduct extends Model
 
     public function getUnitPriceAttribute()
     {
-        return $this->attributes['rate'] ?? 0;
+        return $this->attributes['unit_price'] ?? $this->attributes['unitPrice'] ?? $this->attributes['rate'] ?? 0;
+    }
+
+    public function getTotalPriceAttribute()
+    {
+        return $this->attributes['total_price'] ?? $this->attributes['total'] ?? (($this->quantity ?? 0) * (float)($this->unit_price));
     }
 
     public function getTotalAttribute()
     {
-        return $this->attributes['total_price'] ?? 0;
+        return $this->attributes['total'] ?? $this->attributes['total_price'] ?? (($this->quantity ?? 0) * (float)($this->unit_price));
     }
 }
 

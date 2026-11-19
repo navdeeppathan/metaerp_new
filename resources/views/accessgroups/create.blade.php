@@ -18,6 +18,7 @@
         </div>
 
         <div class="flex items-center gap-3">
+            @fullAccess('ACCESS_CONTROL')
             @if(isset($group))
             <form action="{{ route('accessgroups.destroy', $group->id) }}" method="POST">
                 @csrf
@@ -36,6 +37,11 @@
                     class="px-6 py-1.5 rounded-full font-semibold text-xs transition">
                 Save
             </button>
+            @else
+            <span class="px-5 py-1.5 rounded-full font-medium text-xs bg-slate-100 text-slate-500 border border-slate-200">
+                Read Only
+            </span>
+            @endfullAccess
         </div>
     </div>
 

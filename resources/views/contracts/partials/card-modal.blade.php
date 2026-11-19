@@ -166,10 +166,16 @@
                     <span class="material-icons text-slate-400 text-lg ml-2 pointer-events-none">calendar_today</span>
                 </div>
 
+                @fullAccess('CONTRACT')
                 <button type="submit" 
                         class="bg-[#7c3aed] hover:bg-[#6d28d9] text-white px-6 py-2 rounded-full text-xs font-semibold shadow-xs transition cursor-pointer select-none">
                     Save
                 </button>
+                @else
+                <span class="px-4 py-1.5 bg-slate-100 text-slate-500 text-xs font-medium rounded-full border border-slate-200 select-none">
+                    Read Only
+                </span>
+                @endfullAccess
             </div>
         </div>
 

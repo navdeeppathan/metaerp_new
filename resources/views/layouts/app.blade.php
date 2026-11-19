@@ -230,6 +230,7 @@
             </a>
 
             <!-- Users -->
+            @hasPermission('USERS')
             <a href="{{ route('users.index') }}"
                class="flex items-center rounded-xl transition-all {{ request()->routeIs('users.*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}"
                :class="isExpanded ? 'gap-3 px-3 py-2 justify-start' : 'p-2.5 justify-center'"
@@ -240,8 +241,10 @@
                     <div class="text-[11px] text-slate-400 leading-tight mt-0.5">Manage users</div>
                 </div>
             </a>
+            @endhasPermission
 
             <!-- Products -->
+            @hasPermission('PRODUCT')
             <a href="{{ route('products.index') }}"
                class="flex items-center rounded-xl transition-all {{ request()->routeIs('products.*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}"
                :class="isExpanded ? 'gap-3 px-3 py-2 justify-start' : 'p-2.5 justify-center'"
@@ -252,8 +255,10 @@
                     <div class="text-[11px] text-slate-400 leading-tight mt-0.5">All products</div>
                 </div>
             </a>
+            @endhasPermission
 
             <!-- Meta Group (Companies) -->
+            @hasPermission('COMPANY')
             <a href="{{ route('companies.index') }}"
                class="flex items-center rounded-xl transition-all {{ request()->routeIs('companies.*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}"
                :class="isExpanded ? 'gap-3 px-3 py-2 justify-start' : 'p-2.5 justify-center'"
@@ -264,8 +269,10 @@
                     <div class="text-[11px] text-slate-400 leading-tight mt-0.5">Meta Group of companies</div>
                 </div>
             </a>
+            @endhasPermission
 
             <!-- Contacts -->
+            @hasPermission('CONTACT')
             <a href="{{ route('contacts.index') }}"
                class="flex items-center rounded-xl transition-all {{ request()->routeIs('contacts.*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}"
                :class="isExpanded ? 'gap-3 px-3 py-2 justify-start' : 'p-2.5 justify-center'"
@@ -276,8 +283,10 @@
                     <div class="text-[11px] text-slate-400 leading-tight mt-0.5">Add, find, edit contacts</div>
                 </div>
             </a>
+            @endhasPermission
 
             <!-- Offers -->
+            @hasPermission('OFFER')
             <a href="{{ route('offers.index') }}"
                class="flex items-center rounded-xl transition-all {{ request()->routeIs('offers.*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}"
                :class="isExpanded ? 'gap-3 px-3 py-2 justify-start' : 'p-2.5 justify-center'"
@@ -288,8 +297,10 @@
                     <div class="text-[11px] text-slate-400 leading-tight mt-0.5">Purchase and sales offers</div>
                 </div>
             </a>
+            @endhasPermission
 
             <!-- Find Contracts -->
+            @hasPermission('CONTRACT')
             <a href="{{ route('contracts.search') }}"
                class="flex items-center rounded-xl transition-all {{ request()->routeIs('contracts.search') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}"
                :class="isExpanded ? 'gap-3 px-3 py-2 justify-start' : 'p-2.5 justify-center'"
@@ -312,8 +323,10 @@
                     <div class="text-[11px] text-slate-400 leading-tight mt-0.5">Purchase and sales contracts</div>
                 </div>
             </a>
+            @endhasPermission
 
             <!-- Detached Notes -->
+            @hasPermission(['DETACHED_NOTES', 'CONTRACT'])
             <a href="{{ route('detached-notes.index') }}"
                class="flex items-center rounded-xl transition-all {{ request()->routeIs('detached-notes.*') || request()->is('detached-notes*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}"
                :class="isExpanded ? 'gap-3 px-3 py-2 justify-start' : 'p-2.5 justify-center'"
@@ -324,8 +337,10 @@
                     <div class="text-[11px] text-slate-400 leading-tight mt-0.5">Detached Notes</div>
                 </div>
             </a>
+            @endhasPermission
 
             <!-- Access Control -->
+            @hasPermission('ACCESS_CONTROL')
             <a href="{{ route('accessgroups.index') }}"
                class="flex items-center rounded-xl transition-all {{ request()->routeIs('accessgroups.*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}"
                :class="isExpanded ? 'gap-3 px-3 py-2 justify-start' : 'p-2.5 justify-center'"
@@ -336,8 +351,10 @@
                     <div class="text-[11px] text-slate-400 leading-tight mt-0.5">Manage access control of users</div>
                 </div>
             </a>
+            @endhasPermission
 
             <!-- Templates -->
+            @hasPermission('TEMPLATE')
             <a href="{{ route('templates.index') }}"
                class="flex items-center rounded-xl transition-all {{ request()->routeIs('templates.*') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}"
                :class="isExpanded ? 'gap-3 px-3 py-2 justify-start' : 'p-2.5 justify-center'"
@@ -348,8 +365,10 @@
                     <div class="text-[11px] text-slate-400 leading-tight mt-0.5">Manage templates</div>
                 </div>
             </a>
+            @endhasPermission
 
             <!-- Settings (Collapsible Submenu Matching Screenshots) -->
+            @hasPermission('SYSTEM_SETTINGS')
             <div x-data="{ open: {{ request()->routeIs('settings.*') || request()->is('settings*') || request()->is('countries*') || request()->is('company-types*') || request()->is('credit-debit-types*') || request()->is('currencies*') || request()->is('departments*') || request()->is('packTypes*') || request()->is('paymentTypes*') || request()->is('paymentTermsTypes*') ? 'true' : 'false' }} }">
                 <button @click="if(!isExpanded) { toggleCollapsed(); open = true; } else { open = !open; }"
                         type="button"
@@ -419,6 +438,7 @@
                     </a>
                 </div>
             </div>
+            @endhasPermission
         </nav>
     </aside>
 
@@ -467,6 +487,7 @@
                 </button>
 
                 <!-- Navigation Search Button -->
+                @hasPermission('CONTRACT')
                 <a href="{{ route('contracts.search') }}" 
                    class="w-10 h-10 flex items-center justify-center text-slate-500 hover:text-slate-800 rounded-full hover:bg-slate-100 transition-colors cursor-pointer" 
                    title="Search">
@@ -474,6 +495,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                     </svg>
                 </a>
+                @endhasPermission
 
                 <!-- User Dropdown Menu: Root + circle 'u' -->
                 <div class="relative" x-data="{ open: false }">

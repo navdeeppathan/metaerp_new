@@ -76,6 +76,7 @@
                 </p>
             </div>
 
+            @fullAccess('USERS')
             <div>
                 <button
                     type="submit"
@@ -84,6 +85,13 @@
                     Save
                 </button>
             </div>
+            @else
+            <div>
+                <span class="rounded-full px-5 py-2 text-xs font-medium text-slate-500 bg-slate-100 border border-slate-200">
+                    Read Only
+                </span>
+            </div>
+            @endfullAccess
         </div>
 
         @if (isset($errors) && $errors->any())

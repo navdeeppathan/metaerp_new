@@ -20,9 +20,11 @@
                        class="w-full bg-white border border-slate-200/90 rounded-full pl-11 pr-5 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 shadow-2xs transition">
             </div>
 
+            @fullAccess('CONTRACT')
             <button @click="showNewModal = true" class="bg-[#4f46e5] hover:bg-[#4338ca] text-white px-7 py-2.5 rounded-full font-semibold text-sm shadow-xs transition-colors whitespace-nowrap cursor-pointer flex items-center justify-center">
                 Add a contract
             </button>
+            @endfullAccess
         </div>
     </div>
 

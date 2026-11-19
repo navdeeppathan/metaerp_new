@@ -18,6 +18,7 @@
         </div>
 
         <div class="flex items-center gap-3">
+            @fullAccess('SYSTEM_SETTINGS')
             @if($currency)
             <!-- Remove Button with Trash Icon Matching Screenshot -->
             <form action="{{ route('settings.currencies.destroy', $currency->id) }}" method="POST" class="inline">
@@ -39,6 +40,11 @@
                     class="px-6 py-2 rounded-full text-xs font-semibold transition select-none">
                 Save
             </button>
+            @else
+            <span class="px-5 py-2 rounded-full text-xs font-medium bg-slate-100 text-slate-500 border border-slate-200">
+                Read Only
+            </span>
+            @endfullAccess
         </div>
     </div>
 

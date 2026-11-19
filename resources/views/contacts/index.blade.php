@@ -33,6 +33,7 @@
             </form>
 
             <!-- + Add Button Matching Screenshot -->
+            @fullAccess('CONTACT')
             <a
                 href="{{ route('contacts.create') }}"
                 class="px-6 py-2.5 bg-[#4f46e5] hover:bg-[#4338ca] text-white rounded-full text-sm font-semibold flex items-center justify-center gap-1.5 shadow-xs transition-colors shrink-0 cursor-pointer whitespace-nowrap"
@@ -40,6 +41,7 @@
                 <span class="material-icons text-base font-bold leading-none">add</span>
                 <span>Add</span>
             </a>
+            @endfullAccess
         </div>
     </div>
 

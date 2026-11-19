@@ -157,6 +157,7 @@
                 @endif
 
                 <!-- Save Button -->
+                @fullAccess('CONTACT')
                 <button
                     type="submit"
                     form="contact-form"
@@ -164,6 +165,11 @@
                 >
                     Save
                 </button>
+                @else
+                <span class="inline-flex items-center px-5 py-2 bg-slate-100 text-slate-500 text-xs font-medium rounded-full border border-slate-200">
+                    Read Only
+                </span>
+                @endfullAccess
             </div>
         </div>
     </div>
