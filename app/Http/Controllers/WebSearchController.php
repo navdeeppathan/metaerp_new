@@ -45,6 +45,12 @@ class WebSearchController extends Controller
             }
         }
 
+        $hasDateFilter = $request->has('from_date') || $request->has('startDate') || $request->has('to_date') || $request->has('endDate');
+        if (!$hasDateFilter && ($request->filled('q') || $request->filled('search'))) {
+            $fromDate = null;
+            $toDate = null;
+        }
+
         $query = Contract::with([
             'stage',
             'purchase.contact',
@@ -55,13 +61,14 @@ class WebSearchController extends Controller
             $q->where('active', true)->orWhereNull('active');
         });
 
-        if ($request->filled('q')) {
-            $q = $request->input('q');
-            $query->where(function($sub) use ($q) {
-                $sub->where('order_code', 'like', "%{$q}%")
-                    ->orWhere('customer_purchase_order', 'like', "%{$q}%")
-                    ->orWhereHas('purchase.contact', fn($c) => $c->where('name', 'like', "%{$q}%"))
-                    ->orWhereHas('sale.contact', fn($c) => $c->where('name', 'like', "%{$q}%"));
+        if ($request->filled('q') || $request->filled('search')) {
+            $searchTerm = $request->input('q', $request->input('search'));
+            $query->where(function($sub) use ($searchTerm) {
+                $sub->where('order_code', 'like', "%{$searchTerm}%")
+                    ->orWhere('customer_purchase_order', 'like', "%{$searchTerm}%")
+                    ->orWhere('description', 'like', "%{$searchTerm}%")
+                    ->orWhereHas('purchase.contact', fn($c) => $c->where('name', 'like', "%{$searchTerm}%"))
+                    ->orWhereHas('sale.contact', fn($c) => $c->where('name', 'like', "%{$searchTerm}%"));
             });
         }
 

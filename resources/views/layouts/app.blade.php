@@ -470,7 +470,8 @@
     <!-- Main Content Area -->
     <div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
         <!-- Topbar: Amber Star on Left, Fullscreen + Search + Root (u) on Right (Matching Screenshot Exactly) -->
-        <header class="h-16 bg-white border-b border-slate-200/80 px-6 sm:px-8 flex items-center justify-between shrink-0 shadow-xs z-30 select-none">
+        <header class="relative h-16 bg-white border-b border-slate-200/80 px-6 sm:px-8 flex items-center justify-between shrink-0 shadow-xs z-30 select-none"
+                x-data="headerSearch()">
             <!-- Left Side: Mobile Hamburger Menu & Favorite Amber Star -->
             <div class="flex items-center gap-3">
                 <!-- Mobile Menu Button -->
@@ -506,15 +507,16 @@
                     </svg>
                 </button>
 
-                <!-- Navigation Search Button -->
+                <!-- Navigation Search Trigger Button (Opens Fullscreen Topbar Search) -->
                 @hasPermission('CONTRACT')
-                <a href="{{ route('contracts.search') }}" 
-                   class="w-10 h-10 flex items-center justify-center text-slate-500 hover:text-slate-800 rounded-full hover:bg-slate-100 transition-colors cursor-pointer" 
-                   title="Search">
+                <button type="button" 
+                        @click="openSearch()"
+                        class="w-10 h-10 flex items-center justify-center text-slate-500 hover:text-slate-800 rounded-full hover:bg-slate-100 transition-colors cursor-pointer" 
+                        title="Search">
                     <svg class="w-5 h-5 stroke-[1.8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                     </svg>
-                </a>
+                </button>
                 @endhasPermission
 
                 <!-- User Dropdown Menu: Root + circle 'u' -->
@@ -540,6 +542,143 @@
                             </button>
                         </form>
                     </div>
+                </div>
+            </div>
+
+            <!-- Full Header Search Overlay (Exact React Fuse Search variant="full" as per user screenshot) -->
+            <div x-show="isSearchOpen" 
+                 x-cloak
+                 class="absolute inset-0 bg-white z-40 px-6 sm:px-8 flex items-center justify-between"
+                 @click.away="closeSearch()"
+                 @keydown.escape.window="closeSearch()">
+                <div class="flex-1 flex items-center h-full mr-4">
+                    <input type="text"
+                           x-ref="searchInput"
+                           x-model="searchQuery"
+                           @input.debounce.250ms="performSearch()"
+                           @keydown.enter.prevent="submitSearch()"
+                           placeholder="Search"
+                           class="w-full text-base sm:text-lg text-slate-800 placeholder-slate-400 bg-transparent border-none outline-none focus:outline-none focus:ring-0 p-0 font-normal">
+                </div>
+                <div class="flex items-center gap-2">
+                    <template x-if="loading">
+                        <svg class="animate-spin h-5 w-5 text-slate-400 mr-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </template>
+                    <button type="button" 
+                            @click="closeSearch()" 
+                            class="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-slate-700 rounded-full hover:bg-slate-100 transition-colors cursor-pointer" 
+                            title="Close Search">
+                        <svg class="w-5 h-5 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Autosuggest Dropdown Paper (Matching Fuse Autosuggest) -->
+            <div x-show="isSearchOpen && (totalResults > 0 || (hasSearched && !loading))"
+                 x-cloak
+                 class="absolute top-16 left-0 right-0 bg-white border-t border-slate-200/80 shadow-2xl z-50 max-h-[500px] overflow-y-auto divide-y divide-slate-100 select-auto">
+                <!-- Contracts Section -->
+                <template x-if="suggestions.contracts && suggestions.contracts.length > 0">
+                    <div class="py-2">
+                        <div class="px-6 py-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+                            <span>Contracts</span>
+                            <span x-text="suggestions.contracts.length" class="text-[11px] bg-slate-100 text-slate-500 rounded px-1.5 py-0.5 font-medium"></span>
+                        </div>
+                        <template x-for="contract in suggestions.contracts" :key="'contract-' + contract.id">
+                            <a :href="'/findContracts/' + contract.id" 
+                               class="flex items-center gap-3 px-6 py-2.5 hover:bg-slate-50 transition-colors group text-slate-700">
+                                <span class="material-icons-outlined text-slate-400 group-hover:text-indigo-600 transition-colors text-xl">description</span>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-sm font-semibold text-slate-800 group-hover:text-indigo-600" x-text="contract.order_code"></div>
+                                    <div class="text-xs text-slate-400 truncate" x-text="contract.description || (contract.type + ' • ' + contract.status)"></div>
+                                </div>
+                                <span class="material-icons-outlined text-slate-300 group-hover:text-slate-500 text-sm">arrow_forward</span>
+                            </a>
+                        </template>
+                    </div>
+                </template>
+
+                <!-- Contacts Section -->
+                <template x-if="suggestions.contacts && suggestions.contacts.length > 0">
+                    <div class="py-2">
+                        <div class="px-6 py-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+                            <span>Contacts</span>
+                            <span x-text="suggestions.contacts.length" class="text-[11px] bg-slate-100 text-slate-500 rounded px-1.5 py-0.5 font-medium"></span>
+                        </div>
+                        <template x-for="contact in suggestions.contacts" :key="'contact-' + contact.id">
+                            <a :href="'/contacts/' + contact.id" 
+                               class="flex items-center gap-3 px-6 py-2.5 hover:bg-slate-50 transition-colors group text-slate-700">
+                                <span class="material-icons-outlined text-slate-400 group-hover:text-indigo-600 transition-colors text-xl">people</span>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-sm font-semibold text-slate-800 group-hover:text-indigo-600" x-text="(contact.code_meta ? '(' + contact.code_meta + ') ' : '') + contact.name"></div>
+                                </div>
+                                <span class="material-icons-outlined text-slate-300 group-hover:text-slate-500 text-sm">arrow_forward</span>
+                            </a>
+                        </template>
+                    </div>
+                </template>
+
+                <!-- Products Section -->
+                <template x-if="suggestions.products && suggestions.products.length > 0">
+                    <div class="py-2">
+                        <div class="px-6 py-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+                            <span>Products</span>
+                            <span x-text="suggestions.products.length" class="text-[11px] bg-slate-100 text-slate-500 rounded px-1.5 py-0.5 font-medium"></span>
+                        </div>
+                        <template x-for="product in suggestions.products" :key="'product-' + product.id">
+                            <a :href="'/products/' + product.id" 
+                               class="flex items-center gap-3 px-6 py-2.5 hover:bg-slate-50 transition-colors group text-slate-700">
+                                <span class="material-icons-outlined text-slate-400 group-hover:text-indigo-600 transition-colors text-xl">inventory_2</span>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-sm font-semibold text-slate-800 group-hover:text-indigo-600" x-text="(product.code ? '(' + product.code + ') ' : '') + product.name"></div>
+                                </div>
+                                <span class="material-icons-outlined text-slate-300 group-hover:text-slate-500 text-sm">arrow_forward</span>
+                            </a>
+                        </template>
+                    </div>
+                </template>
+
+                <!-- Offers Section -->
+                <template x-if="suggestions.offers && suggestions.offers.length > 0">
+                    <div class="py-2">
+                        <div class="px-6 py-1.5 text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center justify-between">
+                            <span>Offers</span>
+                            <span x-text="suggestions.offers.length" class="text-[11px] bg-slate-100 text-slate-500 rounded px-1.5 py-0.5 font-medium"></span>
+                        </div>
+                        <template x-for="offer in suggestions.offers" :key="'offer-' + offer.id">
+                            <a :href="'/offers/' + offer.id" 
+                               class="flex items-center gap-3 px-6 py-2.5 hover:bg-slate-50 transition-colors group text-slate-700">
+                                <span class="material-icons-outlined text-slate-400 group-hover:text-indigo-600 transition-colors text-xl">assignment</span>
+                                <div class="flex-1 min-w-0">
+                                    <div class="text-sm font-semibold text-slate-800 group-hover:text-indigo-600" x-text="offer.order_code + (offer.subject ? ' - ' + offer.subject : '')"></div>
+                                </div>
+                                <span class="material-icons-outlined text-slate-300 group-hover:text-slate-500 text-sm">arrow_forward</span>
+                            </a>
+                        </template>
+                    </div>
+                </template>
+
+                <!-- No Results State -->
+                <template x-if="hasSearched && totalResults === 0 && !loading">
+                    <div class="px-6 py-6 text-center text-slate-500 text-sm">
+                        No results found for "<span class="font-semibold text-slate-700" x-text="searchQuery"></span>". 
+                        <div class="mt-2 text-xs text-slate-400">Press <kbd class="px-1.5 py-0.5 bg-slate-100 rounded border border-slate-200 font-mono">Enter</kbd> to search contracts.</div>
+                    </div>
+                </template>
+
+                <!-- Press Enter Footer Hint -->
+                <div @click="submitSearch()" 
+                     class="px-6 py-3 bg-slate-50 hover:bg-slate-100/80 cursor-pointer flex items-center justify-between text-xs text-slate-500 transition-colors">
+                    <span class="flex items-center gap-1.5">
+                        <span class="material-icons-outlined text-sm">search</span>
+                        <span>Search all contracts for "<strong class="font-medium text-slate-800" x-text="searchQuery"></strong>"</span>
+                    </span>
+                    <span class="font-medium text-indigo-600 flex items-center gap-1">Press Enter <span class="material-icons-outlined text-xs">keyboard_return</span></span>
                 </div>
             </div>
         </header>
@@ -767,6 +906,75 @@
         window.hideLoading = function() {
             window.dispatchEvent(new CustomEvent('hide-loader'));
         };
+
+        // Global Header Search Controller (Matching FuseSearch Full Variant)
+        function headerSearch() {
+            return {
+                isSearchOpen: false,
+                searchQuery: '',
+                loading: false,
+                hasSearched: false,
+                suggestions: {
+                    contracts: [],
+                    contacts: [],
+                    products: [],
+                    offers: [],
+                    companies: []
+                },
+                get totalResults() {
+                    return (this.suggestions.contracts?.length || 0) +
+                           (this.suggestions.contacts?.length || 0) +
+                           (this.suggestions.products?.length || 0) +
+                           (this.suggestions.offers?.length || 0) +
+                           (this.suggestions.companies?.length || 0);
+                },
+                openSearch() {
+                    this.isSearchOpen = true;
+                    this.$nextTick(() => {
+                        if (this.$refs.searchInput) {
+                            this.$refs.searchInput.focus();
+                        }
+                    });
+                },
+                closeSearch() {
+                    this.isSearchOpen = false;
+                    this.searchQuery = '';
+                    this.loading = false;
+                    this.hasSearched = false;
+                    this.suggestions = { contracts: [], contacts: [], products: [], offers: [], companies: [] };
+                },
+                async performSearch() {
+                    const q = this.searchQuery.trim();
+                    if (!q) {
+                        this.suggestions = { contracts: [], contacts: [], products: [], offers: [], companies: [] };
+                        this.hasSearched = false;
+                        this.loading = false;
+                        return;
+                    }
+                    this.loading = true;
+                    this.hasSearched = true;
+                    try {
+                        const res = await fetch('/search/autocomplete/' + encodeURIComponent(q), {
+                            headers: { 'Accept': 'application/json' }
+                        });
+                        if (res.ok) {
+                            const data = await res.json();
+                            this.suggestions = data;
+                        }
+                    } catch (err) {
+                        console.error('Header search error:', err);
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+                submitSearch() {
+                    const q = this.searchQuery.trim();
+                    if (q) {
+                        window.location.href = '/findContracts?q=' + encodeURIComponent(q);
+                    }
+                }
+            };
+        }
 
         // Global interceptor for all DELETE forms or forms requiring confirmation
         document.addEventListener('submit', function(e) {

@@ -56,6 +56,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/contracts/{id}', [WebContractController::class, 'show'])->name('contracts.show');
         Route::get('/findContracts/{id}', [WebContractController::class, 'show']);
         Route::get('/findContracts', [WebSearchController::class, 'index'])->name('contracts.search');
+        Route::get('/search/autocomplete/{text}', [\App\Http\Controllers\Api\SearchController::class, 'search'])->name('search.autocomplete');
     });
 
     Route::middleware('permission:CONTRACT,FULL')->group(function () {
