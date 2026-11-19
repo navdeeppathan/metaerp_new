@@ -666,15 +666,7 @@ class ContractController extends BaseApiController
 
     private function parseTimestamp($value): ?Carbon
     {
-        if (!$value) return null;
-        if (is_numeric($value)) {
-            // Check if milliseconds (13 digits) or seconds (10 digits)
-            if ($value > 9999999999) {
-                return Carbon::createFromTimestampMs($value);
-            }
-            return Carbon::createFromTimestamp($value);
-        }
-        return Carbon::parse($value);
+        return Contract::normalizeDateValue($value);
     }
 
     private function formatContractDetail(Contract $c): array

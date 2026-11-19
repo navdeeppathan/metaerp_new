@@ -181,6 +181,81 @@ class Contract extends Model
         $this->attributes['order_code'] = $value;
     }
 
+    public static function normalizeDateValue($rawDate)
+    {
+        if (empty($rawDate)) {
+            return null;
+        }
+
+        if ($rawDate instanceof \Carbon\Carbon || $rawDate instanceof \DateTimeInterface) {
+            return $rawDate;
+        }
+
+        if (is_numeric($rawDate)) {
+            if ($rawDate > 100000000000) {
+                $rawDate = (int) round($rawDate / 1000);
+            }
+            return \Carbon\Carbon::createFromTimestamp($rawDate);
+        }
+
+        $rawDate = trim((string) $rawDate);
+
+        $formats = [
+            'd/m/Y h:i A',
+            'd/m/Y h:i a',
+            'd/m/Y H:i:s',
+            'd/m/Y H:i',
+            'd/m/Y',
+            'd-m-Y h:i A',
+            'd-m-Y h:i a',
+            'd-m-Y H:i:s',
+            'd-m-Y H:i',
+            'd-m-Y',
+            'Y-m-d H:i:s',
+            'Y-m-d H:i',
+            'Y-m-d',
+        ];
+
+        foreach ($formats as $fmt) {
+            try {
+                return \Carbon\Carbon::createFromFormat($fmt, $rawDate);
+            } catch (\Throwable $e) {
+                continue;
+            }
+        }
+
+        try {
+            return \Carbon\Carbon::parse($rawDate);
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    public function setDueDateAttribute($value)
+    {
+        $this->attributes['due_date'] = static::normalizeDateValue($value);
+    }
+
+    public function setLoadingDateAttribute($value)
+    {
+        $this->attributes['loading_date'] = static::normalizeDateValue($value);
+    }
+
+    public function setSalesInvoiceDateAttribute($value)
+    {
+        $this->attributes['sales_invoice_date'] = static::normalizeDateValue($value);
+    }
+
+    public function setCloseDateAttribute($value)
+    {
+        $this->attributes['close_date'] = static::normalizeDateValue($value);
+    }
+
+    public function setCancellationDateAttribute($value)
+    {
+        $this->attributes['cancellation_date'] = static::normalizeDateValue($value);
+    }
+
     public function getFormattedDueDateAttribute()
     {
         if ($this->due_date) {

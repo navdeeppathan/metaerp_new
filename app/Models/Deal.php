@@ -41,6 +41,11 @@ class Deal extends Model
         'payment_date' => 'datetime',
     ];
 
+    public function setPaymentDateAttribute($value)
+    {
+        $this->attributes['payment_date'] = \App\Models\Contract::normalizeDateValue($value);
+    }
+
     public function metaCompany()
     {
         return $this->belongsTo(Company::class, 'meta_company_id', 'id');

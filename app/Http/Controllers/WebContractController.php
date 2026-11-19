@@ -154,11 +154,7 @@ class WebContractController extends Controller
 
         if ($request->has('dueDate') || $request->has('due_date')) {
             $rawDate = $request->input('dueDate') ?: $request->input('due_date');
-            if (is_numeric($rawDate)) {
-                $contract->due_date = \Carbon\Carbon::createFromTimestamp($rawDate);
-            } else {
-                $contract->due_date = \Carbon\Carbon::parse($rawDate);
-            }
+            $contract->due_date = Contract::normalizeDateValue($rawDate) ?: $contract->due_date;
         }
         if ($request->has('type')) {
             $contract->type = $request->input('type');
@@ -192,7 +188,7 @@ class WebContractController extends Controller
             $dealFields = [];
             if ($request->filled('meta_company_id')) $dealFields['meta_company_id'] = $request->input('meta_company_id');
             if ($request->filled('payment_account_id')) $dealFields['payment_account_id'] = $request->input('payment_account_id');
-            if ($request->filled('payment_date')) $dealFields['payment_date'] = $request->input('payment_date');
+            if ($request->filled('payment_date')) $dealFields['payment_date'] = Contract::normalizeDateValue($request->input('payment_date'));
             if ($request->filled('country_of_origin_id')) $dealFields['country_of_origin_id'] = $request->input('country_of_origin_id');
             if ($request->filled('contact_id')) $dealFields['contact_id'] = $request->input('contact_id');
             if ($request->filled('address_id')) $dealFields['address_id'] = $request->input('address_id');
@@ -279,21 +275,9 @@ class WebContractController extends Controller
         // Parse due_date
         $dueDate = now();
         if ($request->filled('order_date')) {
-            try {
-                $dueDate = \Carbon\Carbon::createFromFormat('d/m/Y h:i A', $request->input('order_date'));
-            } catch (\Throwable $e) {
-                try {
-                    $dueDate = \Carbon\Carbon::parse($request->input('order_date'));
-                } catch (\Throwable $e2) {
-                    $dueDate = now();
-                }
-            }
+            $dueDate = Contract::normalizeDateValue($request->input('order_date')) ?: now();
         } elseif ($request->filled('due_date')) {
-            try {
-                $dueDate = \Carbon\Carbon::parse($request->input('due_date'));
-            } catch (\Throwable $e) {
-                $dueDate = now();
-            }
+            $dueDate = Contract::normalizeDateValue($request->input('due_date')) ?: now();
         }
 
         $purchaseDeal = null;
@@ -315,13 +299,7 @@ class WebContractController extends Controller
             $buyingPaymentDate = null;
             if ($request->filled('buying_payment_date') || $request->filled('payment_date')) {
                 $pDate = $request->input('buying_payment_date') ?: $request->input('payment_date');
-                try {
-                    $buyingPaymentDate = \Carbon\Carbon::createFromFormat('d/m/Y', $pDate);
-                } catch (\Throwable $e) {
-                    try {
-                        $buyingPaymentDate = \Carbon\Carbon::parse($pDate);
-                    } catch (\Throwable $e2) {}
-                }
+                $buyingPaymentDate = Contract::normalizeDateValue($pDate);
             }
 
             $purchaseDeal = Deal::create([
@@ -401,13 +379,7 @@ class WebContractController extends Controller
 
             $sellingPaymentDate = null;
             if ($request->filled('selling_payment_date')) {
-                try {
-                    $sellingPaymentDate = \Carbon\Carbon::createFromFormat('d/m/Y', $request->input('selling_payment_date'));
-                } catch (\Throwable $e) {
-                    try {
-                        $sellingPaymentDate = \Carbon\Carbon::parse($request->input('selling_payment_date'));
-                    } catch (\Throwable $e2) {}
-                }
+                $sellingPaymentDate = Contract::normalizeDateValue($request->input('selling_payment_date'));
             }
 
             $saleDeal = Deal::create([
