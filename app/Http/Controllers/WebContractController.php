@@ -352,13 +352,15 @@ class WebContractController extends Controller
                     if (empty($pData['product_id'])) continue;
                     $qty = (float) ($pData['quantity'] ?? 0);
                     $rate = (float) ($pData['unit_price'] ?? 0);
+                    $rawPricing = strtoupper(trim((string)($pData['pricing_type'] ?? 'CUSTOM')));
+                    $pricingType = ($rawPricing === 'LME' || $rawPricing === 'FORMULA') ? 'LME' : 'CUSTOM';
                     $dealProduct = DealProduct::create([
                         'product_id' => $pData['product_id'],
                         'quantity' => $qty,
                         'rate' => $rate,
                         'uom' => $pData['uom'] ?? 'MT',
                         'total_price' => $qty * $rate,
-                        'pricing_type' => $pData['pricing_type'] ?? 'Fixed',
+                        'pricing_type' => $pricingType,
                         'status' => 'PENDING',
                         'active' => true,
                     ]);
@@ -375,7 +377,7 @@ class WebContractController extends Controller
                         'rate' => $unitPrice,
                         'uom' => 'MT',
                         'total_price' => $quantity * $unitPrice,
-                        'pricing_type' => 'Fixed',
+                        'pricing_type' => 'CUSTOM',
                         'status' => 'PENDING',
                         'active' => true,
                     ]);
@@ -436,13 +438,15 @@ class WebContractController extends Controller
                     if (empty($pData['product_id'])) continue;
                     $qty = (float) ($pData['quantity'] ?? 0);
                     $rate = (float) ($pData['unit_price'] ?? 0);
+                    $rawPricing = strtoupper(trim((string)($pData['pricing_type'] ?? 'CUSTOM')));
+                    $pricingType = ($rawPricing === 'LME' || $rawPricing === 'FORMULA') ? 'LME' : 'CUSTOM';
                     $dealProduct = DealProduct::create([
                         'product_id' => $pData['product_id'],
                         'quantity' => $qty,
                         'rate' => $rate,
                         'uom' => $pData['uom'] ?? 'MT',
                         'total_price' => $qty * $rate,
-                        'pricing_type' => $pData['pricing_type'] ?? 'Fixed',
+                        'pricing_type' => $pricingType,
                         'status' => 'PENDING',
                         'active' => true,
                     ]);
@@ -459,7 +463,7 @@ class WebContractController extends Controller
                         'rate' => $unitPrice,
                         'uom' => 'MT',
                         'total_price' => $quantity * $unitPrice,
-                        'pricing_type' => 'Fixed',
+                        'pricing_type' => 'CUSTOM',
                         'status' => 'PENDING',
                         'active' => true,
                     ]);

@@ -75,4 +75,14 @@ class ProductContract extends Model
     {
         return $this->belongsTo(Product::class, 'product_id', 'id');
     }
+
+    public function setPricingTypeAttribute($value)
+    {
+        $val = strtoupper(trim((string) $value));
+        if ($val === 'LME' || $val === 'FORMULA') {
+            $this->attributes['pricing_type'] = 'LME';
+        } else {
+            $this->attributes['pricing_type'] = 'CUSTOM';
+        }
+    }
 }

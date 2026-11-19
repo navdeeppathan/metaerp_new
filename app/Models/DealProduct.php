@@ -90,6 +90,16 @@ class DealProduct extends Model
         return $this->belongsTo(Currency::class, 'id', 'id')->whereRaw('1 = 0');
     }
 
+    public function setPricingTypeAttribute($value)
+    {
+        $val = strtoupper(trim((string) $value));
+        if ($val === 'LME' || $val === 'FORMULA') {
+            $this->attributes['pricing_type'] = 'LME';
+        } else {
+            $this->attributes['pricing_type'] = 'CUSTOM';
+        }
+    }
+
     public function getUnitPriceAttribute()
     {
         return $this->attributes['unit_price'] ?? $this->attributes['unitPrice'] ?? $this->attributes['rate'] ?? 0;

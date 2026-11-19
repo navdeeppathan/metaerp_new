@@ -586,8 +586,8 @@
                                                             <td class="py-2 px-3">
                                                                 <input type="hidden" :name="'buying_products[' + idx + '][pricing_type]'" :value="prod.pricing_type">
                                                                 <select x-model="prod.pricing_type" class="text-xs border border-slate-200 rounded p-1 w-full bg-white">
-                                                                    <option value="Fixed">Fixed</option>
-                                                                    <option value="Formula">Formula</option>
+                                                                    <option value="CUSTOM">Custom</option>
+                                                                    <option value="LME">LME</option>
                                                                 </select>
                                                             </td>
                                                             <td class="py-2 px-2 text-right">
@@ -840,8 +840,8 @@
                                                             <td class="py-2 px-3">
                                                                 <input type="hidden" :name="'selling_products[' + idx + '][pricing_type]'" :value="prod.pricing_type">
                                                                 <select x-model="prod.pricing_type" class="text-xs border border-slate-200 rounded p-1 w-full bg-white">
-                                                                    <option value="Fixed">Fixed</option>
-                                                                    <option value="Formula">Formula</option>
+                                                                    <option value="CUSTOM">Custom</option>
+                                                                    <option value="LME">LME</option>
                                                                 </select>
                                                             </td>
                                                             <td class="py-2 px-2 text-right">
@@ -1303,10 +1303,10 @@ function kanbanBoard() {
             this.showToast('Contract creation cancelled');
         },
         newBuyingProducts: [
-            { product_id: '{{ $products->first()?->id ?? 1 }}', quantity: 0, uom: 'MT', unitPrice: 0, pricing_type: 'Fixed' }
+            { product_id: '{{ $products->first()?->id ?? 1 }}', quantity: 0, uom: 'MT', unitPrice: 0, pricing_type: 'CUSTOM' }
         ],
         newSellingProducts: [
-            { product_id: '{{ $products->first()?->id ?? 1 }}', quantity: 0, uom: 'MT', unitPrice: 0, pricing_type: 'Fixed' }
+            { product_id: '{{ $products->first()?->id ?? 1 }}', quantity: 0, uom: 'MT', unitPrice: 0, pricing_type: 'CUSTOM' }
         ],
 
         getBuyingBankAccounts() {
@@ -1347,7 +1347,7 @@ function kanbanBoard() {
                 quantity: 0,
                 uom: 'MT',
                 unitPrice: 0,
-                pricing_type: 'Fixed'
+                pricing_type: 'CUSTOM'
             });
         },
         removeBuyingProduct(index) {
@@ -1369,7 +1369,7 @@ function kanbanBoard() {
                 quantity: 0,
                 uom: 'MT',
                 unitPrice: 0,
-                pricing_type: 'Fixed'
+                pricing_type: 'CUSTOM'
             });
         },
         removeSellingProduct(index) {
