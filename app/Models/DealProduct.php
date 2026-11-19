@@ -100,6 +100,16 @@ class DealProduct extends Model
         }
     }
 
+    public function setStatusAttribute($value)
+    {
+        $val = strtoupper(trim((string) $value));
+        if ($val === 'IN_PROGRESS' || $val === 'IN PROGRESS') {
+            $this->attributes['status'] = 'IN_PROGRESS';
+        } else {
+            $this->attributes['status'] = 'STORED';
+        }
+    }
+
     public function getUnitPriceAttribute()
     {
         return $this->attributes['unit_price'] ?? $this->attributes['unitPrice'] ?? $this->attributes['rate'] ?? 0;

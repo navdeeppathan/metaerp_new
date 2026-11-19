@@ -361,7 +361,7 @@ class WebContractController extends Controller
                         'uom' => $pData['uom'] ?? 'MT',
                         'total_price' => $qty * $rate,
                         'pricing_type' => $pricingType,
-                        'status' => 'PENDING',
+                        'status' => 'STORED',
                         'active' => true,
                     ]);
                     $purchaseDeal->products()->attach($dealProduct->id);
@@ -378,7 +378,7 @@ class WebContractController extends Controller
                         'uom' => 'MT',
                         'total_price' => $quantity * $unitPrice,
                         'pricing_type' => 'CUSTOM',
-                        'status' => 'PENDING',
+                        'status' => 'STORED',
                         'active' => true,
                     ]);
                     $purchaseDeal->products()->attach($dealProduct->id);
@@ -447,7 +447,7 @@ class WebContractController extends Controller
                         'uom' => $pData['uom'] ?? 'MT',
                         'total_price' => $qty * $rate,
                         'pricing_type' => $pricingType,
-                        'status' => 'PENDING',
+                        'status' => 'STORED',
                         'active' => true,
                     ]);
                     $saleDeal->products()->attach($dealProduct->id);
@@ -464,7 +464,7 @@ class WebContractController extends Controller
                         'uom' => 'MT',
                         'total_price' => $quantity * $unitPrice,
                         'pricing_type' => 'CUSTOM',
-                        'status' => 'PENDING',
+                        'status' => 'STORED',
                         'active' => true,
                     ]);
                     $saleDeal->products()->attach($dealProduct->id);

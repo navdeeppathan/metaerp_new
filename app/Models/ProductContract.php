@@ -85,4 +85,14 @@ class ProductContract extends Model
             $this->attributes['pricing_type'] = 'CUSTOM';
         }
     }
+
+    public function setStatusAttribute($value)
+    {
+        $val = strtoupper(trim((string) $value));
+        if ($val === 'IN_PROGRESS' || $val === 'IN PROGRESS') {
+            $this->attributes['status'] = 'IN_PROGRESS';
+        } else {
+            $this->attributes['status'] = 'STORED';
+        }
+    }
 }
