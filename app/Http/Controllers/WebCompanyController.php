@@ -42,7 +42,7 @@ class WebCompanyController extends Controller
             });
         }
 
-        $perPage = (int) $request->input('per_page', 10);
+        $perPage = (int) ($request->input('per_page') ?? $request->input('perPage') ?? $request->input('rowsPerPage') ?? $request->input('size') ?? 10);
         if (!in_array($perPage, [10, 25, 50, 100])) {
             $perPage = 10;
         }

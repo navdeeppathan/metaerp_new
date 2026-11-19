@@ -12,6 +12,9 @@
 
         <div class="flex items-center gap-3">
             <form method="GET" action="{{ route('settings.currencies') }}" class="relative w-full sm:w-72 md:w-80">
+                @if(request()->filled('per_page'))
+                    <input type="hidden" name="per_page" value="{{ request('per_page') }}">
+                @endif
                 <span class="material-icons-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg pointer-events-none">search</span>
                 <input type="text" 
                        name="search" 

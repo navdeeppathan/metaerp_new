@@ -15,6 +15,7 @@
         <!-- Filter Bar -->
         <form action="{{ route('contracts.search') }}" method="GET" id="searchFilterForm" class="flex flex-wrap items-center gap-3">
             <input type="hidden" name="per_page" id="per_page_input" value="{{ $perPage ?? 10 }}">
+            <input type="hidden" name="q" value="{{ request('q', request('search', '')) }}">
 
             <!-- Date Range Picker Pill -->
             <div class="flex items-center bg-white border border-slate-200/90 rounded-full px-5 py-2.5 shadow-2xs text-sm text-slate-800">
@@ -175,52 +176,8 @@
     </div>
 
     <!-- Pagination Footer Matching Screenshot -->
-    <div class="flex items-center justify-end gap-6 text-xs text-slate-600 pt-3 pb-2 select-none">
-        <div class="flex items-center gap-2">
-            <span>Rows per page:</span>
-            <div class="relative inline-flex items-center">
-                <select
-                    onchange="changePerPage(this.value)"
-                    class="appearance-none bg-transparent pr-4 font-medium text-slate-700 cursor-pointer focus:outline-none"
-                >
-                    <option value="10" {{ ($perPage ?? 10) == 10 ? 'selected' : '' }}>10</option>
-                    <option value="25" {{ ($perPage ?? 10) == 25 ? 'selected' : '' }}>25</option>
-                    <option value="50" {{ ($perPage ?? 10) == 50 ? 'selected' : '' }}>50</option>
-                    <option value="100" {{ ($perPage ?? 10) == 100 ? 'selected' : '' }}>100</option>
-                </select>
-                <span class="material-icons absolute right-0 top-1/2 -translate-y-1/2 text-sm text-slate-400 pointer-events-none">arrow_drop_down</span>
-            </div>
-        </div>
-
-        <div>
-            @if($contracts->total() > 0)
-                {{ ($contracts->currentPage() - 1) * $contracts->perPage() + 1 }}-{{ min($contracts->currentPage() * $contracts->perPage(), $contracts->total()) }} of {{ $contracts->total() }}
-            @else
-                0 of 0
-            @endif
-        </div>
-
-        <div class="flex items-center gap-1">
-            @if($contracts->onFirstPage())
-                <span class="p-1 text-slate-300 cursor-not-allowed">
-                    <span class="material-icons text-base">chevron_left</span>
-                </span>
-            @else
-                <a href="{{ $contracts->previousPageUrl() }}" class="p-1 text-slate-600 hover:text-slate-900 transition">
-                    <span class="material-icons text-base">chevron_left</span>
-                </a>
-            @endif
-
-            @if($contracts->hasMorePages())
-                <a href="{{ $contracts->nextPageUrl() }}" class="p-1 text-slate-600 hover:text-slate-900 transition">
-                    <span class="material-icons text-base">chevron_right</span>
-                </a>
-            @else
-                <span class="p-1 text-slate-300 cursor-not-allowed">
-                    <span class="material-icons text-base">chevron_right</span>
-                </span>
-            @endif
-        </div>
+    <div class="px-6 py-3 border-t border-slate-100">
+        @include('partials.pagination', ['paginator' => $contracts])
     </div>
 </div>
 
@@ -243,10 +200,5 @@
             toPicker.open();
         });
     });
-
-    function changePerPage(val) {
-        document.getElementById('per_page_input').value = val;
-        document.getElementById('searchFilterForm').submit();
-    }
 </script>
 @endsection
