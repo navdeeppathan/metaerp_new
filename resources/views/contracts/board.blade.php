@@ -213,10 +213,16 @@
 
                                 <div class="flex items-center gap-4">
                                     <!-- Order date notch container -->
-                                    <div class="relative border border-slate-300 rounded-md px-3 pt-2 pb-1.5 bg-white min-w-[220px] flex items-center justify-between">
+                                    <div class="relative border border-slate-300 rounded-md px-3 pt-2 pb-1.5 bg-white min-w-[220px] flex items-center justify-between cursor-pointer"
+                                         @click="$refs.newOrderDateInput && ($refs.newOrderDateInput._flatpickr ? $refs.newOrderDateInput._flatpickr.open() : $refs.newOrderDateInput.focus())">
                                         <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Order date</label>
-                                        <input type="text" name="order_date" x-model="orderDateValue" class="text-xs text-slate-800 font-normal w-full bg-transparent border-none focus:outline-none p-0 cursor-pointer">
-                                        <span class="material-icons text-slate-400 text-lg ml-2 pointer-events-none">calendar_today</span>
+                                        <input type="text" 
+                                               id="new_contract_order_date" 
+                                               name="order_date" 
+                                               x-ref="newOrderDateInput"
+                                               x-model="orderDateValue" 
+                                               class="text-xs text-slate-800 font-normal w-full bg-transparent border-none focus:outline-none p-0 cursor-pointer">
+                                        <span class="material-icons text-slate-400 text-lg ml-2 cursor-pointer">calendar_today</span>
                                     </div>
 
                                     <button type="submit" class="bg-[#7c3aed] hover:bg-[#6d28d9] text-white px-6 py-2 rounded-full text-xs font-semibold shadow-xs transition cursor-pointer select-none">
@@ -391,10 +397,16 @@
                                         </div>
 
                                         <!-- Payment Date -->
-                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2 pb-1.5 bg-white min-h-[46px] flex items-center justify-between">
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2 pb-1.5 bg-white min-h-[46px] flex items-center justify-between cursor-pointer"
+                                             @click="$refs.newBuyingPaymentDateInput && ($refs.newBuyingPaymentDateInput._flatpickr ? $refs.newBuyingPaymentDateInput._flatpickr.open() : $refs.newBuyingPaymentDateInput.focus())">
                                             <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Payment Date</label>
-                                            <input type="text" name="buying_payment_date" placeholder="DD/MM/YYYY" class="text-xs text-slate-800 font-normal w-full bg-transparent border-none focus:outline-none p-0 placeholder-slate-400">
-                                            <span class="material-icons text-slate-400 text-base pointer-events-none">calendar_today</span>
+                                            <input type="text" 
+                                                   id="new_contract_buying_payment_date" 
+                                                   name="buying_payment_date" 
+                                                   x-ref="newBuyingPaymentDateInput"
+                                                   placeholder="DD/MM/YYYY" 
+                                                   class="text-xs text-slate-800 font-normal w-full bg-transparent border-none focus:outline-none p-0 placeholder-slate-400 cursor-pointer">
+                                            <span class="material-icons text-slate-400 text-base cursor-pointer">calendar_today</span>
                                         </div>
 
                                         <!-- Country of origin * -->
@@ -645,10 +657,16 @@
                                         </div>
 
                                         <!-- Payment Date -->
-                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2 pb-1.5 bg-white min-h-[46px] flex items-center justify-between">
+                                        <div class="relative border border-slate-300 rounded-md px-3 pt-2 pb-1.5 bg-white min-h-[46px] flex items-center justify-between cursor-pointer"
+                                             @click="$refs.newSellingPaymentDateInput && ($refs.newSellingPaymentDateInput._flatpickr ? $refs.newSellingPaymentDateInput._flatpickr.open() : $refs.newSellingPaymentDateInput.focus())">
                                             <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Payment Date</label>
-                                            <input type="text" name="selling_payment_date" placeholder="DD/MM/YYYY" class="text-xs text-slate-800 font-normal w-full bg-transparent border-none focus:outline-none p-0 placeholder-slate-400">
-                                            <span class="material-icons text-slate-400 text-base pointer-events-none">calendar_today</span>
+                                            <input type="text" 
+                                                   id="new_contract_selling_payment_date" 
+                                                   name="selling_payment_date" 
+                                                   x-ref="newSellingPaymentDateInput"
+                                                   placeholder="DD/MM/YYYY" 
+                                                   class="text-xs text-slate-800 font-normal w-full bg-transparent border-none focus:outline-none p-0 placeholder-slate-400 cursor-pointer">
+                                            <span class="material-icons text-slate-400 text-base cursor-pointer">calendar_today</span>
                                         </div>
 
                                         <!-- Country of origin * -->
@@ -1160,6 +1178,7 @@ function kanbanBoard() {
                         if (window.Alpine) {
                             Alpine.initTree(content);
                         }
+                        this.initCardModalPickers(content);
                     }
                     this.modalLoading = false;
                 })
@@ -1167,6 +1186,72 @@ function kanbanBoard() {
                     console.error('Failed to load contract modal:', err);
                     this.modalLoading = false;
                 });
+        },
+
+        init() {
+            this.$watch('showNewModal', val => {
+                if (val) {
+                    this.$nextTick(() => {
+                        this.initNewContractPickers();
+                    });
+                }
+            });
+        },
+
+        initNewContractPickers() {
+            if (typeof flatpickr === 'undefined') return;
+            const orderEl = document.getElementById('new_contract_order_date');
+            if (orderEl && !orderEl._flatpickr) {
+                flatpickr(orderEl, {
+                    enableTime: true,
+                    dateFormat: 'd/m/Y h:i K',
+                    allowInput: true,
+                    disableMobile: true,
+                    defaultDate: this.orderDateValue || new Date(),
+                    onChange: (dates, dateStr) => {
+                        this.orderDateValue = dateStr;
+                    }
+                });
+            }
+            const buyPayEl = document.getElementById('new_contract_buying_payment_date');
+            if (buyPayEl && !buyPayEl._flatpickr) {
+                flatpickr(buyPayEl, {
+                    dateFormat: 'd/m/Y',
+                    allowInput: true,
+                    disableMobile: true
+                });
+            }
+            const sellPayEl = document.getElementById('new_contract_selling_payment_date');
+            if (sellPayEl && !sellPayEl._flatpickr) {
+                flatpickr(sellPayEl, {
+                    dateFormat: 'd/m/Y',
+                    allowInput: true,
+                    disableMobile: true
+                });
+            }
+        },
+
+        initCardModalPickers(container) {
+            if (typeof flatpickr === 'undefined' || !container) return;
+            setTimeout(() => {
+                const orderEl = container.querySelector('input[name="due_date"]');
+                if (orderEl && !orderEl._flatpickr) {
+                    flatpickr(orderEl, {
+                        enableTime: true,
+                        dateFormat: 'd/m/Y h:i K',
+                        allowInput: true,
+                        disableMobile: true
+                    });
+                }
+                const payEl = container.querySelector('input[name="payment_date"]');
+                if (payEl && !payEl._flatpickr) {
+                    flatpickr(payEl, {
+                        dateFormat: 'd/m/Y',
+                        allowInput: true,
+                        disableMobile: true
+                    });
+                }
+            }, 60);
         },
         contractType: 'BUY_AND_SELL',
         sideTab: 'buying',

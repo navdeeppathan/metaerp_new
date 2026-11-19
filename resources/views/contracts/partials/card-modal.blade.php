@@ -6,6 +6,30 @@
 @endphp
 
 <form action="{{ route('contracts.update', $contract->id) }}" method="POST" id="contractModalForm-{{ $contract->id }}"
+      x-init="
+          $nextTick(() => {
+              if (typeof flatpickr !== 'undefined') {
+                  const orderEl = $el.querySelector('input[name=\'due_date\']');
+                  if (orderEl && !orderEl._flatpickr) {
+                      flatpickr(orderEl, {
+                          enableTime: true,
+                          dateFormat: 'd/m/Y h:i K',
+                          allowInput: true,
+                          disableMobile: true,
+                          onChange: (dates, dateStr) => { orderDateValue = dateStr; }
+                      });
+                  }
+                  const payEl = $el.querySelector('input[name=\'payment_date\']');
+                  if (payEl && !payEl._flatpickr) {
+                      flatpickr(payEl, {
+                          dateFormat: 'd/m/Y',
+                          allowInput: true,
+                          disableMobile: true
+                      });
+                  }
+              }
+          });
+      "
       x-data="{ 
           activeDealTab: '{{ $activeTabDefault }}',
           contractType: '{{ $contract->type ?? 'SELL' }}',
@@ -158,12 +182,13 @@
 
             <!-- Order date & Save Button -->
             <div class="flex items-center gap-4">
-                <div class="relative border border-slate-300 rounded-md px-3 pt-2 pb-1.5 bg-white min-w-[220px] flex items-center justify-between">
+                <div class="relative border border-slate-300 rounded-md px-3 pt-2 pb-1.5 bg-white min-w-[220px] flex items-center justify-between cursor-pointer"
+                     @click="const el = $el.querySelector('input[name=\'due_date\']'); if (el && el._flatpickr) el._flatpickr.open(); else if (el) el.focus();">
                     <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Order date</label>
                     <input type="text" name="due_date" 
                            x-model="orderDateValue" 
                            class="text-xs text-slate-800 font-normal w-full bg-transparent border-none focus:outline-none p-0 cursor-pointer">
-                    <span class="material-icons text-slate-400 text-lg ml-2 pointer-events-none">calendar_today</span>
+                    <span class="material-icons text-slate-400 text-lg ml-2 cursor-pointer">calendar_today</span>
                 </div>
 
                 @fullAccess('CONTRACT')
@@ -356,13 +381,14 @@
                     </div>
 
                     <!-- Payment Date -->
-                    <div class="relative border border-slate-300 rounded-md px-3 pt-2 pb-1.5 bg-white min-h-[46px] flex items-center justify-between">
+                    <div class="relative border border-slate-300 rounded-md px-3 pt-2 pb-1.5 bg-white min-h-[46px] flex items-center justify-between cursor-pointer"
+                         @click="const el = $el.querySelector('input[name=\'payment_date\']'); if (el && el._flatpickr) el._flatpickr.open(); else if (el) el.focus();">
                         <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Payment Date</label>
                         <input type="text" name="payment_date" 
                                value="{{ $curDeal?->payment_date ? \Carbon\Carbon::parse($curDeal->payment_date)->format('d/m/Y') : '' }}" 
                                placeholder="DD/MM/YYYY" 
-                               class="text-xs text-slate-800 font-normal w-full bg-transparent border-none focus:outline-none p-0">
-                        <span class="material-icons text-slate-400 text-base pointer-events-none">calendar_today</span>
+                               class="text-xs text-slate-800 font-normal w-full bg-transparent border-none focus:outline-none p-0 cursor-pointer">
+                        <span class="material-icons text-slate-400 text-base cursor-pointer">calendar_today</span>
                     </div>
 
                     <!-- Country of origin -->
