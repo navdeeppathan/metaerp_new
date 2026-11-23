@@ -25,6 +25,7 @@ class WebDashboardController extends Controller
 
     public function dashboardV2(Request $request)
     {
+        @ini_set('memory_limit', '512M');
         $data = $this->buildDashboardV2Data($request);
 
         return view('dashboards.v2', $data);
@@ -32,11 +33,14 @@ class WebDashboardController extends Controller
 
     public function apiDashboardV2Data(Request $request)
     {
+        @ini_set('memory_limit', '512M');
         return response()->json($this->buildDashboardV2Data($request));
     }
 
     private function buildDashboardV2Data(Request $request): array
     {
+        @ini_set('memory_limit', '512M');
+
         $user = $request->user();
         $isSuperAdmin = $user ? $user->isSuperAdmin() : false;
 
@@ -52,42 +56,75 @@ class WebDashboardController extends Controller
         if (!$isSuperAdmin && !empty($accessibleCompanyIds)) {
             $companiesQuery->whereIn('id', $accessibleCompanyIds);
         }
-        $availableCompanies = $companiesQuery->get();
+        $availableCompanies = $companiesQuery->get(['id', 'name']);
 
         // Stages
-        $allStages = Stage::where('active', true)->orderBy('position', 'asc')->get();
+        $allStages = Stage::where('active', true)->orderBy('position', 'asc')->get(['id', 'name', 'description', 'position']);
 
         // Selected filters from request
         $selectedCompanyId = $request->filled('company_id') && $request->company_id !== 'all' ? (int) $request->company_id : null;
         $selectedStageId = $request->filled('stage_id') && $request->stage_id !== 'all' ? (int) $request->stage_id : null;
         $selectedCurrency = $request->filled('currency') && $request->currency !== 'all' ? trim((string) $request->currency) : null;
-        $startDate = $request->filled('start_date') ? Carbon::parse($request->start_date)->startOfDay() : null;
-        $endDate = $request->filled('end_date') ? Carbon::parse($request->end_date)->endOfDay() : null;
+        
+        $startDate = $request->filled('start_date') ? Carbon::parse($request->start_date)->startOfDay() : Carbon::now()->subDays(180)->startOfDay();
+        $endDate = $request->filled('end_date') ? Carbon::parse($request->end_date)->endOfDay() : Carbon::now()->addDays(30)->endOfDay();
 
-        // Base contracts query
-        $contractsQuery = Contract::with([
-            'stage',
-            'purchase.contact',
-            'purchase.products',
-            'sale.contact',
-            'sale.products',
-            'packingLists',
-        ])
-        ->where('active', true);
+        // Base contracts query with selected columns to optimize memory
+        $contractsQuery = Contract::query()
+            ->where('active', true)
+            ->select([
+                'id',
+                'order_code',
+                'orderCode',
+                'due_date',
+                'loading_date',
+                'loadingDate',
+                'sales_invoice_date',
+                'stage_id',
+                'purchase_id',
+                'sale_id',
+                'active',
+                'currency',
+                'transport_price_agreed',
+                'mode_of_transport',
+            ])
+            ->with([
+                'stage:id,description,name,position',
+                'purchase' => function ($q) {
+                    $q->select(['id', 'contact_id', 'meta_company_id']);
+                },
+                'purchase.contact:id,name',
+                'purchase.products' => function ($q) {
+                    $q->select(['id', 'deal_id', 'total_price', 'total', 'quantity', 'unit_price', 'rate', 'net_weight']);
+                },
+                'sale' => function ($q) {
+                    $q->select(['id', 'contact_id', 'meta_company_id']);
+                },
+                'sale.contact:id,name',
+                'sale.products' => function ($q) {
+                    $q->select(['id', 'deal_id', 'total_price', 'total', 'quantity', 'unit_price', 'rate', 'net_weight']);
+                },
+            ]);
 
-        // Company permission scoping
+        // Company permission scoping via relationships in SQL
         if (!$isSuperAdmin && !empty($accessibleCompanyIds)) {
             $contractsQuery->where(function ($q) use ($accessibleCompanyIds) {
-                $q->whereIn('salesCompany', $accessibleCompanyIds)
-                  ->orWhereIn('purchaseCompany', $accessibleCompanyIds);
+                $q->whereHas('sale', function ($sq) use ($accessibleCompanyIds) {
+                    $sq->whereIn('meta_company_id', $accessibleCompanyIds);
+                })->orWhereHas('purchase', function ($pq) use ($accessibleCompanyIds) {
+                    $pq->whereIn('meta_company_id', $accessibleCompanyIds);
+                });
             });
         }
 
-        // Apply request filters
+        // Apply request company filter
         if ($selectedCompanyId) {
             $contractsQuery->where(function ($q) use ($selectedCompanyId) {
-                $q->where('salesCompany', $selectedCompanyId)
-                  ->orWhere('purchaseCompany', $selectedCompanyId);
+                $q->whereHas('sale', function ($sq) use ($selectedCompanyId) {
+                    $sq->where('meta_company_id', $selectedCompanyId);
+                })->orWhereHas('purchase', function ($pq) use ($selectedCompanyId) {
+                    $pq->where('meta_company_id', $selectedCompanyId);
+                });
             });
         }
 
@@ -99,7 +136,19 @@ class WebDashboardController extends Controller
             $contractsQuery->where('currency', $selectedCurrency);
         }
 
-        $allContracts = $contractsQuery->get();
+        // Apply date range filter in SQL
+        if ($startDate && $endDate) {
+            $contractsQuery->where(function ($q) use ($startDate, $endDate) {
+                $q->whereBetween('due_date', [$startDate, $endDate])
+                  ->orWhereBetween('loading_date', [$startDate, $endDate])
+                  ->orWhere(function ($sub) {
+                      $sub->whereNull('due_date')->whereNull('loading_date');
+                  });
+            });
+        }
+
+        // Bound to the most recent 1,000 contracts to guarantee zero OOM
+        $allContracts = $contractsQuery->orderBy('id', 'desc')->limit(1000)->get();
 
         // Apply date filtering in PHP if specified
         if ($startDate || $endDate) {
@@ -130,6 +179,9 @@ class WebDashboardController extends Controller
         $monthlyData = [];
         $topBuyers = [];
         $topSuppliers = [];
+
+        // Map company IDs to names in memory to avoid N+1 queries
+        $companiesMap = Company::where('active', true)->pluck('name', 'id')->toArray();
 
         foreach ($allContracts as $c) {
             $cSaleTotal = 0.0;
@@ -165,8 +217,10 @@ class WebDashboardController extends Controller
                 $closedCount++;
             }
 
-            // Group by company
-            $compName = $c->salesCompanyName ?: ($c->purchaseCompanyName ?: 'Global Trading');
+            // Group by company using in-memory map
+            $saleCompId = $c->sale?->meta_company_id;
+            $purchCompId = $c->purchase?->meta_company_id;
+            $compName = $companiesMap[$saleCompId] ?? ($companiesMap[$purchCompId] ?? 'Global Trading');
             if (!isset($companyTotals[$compName])) {
                 $companyTotals[$compName] = [
                     'name' => $compName,
