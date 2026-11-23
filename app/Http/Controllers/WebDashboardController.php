@@ -56,10 +56,10 @@ class WebDashboardController extends Controller
         if (!$isSuperAdmin && !empty($accessibleCompanyIds)) {
             $companiesQuery->whereIn('id', $accessibleCompanyIds);
         }
-        $availableCompanies = $companiesQuery->get(['id', 'name']);
+        $availableCompanies = $companiesQuery->get();
 
-        // Stages
-        $allStages = Stage::where('active', true)->orderBy('position', 'asc')->get(['id', 'name', 'description', 'position']);
+        // Stages (Table columns: id, active, description, position, type, version, model_id)
+        $allStages = Stage::where('active', true)->orderBy('position', 'asc')->get();
 
         // Selected filters from request
         $selectedCompanyId = $request->filled('company_id') && $request->company_id !== 'all' ? (int) $request->company_id : null;
@@ -69,42 +69,15 @@ class WebDashboardController extends Controller
         $startDate = $request->filled('start_date') ? Carbon::parse($request->start_date)->startOfDay() : Carbon::now()->subDays(180)->startOfDay();
         $endDate = $request->filled('end_date') ? Carbon::parse($request->end_date)->endOfDay() : Carbon::now()->addDays(30)->endOfDay();
 
-        // Base contracts query with selected columns to optimize memory
-        $contractsQuery = Contract::query()
-            ->where('active', true)
-            ->select([
-                'id',
-                'order_code',
-                'orderCode',
-                'due_date',
-                'loading_date',
-                'loadingDate',
-                'sales_invoice_date',
-                'stage_id',
-                'purchase_id',
-                'sale_id',
-                'active',
-                'currency',
-                'transport_price_agreed',
-                'mode_of_transport',
-            ])
-            ->with([
-                'stage:id,description,name,position',
-                'purchase' => function ($q) {
-                    $q->select(['id', 'contact_id', 'meta_company_id']);
-                },
-                'purchase.contact:id,name',
-                'purchase.products' => function ($q) {
-                    $q->select(['id', 'deal_id', 'total_price', 'total', 'quantity', 'unit_price', 'rate', 'net_weight']);
-                },
-                'sale' => function ($q) {
-                    $q->select(['id', 'contact_id', 'meta_company_id']);
-                },
-                'sale.contact:id,name',
-                'sale.products' => function ($q) {
-                    $q->select(['id', 'deal_id', 'total_price', 'total', 'quantity', 'unit_price', 'rate', 'net_weight']);
-                },
-            ]);
+        // Base contracts query with standard model relationships (no packingLists to conserve RAM)
+        $contractsQuery = Contract::with([
+            'stage',
+            'purchase.contact',
+            'purchase.products',
+            'sale.contact',
+            'sale.products',
+        ])
+        ->where('active', true);
 
         // Company permission scoping via relationships in SQL
         if (!$isSuperAdmin && !empty($accessibleCompanyIds)) {
@@ -354,7 +327,7 @@ class WebDashboardController extends Controller
             }
             $stageMatrix[] = [
                 'id' => $stage->id,
-                'title' => $stage->description ?: $stage->name,
+                'title' => $stage->description ?: ($stage->type ?: ('Stage #' . $stage->id)),
                 'count' => $sCount,
                 'value' => $sVal,
                 'pct' => $totalContractsCount > 0 ? round(($sCount / $totalContractsCount) * 100, 1) : 0,

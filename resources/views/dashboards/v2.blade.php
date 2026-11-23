@@ -805,7 +805,7 @@
                         <option value="all">All Execution Stages</option>
                         @foreach($allStages as $stage)
                         <option value="{{ $stage->id }}" {{ (string)$selectedStageId === (string)$stage->id ? 'selected' : '' }}>
-                            {{ $stage->description ?: $stage->name }}
+                            {{ $stage->description ?: ($stage->type ?: 'Stage #' . $stage->id) }}
                         </option>
                         @endforeach
                     </select>
