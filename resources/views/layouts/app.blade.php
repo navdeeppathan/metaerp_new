@@ -242,11 +242,23 @@
 
             <!-- Dashboard -->
             <a href="{{ route('dashboards.analytics') }}"
-               class="flex items-center rounded-xl transition-all {{ request()->routeIs('dashboards.*') || request()->routeIs('dashboard') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}"
+               class="flex items-center rounded-xl transition-all {{ request()->routeIs('dashboards.analytics') || request()->routeIs('dashboard') ? 'bg-[#1e293b] text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}"
                :class="isExpanded ? 'gap-3 px-3 py-2 justify-start' : 'p-2.5 justify-center'"
                title="Dashboard">
                 <span class="material-icons-outlined text-lg shrink-0">speed</span>
                 <span class="truncate" x-show="isExpanded" x-transition.opacity>Dashboard</span>
+            </a>
+
+            <!-- Power BI Dashboard v2 -->
+            <a href="{{ route('dashboards.v2') }}"
+               class="flex items-center rounded-xl transition-all {{ request()->routeIs('dashboards.v2') ? 'bg-indigo-600 text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}"
+               :class="isExpanded ? 'gap-3 px-3 py-2 justify-start' : 'p-2.5 justify-center'"
+               title="Power BI Dashboard v2">
+                <span class="material-icons-outlined text-lg shrink-0 text-indigo-400">insights</span>
+                <div class="flex items-center justify-between flex-1 min-w-0" x-show="isExpanded" x-transition.opacity>
+                    <span class="truncate">Dashboard v2</span>
+                    <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 uppercase tracking-wider">BI</span>
+                </div>
             </a>
 
             <!-- Users -->

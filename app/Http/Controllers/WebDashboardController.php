@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use App\Models\Contract;
 use App\Models\ModelWorkflow;
+use App\Models\Stage;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -20,6 +21,357 @@ class WebDashboardController extends Controller
     public function apiWidgets()
     {
         return response()->json($this->buildDashboardData());
+    }
+
+    public function dashboardV2(Request $request)
+    {
+        $data = $this->buildDashboardV2Data($request);
+
+        return view('dashboards.v2', $data);
+    }
+
+    public function apiDashboardV2Data(Request $request)
+    {
+        return response()->json($this->buildDashboardV2Data($request));
+    }
+
+    private function buildDashboardV2Data(Request $request): array
+    {
+        $user = $request->user();
+        $isSuperAdmin = $user ? $user->isSuperAdmin() : false;
+
+        // Role-based visibility flags
+        $canViewFinancials = $isSuperAdmin || ($user && ($user->hasPermission(['FINANCE', 'ACCOUNTING'], 'READ') || $user->hasPermission('DASHBOARD', 'FULL')));
+        $canViewContracts = $isSuperAdmin || ($user && $user->hasPermission('CONTRACT', 'READ'));
+        $canViewLogistics = $isSuperAdmin || ($user && ($user->hasPermission(['LOGISTICS', 'PACKING'], 'READ') || $user->hasPermission('CONTRACT', 'READ')));
+        $canViewProfit = $canViewFinancials; // Hide profit/margins from pure operations/sales if not permitted
+
+        // Accessible company scope
+        $accessibleCompanyIds = $user ? $user->getAccessibleCompanies('CONTRACT') : [];
+        $companiesQuery = Company::where('active', true)->orderBy('name');
+        if (!$isSuperAdmin && !empty($accessibleCompanyIds)) {
+            $companiesQuery->whereIn('id', $accessibleCompanyIds);
+        }
+        $availableCompanies = $companiesQuery->get();
+
+        // Stages
+        $allStages = Stage::where('active', true)->orderBy('position', 'asc')->get();
+
+        // Selected filters from request
+        $selectedCompanyId = $request->filled('company_id') && $request->company_id !== 'all' ? (int) $request->company_id : null;
+        $selectedStageId = $request->filled('stage_id') && $request->stage_id !== 'all' ? (int) $request->stage_id : null;
+        $selectedCurrency = $request->filled('currency') && $request->currency !== 'all' ? trim((string) $request->currency) : null;
+        $startDate = $request->filled('start_date') ? Carbon::parse($request->start_date)->startOfDay() : null;
+        $endDate = $request->filled('end_date') ? Carbon::parse($request->end_date)->endOfDay() : null;
+
+        // Base contracts query
+        $contractsQuery = Contract::with([
+            'stage',
+            'purchase.contact',
+            'purchase.products',
+            'sale.contact',
+            'sale.products',
+            'packingLists',
+        ])
+        ->where('active', true);
+
+        // Company permission scoping
+        if (!$isSuperAdmin && !empty($accessibleCompanyIds)) {
+            $contractsQuery->where(function ($q) use ($accessibleCompanyIds) {
+                $q->whereIn('salesCompany', $accessibleCompanyIds)
+                  ->orWhereIn('purchaseCompany', $accessibleCompanyIds);
+            });
+        }
+
+        // Apply request filters
+        if ($selectedCompanyId) {
+            $contractsQuery->where(function ($q) use ($selectedCompanyId) {
+                $q->where('salesCompany', $selectedCompanyId)
+                  ->orWhere('purchaseCompany', $selectedCompanyId);
+            });
+        }
+
+        if ($selectedStageId) {
+            $contractsQuery->where('stage_id', $selectedStageId);
+        }
+
+        if ($selectedCurrency) {
+            $contractsQuery->where('currency', $selectedCurrency);
+        }
+
+        $allContracts = $contractsQuery->get();
+
+        // Apply date filtering in PHP if specified
+        if ($startDate || $endDate) {
+            $allContracts = $allContracts->filter(function ($c) use ($startDate, $endDate) {
+                $d = $c->due_date ?: ($c->loading_date ?: $c->sales_invoice_date);
+                if (!$d) {
+                    return true;
+                }
+                if ($startDate && $d->lt($startDate)) {
+                    return false;
+                }
+                if ($endDate && $d->gt($endDate)) {
+                    return false;
+                }
+                return true;
+            });
+        }
+
+        // Aggregate core numbers
+        $totalSales = 0.0;
+        $totalPurchases = 0.0;
+        $totalTransport = 0.0;
+        $totalTonnage = 0.0;
+        $inTransitCount = 0;
+        $closedCount = 0;
+        $contractPoints = [];
+        $companyTotals = [];
+        $monthlyData = [];
+        $topBuyers = [];
+        $topSuppliers = [];
+
+        foreach ($allContracts as $c) {
+            $cSaleTotal = 0.0;
+            $cPurchaseTotal = 0.0;
+            $cTonnage = 0.0;
+
+            if ($c->sale && $c->sale->products) {
+                foreach ($c->sale->products as $p) {
+                    $itemTotal = (float) ($p->total_price ?: ($p->total ?: ($p->quantity * ($p->unit_price ?: ($p->rate ?: 0)))));
+                    $cSaleTotal += $itemTotal;
+                    $cTonnage += (float) ($p->quantity ?: ($p->net_weight ?: 0));
+                }
+            }
+
+            if ($c->purchase && $c->purchase->products) {
+                foreach ($c->purchase->products as $p) {
+                    $itemTotal = (float) ($p->total_price ?: ($p->total ?: ($p->quantity * ($p->unit_price ?: ($p->rate ?: 0)))));
+                    $cPurchaseTotal += $itemTotal;
+                }
+            }
+
+            $transportCost = (float) ($c->transport_price_agreed ?: 0);
+            $totalTransport += $transportCost;
+            $totalSales += $cSaleTotal;
+            $totalPurchases += $cPurchaseTotal;
+            $totalTonnage += $cTonnage;
+
+            $stageName = strtolower(trim((string) ($c->stage?->description ?: $c->stage?->name ?: '')));
+            if (str_contains($stageName, 'transit') || str_contains($stageName, 'load') || str_contains($stageName, 'ship')) {
+                $inTransitCount++;
+            }
+            if (str_contains($stageName, 'close') || str_contains($stageName, 'complete') || str_contains($stageName, 'invoic')) {
+                $closedCount++;
+            }
+
+            // Group by company
+            $compName = $c->salesCompanyName ?: ($c->purchaseCompanyName ?: 'Global Trading');
+            if (!isset($companyTotals[$compName])) {
+                $companyTotals[$compName] = [
+                    'name' => $compName,
+                    'sales' => 0.0,
+                    'purchases' => 0.0,
+                    'contracts_count' => 0,
+                ];
+            }
+            $companyTotals[$compName]['sales'] += $cSaleTotal;
+            $companyTotals[$compName]['purchases'] += $cPurchaseTotal;
+            $companyTotals[$compName]['contracts_count']++;
+
+            // Monthly aggregation
+            $d = $c->due_date ?: ($c->loading_date ?: Carbon::now());
+            $monthKey = $d->format('Y-m');
+            $monthLabel = $d->format('M Y');
+            if (!isset($monthlyData[$monthKey])) {
+                $monthlyData[$monthKey] = [
+                    'label' => $monthLabel,
+                    'sort' => $d->startOfMonth()->timestamp,
+                    'sales' => 0.0,
+                    'purchases' => 0.0,
+                    'cpc' => 0.0, // average rate/unit
+                    'weight' => 0.0,
+                ];
+            }
+            $monthlyData[$monthKey]['sales'] += $cSaleTotal;
+            $monthlyData[$monthKey]['purchases'] += $cPurchaseTotal;
+            $monthlyData[$monthKey]['weight'] += $cTonnage;
+
+            // Top Buyers
+            if ($c->sale?->contact?->name) {
+                $buyerName = $c->sale->contact->name;
+                $topBuyers[$buyerName] = ($topBuyers[$buyerName] ?? 0.0) + $cSaleTotal;
+            }
+
+            // Top Suppliers
+            if ($c->purchase?->contact?->name) {
+                $suppName = $c->purchase->contact->name;
+                $topSuppliers[$suppName] = ($topSuppliers[$suppName] ?? 0.0) + $cPurchaseTotal;
+            }
+
+            // Scatter / Bubble Plot item: [Days to Due, Contract Total, Margin Pct]
+            $daysToDue = $c->due_date ? max(1, Carbon::now()->diffInDays($c->due_date, false)) : 30;
+            $cMargin = $cSaleTotal - $cPurchaseTotal;
+            $cMarginPct = $cSaleTotal > 0 ? round(($cMargin / $cSaleTotal) * 100, 1) : 10;
+            $contractPoints[] = [
+                'x' => $daysToDue,
+                'y' => round($cSaleTotal, 2),
+                'z' => max(5, min(50, abs($cMarginPct))),
+                'name' => $c->order_code ?: ('Contract #' . $c->id),
+            ];
+        }
+
+        // Sort monthly buckets
+        uasort($monthlyData, fn($a, $b) => $a['sort'] <=> $b['sort']);
+        // Keep last 6-12 months
+        $monthlySlice = array_slice($monthlyData, -8, 8, true);
+
+        $stackedCategories = [];
+        $stackedSales = [];
+        $stackedPurchases = [];
+        $weeklyCpcSeries = [];
+
+        foreach ($monthlySlice as $m) {
+            $stackedCategories[] = $m['label'];
+            $stackedSales[] = round($m['sales'], 2);
+            $stackedPurchases[] = round($m['purchases'], 2);
+            $avgUnitCost = $m['weight'] > 0 ? round($m['purchases'] / $m['weight'], 2) : 0;
+            $avgUnitSale = $m['weight'] > 0 ? round($m['sales'] / $m['weight'], 2) : 0;
+            $weeklyCpcSeries['cost'][] = $avgUnitCost;
+            $weeklyCpcSeries['price'][] = $avgUnitSale;
+        }
+
+        // Derived summary statistics
+        $grossProfit = $totalSales - $totalPurchases;
+        $profitMarginPct = $totalSales > 0 ? round(($grossProfit / $totalSales) * 100, 2) : 0.0;
+        $totalContractsCount = $allContracts->count();
+        $avgContractValue = $totalContractsCount > 0 ? round($totalSales / $totalContractsCount, 2) : 0.0;
+        $fulfillmentRatePct = $totalContractsCount > 0 ? round(($closedCount / $totalContractsCount) * 100, 1) : 0.0;
+        $roasRatio = $totalPurchases > 0 ? round(($totalSales / $totalPurchases) * 100, 2) : 100.0;
+
+        // Top 5 Buyers and Suppliers
+        arsort($topBuyers);
+        arsort($topSuppliers);
+        $topBuyersList = array_slice($topBuyers, 0, 5, true);
+        $topSuppliersList = array_slice($topSuppliers, 0, 5, true);
+
+        // Donut Chart: Company distribution
+        $donutLabels = [];
+        $donutSeries = [];
+        foreach ($companyTotals as $cName => $cData) {
+            $donutLabels[] = $cName;
+            $donutSeries[] = round($cData['sales'], 2);
+        }
+        if (empty($donutSeries)) {
+            $donutLabels = ['Standard Trading'];
+            $donutSeries = [100];
+        }
+
+        // Heatmap Matrix Breakdown Table (Companies)
+        $companyMatrix = [];
+        $maxSales = max(1, max(array_column($companyTotals, 'sales') ?: [1]));
+        foreach ($companyTotals as $cData) {
+            $cProfit = $cData['sales'] - $cData['purchases'];
+            $cMargin = $cData['sales'] > 0 ? round(($cProfit / $cData['sales']) * 100, 1) : 0;
+            $heatPct = min(100, round(($cData['sales'] / $maxSales) * 100));
+            $companyMatrix[] = [
+                'name' => $cData['name'],
+                'contracts' => $cData['contracts_count'],
+                'sales' => $cData['sales'],
+                'purchases' => $cData['purchases'],
+                'profit' => $cProfit,
+                'margin_pct' => $cMargin,
+                'heat_pct' => $heatPct,
+            ];
+        }
+
+        // Heatmap Matrix Breakdown Table (Stages)
+        $stageMatrix = [];
+        foreach ($allStages as $stage) {
+            $sContracts = $allContracts->filter(fn($c) => (int) $c->stage_id === (int) $stage->id);
+            $sCount = $sContracts->count();
+            $sVal = 0.0;
+            foreach ($sContracts as $sc) {
+                if ($sc->sale && $sc->sale->products) {
+                    foreach ($sc->sale->products as $p) {
+                        $sVal += (float) ($p->total_price ?: ($p->total ?: ($p->quantity * ($p->unit_price ?: ($p->rate ?: 0)))));
+                    }
+                }
+            }
+            $stageMatrix[] = [
+                'id' => $stage->id,
+                'title' => $stage->description ?: $stage->name,
+                'count' => $sCount,
+                'value' => $sVal,
+                'pct' => $totalContractsCount > 0 ? round(($sCount / $totalContractsCount) * 100, 1) : 0,
+            ];
+        }
+
+        // Target Fulfillment Gauge (Target benchmark $1,500,000 or dynamic)
+        $targetRevenue = max(100000.0, round($totalSales * 1.25, -4));
+        $targetGaugePct = min(100, round(($totalSales / $targetRevenue) * 100, 1));
+
+        return [
+            // Permission Flags
+            'canViewFinancials' => $canViewFinancials,
+            'canViewContracts' => $canViewContracts,
+            'canViewLogistics' => $canViewLogistics,
+            'canViewProfit' => $canViewProfit,
+            'isSuperAdmin' => $isSuperAdmin,
+
+            // Filter Options & State
+            'availableCompanies' => $availableCompanies,
+            'allStages' => $allStages,
+            'selectedCompanyId' => $selectedCompanyId,
+            'selectedStageId' => $selectedStageId,
+            'selectedCurrency' => $selectedCurrency,
+            'startDate' => $startDate?->format('Y-m-d'),
+            'endDate' => $endDate?->format('Y-m-d'),
+
+            // 12 Vibrant Coupler KPI Cards
+            'kpis' => [
+                'total_contracts' => $totalContractsCount,
+                'active_deals' => $allContracts->pluck('purchase_id')->merge($allContracts->pluck('sale_id'))->filter()->unique()->count(),
+                'total_sales' => $totalSales,
+                'total_purchases' => $totalPurchases,
+                'gross_profit' => $grossProfit,
+                'profit_margin_pct' => $profitMarginPct,
+                'total_tonnage' => $totalTonnage,
+                'in_transit_count' => $inTransitCount,
+                'closed_count' => $closedCount,
+                'fulfillment_rate_pct' => $fulfillmentRatePct,
+                'avg_contract_value' => $avgContractValue,
+                'roas_ratio' => $roasRatio,
+            ],
+
+            // Charts Data
+            'donut' => [
+                'labels' => $donutLabels,
+                'series' => $donutSeries,
+            ],
+            'stacked' => [
+                'categories' => $stackedCategories,
+                'sales' => $stackedSales,
+                'purchases' => $stackedPurchases,
+            ],
+            'unitRates' => [
+                'categories' => $stackedCategories,
+                'cost' => $weeklyCpcSeries['cost'] ?? [],
+                'price' => $weeklyCpcSeries['price'] ?? [],
+            ],
+            'gauge' => [
+                'current' => $totalSales,
+                'target' => $targetRevenue,
+                'percentage' => $targetGaugePct,
+            ],
+            'horizontalPartners' => [
+                'buyers' => $topBuyersList,
+                'suppliers' => $topSuppliersList,
+            ],
+            'contractPoints' => array_slice($contractPoints, 0, 30),
+            'companyMatrix' => $companyMatrix,
+            'stageMatrix' => $stageMatrix,
+        ];
     }
 
     private function buildDashboardData(): array

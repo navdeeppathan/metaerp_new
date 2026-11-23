@@ -46,6 +46,8 @@ Route::middleware('auth')->group(function () {
     Route::middleware('permission:DASHBOARD|*,READ')->group(function () {
         Route::get('/dashboards/analytics', [WebDashboardController::class, 'analytics'])->name('dashboards.analytics');
         Route::get('/dashboard', fn() => redirect()->route('dashboards.analytics'))->name('dashboard');
+        Route::get('/dashboard-v2', [WebDashboardController::class, 'dashboardV2'])->name('dashboards.v2');
+        Route::get('/api/dashboard-v2/data', [WebDashboardController::class, 'apiDashboardV2Data'])->name('dashboards.v2.data');
     });
 
     // Contracts (Kanban Scrumboard Pipeline) & Find Contracts
