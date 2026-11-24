@@ -44,8 +44,30 @@
     },
     resetFilters() {
         window.location.href = '{{ route('dashboards.v2') }}';
+    },
+    printDashboard() {
+        document.body.classList.add('print-full-dashboard');
+        this.$nextTick(() => {
+            window.dispatchEvent(new Event('resize'));
+            if (window.renderWaterfallChart) {
+                window.renderWaterfallChart(this.waterfallView || 'flow');
+            }
+            setTimeout(() => {
+                window.print();
+            }, 200);
+        });
+    },
+    init() {
+        window.addEventListener('afterprint', () => {
+            document.body.classList.remove('print-full-dashboard');
+            window.dispatchEvent(new Event('resize'));
+        });
+        window.addEventListener('beforeprint', () => {
+            document.body.classList.add('print-full-dashboard');
+            window.dispatchEvent(new Event('resize'));
+        });
     }
-}" class="-m-6 p-4 sm:p-6 bg-[#eaf1fa] min-h-screen text-slate-800 space-y-4 sm:space-y-5">
+}" class="-m-6 p-4 sm:p-6 bg-[#eaf1fa] min-h-screen text-slate-800 space-y-4 sm:space-y-5 dashboard-v2-canvas">
 
     <!-- TOP HEADER BAR (Exact Coupler.io & Power BI Header Style) -->
     <div class="bg-white/90 backdrop-blur-xs border border-slate-200/80 rounded-2xl p-4 sm:p-5 shadow-[0_2px_10px_rgba(0,0,0,0.03)] transition-all">
@@ -81,7 +103,7 @@
             </div>
 
             <!-- Right Nav Capsule & Actions (Matching Coupler.io Overview / Dynamics / Setup) -->
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 no-print">
                 
                 <!-- Dark Navy Nav Capsule -->
                 <div class="bg-[#1c4b82] p-1 rounded-xl flex items-center text-xs font-semibold text-white shadow-xs overflow-x-auto custom-scrollbar">
@@ -124,8 +146,8 @@
                     </button>
 
                     <!-- Setup Dashboard / Export Button (Crisp White Pill with blue text matching Image 1) -->
-                    <button type="button" onclick="window.print()" 
-                            class="flex-1 sm:flex-initial inline-flex justify-center px-4 py-2 text-xs font-bold rounded-xl bg-white text-[#1c4b82] hover:bg-blue-50 transition-all shadow-xs border border-blue-200/80 items-center gap-1.5 whitespace-nowrap">
+                    <button type="button" @click="printDashboard()" 
+                            class="flex-1 sm:flex-initial inline-flex justify-center px-4 py-2 text-xs font-bold rounded-xl bg-white text-[#1c4b82] hover:bg-blue-50 transition-all shadow-xs border border-blue-200/80 items-center gap-1.5 whitespace-nowrap cursor-pointer">
                         <span class="material-icons-outlined text-base text-[#0284c7]">file_download</span>
                         <span>Setup dashboard</span>
                     </button>
@@ -133,11 +155,25 @@
 
             </div>
 
+            <!-- Print-Only Executive Report Metadata (Visible only on print/export) -->
+            <div class="print-only hidden w-full mt-3 pt-3 border-t border-slate-200 text-xs text-slate-500 justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <span class="font-bold text-slate-700">Executive Performance Report</span>
+                    <span>•</span>
+                    <span>Generated: {{ now()->format('M d, Y - h:i A') }}</span>
+                    <span>•</span>
+                    <span>Scope: {{ $isSuperAdmin ? 'Enterprise Scope (All Companies)' : 'Restricted Role Scope' }}</span>
+                </div>
+                <div>
+                    <span>Confidential • Internal MetaERP Intelligence</span>
+                </div>
+            </div>
+
         </div>
     </div>
 
     <!-- 12 EXECUTIVE KPI CARDS (MetaERP Logo Blue Gradients & Theme Accent System) -->
-    <div class="space-y-3">
+    <div class="space-y-3 dashboard-kpi-container print-avoid-break">
         <!-- ROW 1 (6 Cards: MetaERP Brand Blues + Theme Emerald + Theme Rose + Theme Violet) -->
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
             
@@ -550,13 +586,13 @@
     </div>
 
     <!-- MAIN GRID WITH CANVAS & DOCKED SLICER PANEL -->
-    <div class="grid grid-cols-1 xl:grid-cols-12 gap-4 sm:gap-5 items-start">
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-4 sm:gap-5 items-start dashboard-v2-grid">
 
         <!-- DASHBOARD CANVAS TILES (Pure White Cards with subtle borders) -->
-        <div :class="showFilters ? 'xl:col-span-9' : 'xl:col-span-12'" class="space-y-4 sm:space-y-5 min-w-0 transition-all">
+        <div :class="showFilters ? 'xl:col-span-9' : 'xl:col-span-12'" class="space-y-4 sm:space-y-5 min-w-0 transition-all dashboard-v2-tiles">
 
             <!-- TAB 1: OVERVIEW TILES -->
-            <div x-show="activeTab === 'overview'" class="space-y-4 sm:space-y-5">
+            <div x-show="activeTab === 'overview'" class="space-y-4 sm:space-y-5 dashboard-tab-content">
 
                 <!-- ROW 1: Donut (4) + Stacked Bar (5) + Clustered/Radial (3) -->
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
@@ -836,7 +872,12 @@
             </div>
 
             <!-- TAB 2: DYNAMICS TILES -->
-            <div x-show="activeTab === 'dynamics'" class="space-y-4 sm:space-y-5" x-cloak>
+            <div x-show="activeTab === 'dynamics'" class="space-y-4 sm:space-y-5 dashboard-tab-content print-page-break" x-cloak>
+                <!-- Print-Only Section Header -->
+                <div class="print-only hidden items-center justify-between pb-2 border-b border-slate-300 mb-2">
+                    <h2 class="text-base font-black text-[#0f1e36]">II. Commodity Unit Pricing Dynamics</h2>
+                    <span class="text-xs text-slate-500 font-semibold">MetaERP BI Dynamics</span>
+                </div>
                 <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] min-w-0">
                     <div class="flex items-center justify-between mb-4">
                         <div>
@@ -894,7 +935,12 @@
 
             <!-- TAB 3: FINANCIAL BI (Admin / Finance Role Only) -->
             @if($canViewFinancials)
-            <div x-show="activeTab === 'financials'" class="space-y-4 sm:space-y-5" x-cloak>
+            <div x-show="activeTab === 'financials'" class="space-y-4 sm:space-y-5 dashboard-tab-content print-page-break" x-cloak>
+                <!-- Print-Only Section Header -->
+                <div class="print-only hidden items-center justify-between pb-2 border-b border-slate-300 mb-2">
+                    <h2 class="text-base font-black text-[#0f1e36]">III. Trading Financial BI & Margin Waterfall</h2>
+                    <span class="text-xs text-slate-500 font-semibold">Stepwise Margin Realization</span>
+                </div>
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-stretch">
                     
                     <!-- Power BI Cash Flow & Profit Waterfall Chart Card -->
@@ -1053,7 +1099,7 @@
         </div>
 
         <!-- RIGHT-HAND POWER BI SLICER PANEL (Exact Image 1 Slicer Layout) -->
-        <div x-show="showFilters" class="hidden xl:block xl:col-span-3 transition-all min-w-0">
+        <div x-show="showFilters" class="hidden xl:block xl:col-span-3 transition-all min-w-0 dashboard-v2-slicers no-print">
             <div class="bg-white rounded-2xl p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-slate-200/80 sticky top-6 space-y-4 text-slate-700">
                 
                 <div class="flex items-center justify-between pb-3 border-b border-slate-100">
@@ -1197,7 +1243,7 @@
 
     <!-- MOBILE / TABLET OFF-CANVAS SLICER DRAWER -->
     <div x-show="mobileFiltersOpen" 
-         class="fixed inset-0 z-50 xl:hidden overflow-hidden" 
+         class="fixed inset-0 z-50 xl:hidden overflow-hidden no-print" 
          x-cloak>
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" 
              @click="mobileFiltersOpen = false"></div>
@@ -1887,4 +1933,85 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 </script>
+
+<style>
+@media print {
+    /* Reset dashboard outer canvas wrapper */
+    .dashboard-v2-canvas {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+        min-height: auto !important;
+    }
+
+    /* Expand main canvas container to full 100% width, overriding 9-column slicer dock */
+    .dashboard-v2-grid {
+        display: block !important;
+        width: 100% !important;
+    }
+
+    .dashboard-v2-tiles {
+        width: 100% !important;
+        max-width: 100% !important;
+        display: block !important;
+    }
+
+    /* Hide the right-side Slicers Panel and mobile drawer on print */
+    .dashboard-v2-slicers,
+    .no-print {
+        display: none !important;
+    }
+
+    /* Show all tab sections sequentially when printing full dashboard */
+    body.print-full-dashboard .dashboard-tab-content {
+        display: block !important;
+    }
+
+    /* Header banner and print titles */
+    .print-only {
+        display: flex !important;
+    }
+
+    /* Avoid breaking cards and charts across pages */
+    .print-avoid-break,
+    .dashboard-kpi-container {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        margin-bottom: 1.25rem !important;
+    }
+
+    .dashboard-v2-tiles .bg-white.rounded-2xl {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+        margin-bottom: 1.5rem !important;
+        box-shadow: none !important;
+        border: 1px solid #cbd5e1 !important;
+    }
+
+    /* Start major sections on clean new pages */
+    .print-page-break {
+        break-before: page !important;
+        page-break-before: always !important;
+        margin-top: 1.5rem !important;
+    }
+
+    /* ApexCharts container in print */
+    .apexcharts-canvas {
+        margin: 0 auto !important;
+        max-width: 100% !important;
+    }
+
+    /* Table printing rules */
+    table {
+        page-break-inside: auto !important;
+    }
+    tr {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+    thead {
+        display: table-header-group !important;
+    }
+}
+</style>
 @endsection

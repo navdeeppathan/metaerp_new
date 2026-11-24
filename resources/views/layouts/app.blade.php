@@ -153,6 +153,62 @@
                 transform: scale(1.0);
             }
         }
+
+        /* Global Print Rules: Fixes single-page viewport clipping across all browsers */
+        @media print {
+            *, *::before, *::after {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+
+            html, body {
+                height: auto !important;
+                min-height: 100% !important;
+                overflow: visible !important;
+                background-color: #ffffff !important;
+            }
+
+            body {
+                display: block !important;
+                position: static !important;
+            }
+
+            /* Hide app chrome: sidebar, topbar, footer, loaders, mobile drawers */
+            aside,
+            header,
+            footer,
+            .hidden.lg\:block.shrink-0,
+            #fuse-splash-screen,
+            #global-page-loader,
+            div[x-show="sidebarMobileOpen"],
+            .no-print,
+            [data-no-print] {
+                display: none !important;
+            }
+
+            /* Unconstrain main layout wrappers for multi-page document pagination */
+            .flex-1.flex.flex-col.min-w-0.h-full.overflow-hidden {
+                height: auto !important;
+                overflow: visible !important;
+                display: block !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                position: static !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            main {
+                height: auto !important;
+                overflow: visible !important;
+                display: block !important;
+                position: static !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                background: transparent !important;
+            }
+        }
     </style>
 </head>
 <body class="h-full flex overflow-hidden text-slate-800 bg-slate-50"
