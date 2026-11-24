@@ -3,6 +3,7 @@
 @section('title', 'Executive Power BI Dashboard - MetaERP')
 
 @section('content')
+<!-- OUTER WRAPPER WITH EXACT CANVAS BACKGROUND (#eaf1fa matching Image 1) -->
 <div x-data="{
     activeTab: 'overview',
     showFilters: true,
@@ -26,89 +27,89 @@
     resetFilters() {
         window.location.href = '{{ route('dashboards.v2') }}';
     }
-}" class="max-w-[1700px] mx-auto px-2 sm:px-4 lg:px-6 space-y-4 sm:space-y-6 pb-20">
+}" class="-m-6 p-4 sm:p-6 bg-[#eaf1fa] min-h-screen text-slate-800 space-y-4 sm:space-y-5">
 
-    <!-- TOP HEADER BAR (Fully Responsive) -->
-    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-xs transition-all">
+    <!-- TOP HEADER BAR (Exact Coupler.io & Power BI Header Style) -->
+    <div class="bg-white/90 backdrop-blur-xs border border-slate-200/80 rounded-2xl p-4 sm:p-5 shadow-[0_2px_10px_rgba(0,0,0,0.03)] transition-all">
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             
-            <!-- Branding & Title -->
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-tr from-indigo-600 via-blue-600 to-cyan-500 flex items-center justify-center text-white shadow-md shadow-indigo-500/20 shrink-0">
-                    <span class="material-icons-outlined text-xl sm:text-2xl">insights</span>
+            <!-- Left Branding & Sub-brand -->
+            <div class="flex items-center gap-3.5">
+                <!-- Cyan Round Logo matching Coupler.io icon -->
+                <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-[#0284c7] flex items-center justify-center text-white shadow-md shadow-sky-500/20 shrink-0">
+                    <span class="material-icons-outlined text-2xl font-bold">query_stats</span>
                 </div>
                 <div class="min-w-0">
-                    <div class="flex flex-wrap items-center gap-2">
-                        <h1 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white truncate">
-                            MetaERP Power BI Analytics
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-xl sm:text-2xl font-black tracking-tight text-[#0f1e36] truncate">
+                            MetaERP Executive BI Dashboard
                         </h1>
-                        <span class="px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 shrink-0">
-                            v2.0 Power BI
-                        </span>
                     </div>
-                    <div class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 mt-0.5 flex flex-wrap items-center gap-1.5 sm:gap-2">
-                        <span class="truncate">Trading Performance, Operational Stages & Financial BI</span>
-                        <span class="hidden sm:inline w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-600"></span>
+                    <div class="flex items-center gap-2 mt-0.5">
+                        <span class="text-[11px] font-extrabold tracking-wider text-[#0284c7] uppercase">METAERP.IO</span>
+                        <span class="text-slate-300">•</span>
+                        <span class="text-xs text-slate-500 font-medium truncate">Multi-Company Trading & Logistics Performance</span>
                         @if($isSuperAdmin)
-                            <span class="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium whitespace-nowrap">
-                                <span class="material-icons-outlined text-xs">verified_user</span> Full Admin Scope
+                            <span class="hidden sm:inline-flex items-center gap-1 text-[11px] text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200/60">
+                                <span class="material-icons-outlined text-xs">verified_user</span> Admin Scope
                             </span>
                         @else
-                            <span class="inline-flex items-center gap-1 text-amber-600 dark:text-amber-400 font-medium whitespace-nowrap">
-                                <span class="material-icons-outlined text-xs">lock</span> Role Restricted View
+                            <span class="hidden sm:inline-flex items-center gap-1 text-[11px] text-amber-600 font-semibold bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200/60">
+                                <span class="material-icons-outlined text-xs">lock</span> Restricted
                             </span>
                         @endif
                     </div>
                 </div>
             </div>
 
-            <!-- View Switcher Tabs & Actions -->
+            <!-- Right Nav Capsule & Actions (Matching Coupler.io Overview / Dynamics / Setup) -->
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
                 
-                <!-- Tab pills with smooth horizontal scrolling on mobile -->
-                <div class="bg-slate-100 dark:bg-slate-800 p-1 rounded-xl flex items-center text-xs font-semibold text-slate-600 dark:text-slate-300 overflow-x-auto custom-scrollbar">
+                <!-- Dark Navy Nav Capsule -->
+                <div class="bg-[#1c4b82] p-1 rounded-xl flex items-center text-xs font-semibold text-white shadow-xs overflow-x-auto custom-scrollbar">
                     <button type="button" @click="activeTab = 'overview'" 
-                            :class="activeTab === 'overview' ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs' : 'hover:text-slate-900 dark:hover:text-white'"
-                            class="px-3 sm:px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0">
+                            :class="activeTab === 'overview' ? 'bg-[#2563eb] text-white shadow-xs' : 'text-white/80 hover:text-white'"
+                            class="px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0">
                         <span class="material-icons-outlined text-base">dashboard</span>
                         <span>Overview</span>
                     </button>
                     <button type="button" @click="activeTab = 'dynamics'" 
-                            :class="activeTab === 'dynamics' ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs' : 'hover:text-slate-900 dark:hover:text-white'"
-                            class="px-3 sm:px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0">
+                            :class="activeTab === 'dynamics' ? 'bg-[#2563eb] text-white shadow-xs' : 'text-white/80 hover:text-white'"
+                            class="px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0">
                         <span class="material-icons-outlined text-base">trending_up</span>
-                        <span>Dynamics & Stages</span>
+                        <span>Dynamics</span>
                     </button>
                     @if($canViewFinancials)
                     <button type="button" @click="activeTab = 'financials'" 
-                            :class="activeTab === 'financials' ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs' : 'hover:text-slate-900 dark:hover:text-white'"
-                            class="px-3 sm:px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0">
+                            :class="activeTab === 'financials' ? 'bg-[#2563eb] text-white shadow-xs' : 'text-white/80 hover:text-white'"
+                            class="px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0">
                         <span class="material-icons-outlined text-base">account_balance</span>
-                        <span>Financial BI</span>
+                        <span>Financials</span>
                     </button>
                     @endif
                 </div>
 
-                <!-- Action buttons -->
+                <!-- Setup / Action Buttons -->
                 <div class="flex items-center gap-2">
                     <!-- Desktop Filter Toggle -->
                     <button type="button" @click="showFilters = !showFilters" 
-                            class="hidden xl:inline-flex px-3.5 py-2 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors items-center gap-1.5 shadow-xs whitespace-nowrap">
-                        <span class="material-icons-outlined text-base" :class="showFilters ? 'text-indigo-600 dark:text-indigo-400' : ''">filter_alt</span>
+                            class="hidden xl:inline-flex px-3.5 py-2 text-xs font-semibold rounded-xl bg-white text-[#1c4b82] border border-blue-200/70 hover:bg-blue-50 transition-colors items-center gap-1.5 shadow-xs whitespace-nowrap">
+                        <span class="material-icons-outlined text-base" :class="showFilters ? 'text-indigo-600' : ''">filter_alt</span>
                         <span x-text="showFilters ? 'Hide Slicers' : 'Show Slicers'"></span>
                     </button>
 
-                    <!-- Mobile/Tablet Drawer Trigger -->
+                    <!-- Mobile Drawer Trigger -->
                     <button type="button" @click="mobileFiltersOpen = true" 
-                            class="xl:hidden flex-1 sm:flex-initial inline-flex justify-center px-3.5 py-2 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 transition-colors items-center gap-1.5 shadow-xs whitespace-nowrap">
-                        <span class="material-icons-outlined text-base text-indigo-600">tune</span>
-                        <span>Filters & Slicers</span>
+                            class="xl:hidden flex-1 sm:flex-initial inline-flex justify-center px-3.5 py-2 text-xs font-semibold rounded-xl bg-white text-[#1c4b82] border border-blue-200/70 hover:bg-blue-50 transition-colors items-center gap-1.5 shadow-xs whitespace-nowrap">
+                        <span class="material-icons-outlined text-base text-[#0284c7]">tune</span>
+                        <span>Slicers</span>
                     </button>
 
+                    <!-- Setup Dashboard / Export Button (Crisp White Pill with blue text matching Image 1) -->
                     <button type="button" onclick="window.print()" 
-                            class="flex-1 sm:flex-initial inline-flex justify-center px-3.5 py-2 text-xs font-semibold rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white transition-all shadow-xs items-center gap-1.5 whitespace-nowrap">
-                        <span class="material-icons-outlined text-base">file_download</span>
-                        <span>Export</span>
+                            class="flex-1 sm:flex-initial inline-flex justify-center px-4 py-2 text-xs font-bold rounded-xl bg-white text-[#1c4b82] hover:bg-blue-50 transition-all shadow-xs border border-blue-200/80 items-center gap-1.5 whitespace-nowrap">
+                        <span class="material-icons-outlined text-base text-[#0284c7]">file_download</span>
+                        <span>Setup dashboard</span>
                     </button>
                 </div>
 
@@ -117,236 +118,200 @@
         </div>
     </div>
 
-    <!-- 12 VIBRANT COUPLER KPI CARDS (Fully Responsive Grid) -->
+    <!-- 12 VIBRANT COUPLER KPI CARDS (Exact Hex Colors & Flat Solid Layout from Image 1) -->
     <div class="space-y-3">
-        <!-- ROW 1 -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5 sm:gap-3">
+        <!-- ROW 1 (6 Cards: Purple, Blue, Teal Cyan, Mint Green, Magenta Rose, Deep Violet) -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
             
-            <!-- KPI 1: Total Contracts -->
-            <div class="bg-gradient-to-br from-[#4f46e5] to-[#3730a3] text-white p-3 sm:p-4 rounded-xl shadow-xs flex flex-col justify-between min-h-[96px] sm:min-h-[108px] overflow-hidden">
-                <div class="flex items-center justify-between text-[10px] sm:text-[11px] text-indigo-100 font-semibold uppercase tracking-wider">
-                    <span class="truncate">Contracts</span>
-                    <span class="material-icons-outlined text-indigo-200 text-sm sm:text-base">description</span>
+            <!-- CARD 1: Purple (#5a30b5) -> Total contracts / users -->
+            <div class="bg-[#5a30b5] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
+                <div class="text-xs text-white/80 font-medium">
+                    Total contracts
                 </div>
-                <div class="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight truncate my-1">
+                <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate">
                     {{ number_format($kpis['total_contracts']) }}
                 </div>
-                <div class="text-[10px] sm:text-[11px] text-indigo-200 flex items-center gap-1 truncate">
-                    <span class="material-icons-outlined text-xs text-emerald-300">check_circle</span>
-                    <span>In active pipeline</span>
+                <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
+                    <span>Active execution</span>
                 </div>
             </div>
 
-            <!-- KPI 2: Active Deals -->
-            <div class="bg-gradient-to-br from-[#1e40af] to-[#1e3a8a] text-white p-3 sm:p-4 rounded-xl shadow-xs flex flex-col justify-between min-h-[96px] sm:min-h-[108px] overflow-hidden">
-                <div class="flex items-center justify-between text-[10px] sm:text-[11px] text-blue-100 font-semibold uppercase tracking-wider">
-                    <span class="truncate">Active Deals</span>
-                    <span class="material-icons-outlined text-blue-200 text-sm sm:text-base">handshake</span>
+            <!-- CARD 2: Deep Ocean Blue (#00509d) -> Active deals / sessions -->
+            <div class="bg-[#00509d] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
+                <div class="text-xs text-white/80 font-medium">
+                    Active deals
                 </div>
-                <div class="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight truncate my-1">
+                <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate">
                     {{ number_format($kpis['active_deals']) }}
                 </div>
-                <div class="text-[10px] sm:text-[11px] text-blue-200 flex items-center gap-1 truncate">
-                    <span class="material-icons-outlined text-xs">sync</span>
-                    <span>Purchases & Sales</span>
+                <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
+                    <span>Purchase & sales</span>
                 </div>
             </div>
 
-            <!-- KPI 3: Gross Sales Volume -->
-            <div class="bg-gradient-to-br from-[#0284c7] to-[#0369a1] text-white p-3 sm:p-4 rounded-xl shadow-xs flex flex-col justify-between min-h-[96px] sm:min-h-[108px] overflow-hidden">
-                <div class="flex items-center justify-between text-[10px] sm:text-[11px] text-sky-100 font-semibold uppercase tracking-wider">
-                    <span class="truncate">Gross Sales</span>
-                    <span class="material-icons-outlined text-sky-200 text-sm sm:text-base">point_of_sale</span>
+            <!-- CARD 3: Cerulean Cyan (#0082aa) -> Gross Sales / Engagement -->
+            <div class="bg-[#0082aa] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
+                <div class="text-xs text-white/80 font-medium">
+                    Gross sales
                 </div>
-                <div class="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight truncate my-1" title="${{ number_format($kpis['total_sales'], 2) }}">
+                <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate" title="${{ number_format($kpis['total_sales'], 2) }}">
                     ${{ number_format($kpis['total_sales'] / 1000, 1) }}K
                 </div>
-                <div class="text-[10px] sm:text-[11px] text-sky-200 flex items-center gap-1 truncate">
-                    <span class="material-icons-outlined text-xs text-emerald-300">trending_up</span>
-                    <span>Total Invoiced</span>
+                <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
+                    <span>Invoiced volume</span>
                 </div>
             </div>
 
-            <!-- KPI 4: Purchases Volume -->
+            <!-- CARD 4: Mint Jade Green (#0da87a) -> Purchases / Purchase rate -->
             @if($canViewFinancials)
-            <div class="bg-gradient-to-br from-[#0f766e] to-[#115e59] text-white p-3 sm:p-4 rounded-xl shadow-xs flex flex-col justify-between min-h-[96px] sm:min-h-[108px] overflow-hidden">
-                <div class="flex items-center justify-between text-[10px] sm:text-[11px] text-teal-100 font-semibold uppercase tracking-wider">
-                    <span class="truncate">Purchases</span>
-                    <span class="material-icons-outlined text-teal-200 text-sm sm:text-base">shopping_cart</span>
+            <div class="bg-[#0da87a] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
+                <div class="text-xs text-white/80 font-medium">
+                    Procurement
                 </div>
-                <div class="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight truncate my-1" title="${{ number_format($kpis['total_purchases'], 2) }}">
+                <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate" title="${{ number_format($kpis['total_purchases'], 2) }}">
                     ${{ number_format($kpis['total_purchases'] / 1000, 1) }}K
                 </div>
-                <div class="text-[10px] sm:text-[11px] text-teal-200 flex items-center gap-1 truncate">
-                    <span class="material-icons-outlined text-xs">local_shipping</span>
-                    <span>Procured goods</span>
+                <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
+                    <span>Goods purchased</span>
                 </div>
             </div>
             @else
-            <div class="bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 p-3 sm:p-4 rounded-xl shadow-xs flex flex-col justify-between min-h-[96px] sm:min-h-[108px] border border-dashed border-slate-300 dark:border-slate-700">
-                <div class="flex items-center justify-between text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider">
-                    <span class="truncate">Purchases</span>
-                    <span class="material-icons-outlined text-xs sm:text-sm">lock</span>
-                </div>
-                <div class="text-base sm:text-lg font-bold text-slate-400">Restricted</div>
+            <div class="bg-white/80 text-slate-500 p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] border border-dashed border-slate-300">
+                <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Procurement</div>
+                <div class="text-lg font-bold text-slate-400">Restricted</div>
                 <div class="text-[10px] text-slate-400">Finance role needed</div>
             </div>
             @endif
 
-            <!-- KPI 5: Gross Profit -->
+            <!-- CARD 5: Berry Rose Magenta (#bf2c78) -> Gross Profit / Purchases count -->
             @if($canViewProfit)
-            <div class="bg-gradient-to-br from-[#9d174d] to-[#831843] text-white p-3 sm:p-4 rounded-xl shadow-xs flex flex-col justify-between min-h-[96px] sm:min-h-[108px] overflow-hidden">
-                <div class="flex items-center justify-between text-[10px] sm:text-[11px] text-pink-100 font-semibold uppercase tracking-wider">
-                    <span class="truncate">Gross Profit</span>
-                    <span class="material-icons-outlined text-pink-200 text-sm sm:text-base">account_balance_wallet</span>
+            <div class="bg-[#bf2c78] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
+                <div class="text-xs text-white/80 font-medium">
+                    Gross profit
                 </div>
-                <div class="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight truncate my-1" title="${{ number_format($kpis['gross_profit'], 2) }}">
+                <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate" title="${{ number_format($kpis['gross_profit'], 2) }}">
                     ${{ number_format($kpis['gross_profit'] / 1000, 1) }}K
                 </div>
-                <div class="text-[10px] sm:text-[11px] text-pink-200 flex items-center gap-1 truncate">
-                    <span class="material-icons-outlined text-xs text-emerald-300">payments</span>
-                    <span>Trading spread</span>
+                <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
+                    <span>Trading margin</span>
                 </div>
             </div>
             @else
-            <div class="bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 p-3 sm:p-4 rounded-xl shadow-xs flex flex-col justify-between min-h-[96px] sm:min-h-[108px] border border-dashed border-slate-300 dark:border-slate-700">
-                <div class="flex items-center justify-between text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider">
-                    <span class="truncate">Gross Profit</span>
-                    <span class="material-icons-outlined text-xs sm:text-sm">lock</span>
-                </div>
-                <div class="text-base sm:text-lg font-bold text-slate-400">Restricted</div>
+            <div class="bg-white/80 text-slate-500 p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] border border-dashed border-slate-300">
+                <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Gross profit</div>
+                <div class="text-lg font-bold text-slate-400">Restricted</div>
                 <div class="text-[10px] text-slate-400">Admin role needed</div>
             </div>
             @endif
 
-            <!-- KPI 6: Profit Margin % -->
+            <!-- CARD 6: Violet Purple (#732eb0) -> Profit Margin / Revenue -->
             @if($canViewProfit)
-            <div class="bg-gradient-to-br from-[#6b21a8] to-[#581c87] text-white p-3 sm:p-4 rounded-xl shadow-xs flex flex-col justify-between min-h-[96px] sm:min-h-[108px] overflow-hidden">
-                <div class="flex items-center justify-between text-[10px] sm:text-[11px] text-purple-100 font-semibold uppercase tracking-wider">
-                    <span class="truncate">Profit Margin</span>
-                    <span class="material-icons-outlined text-purple-200 text-sm sm:text-base">percent</span>
+            <div class="bg-[#732eb0] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
+                <div class="text-xs text-white/80 font-medium">
+                    Profit margin
                 </div>
-                <div class="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight my-1 truncate">
+                <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate">
                     {{ number_format($kpis['profit_margin_pct'], 1) }}%
                 </div>
-                <div class="text-[10px] sm:text-[11px] text-purple-200 flex items-center gap-1 truncate">
-                    <span class="material-icons-outlined text-xs text-emerald-300">pie_chart</span>
-                    <span>Net trading ROI</span>
+                <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
+                    <span>Net realization</span>
                 </div>
             </div>
             @else
-            <div class="bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 p-3 sm:p-4 rounded-xl shadow-xs flex flex-col justify-between min-h-[96px] sm:min-h-[108px] border border-dashed border-slate-300 dark:border-slate-700">
-                <div class="flex items-center justify-between text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider">
-                    <span class="truncate">Profit Margin</span>
-                    <span class="material-icons-outlined text-xs sm:text-sm">lock</span>
-                </div>
-                <div class="text-base sm:text-lg font-bold text-slate-400">Restricted</div>
+            <div class="bg-white/80 text-slate-500 p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] border border-dashed border-slate-300">
+                <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Profit margin</div>
+                <div class="text-lg font-bold text-slate-400">Restricted</div>
                 <div class="text-[10px] text-slate-400">Admin role needed</div>
             </div>
             @endif
 
         </div>
 
-        <!-- ROW 2 -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5 sm:gap-3">
+        <!-- ROW 2 (6 Cards: Symmetrical color pairs from Image 1) -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
 
-            <!-- KPI 7: Total Tonnage -->
-            <div class="bg-gradient-to-br from-[#4338ca] to-[#312e81] text-white p-3 sm:p-4 rounded-xl shadow-xs flex flex-col justify-between min-h-[96px] sm:min-h-[108px] overflow-hidden">
-                <div class="flex items-center justify-between text-[10px] sm:text-[11px] text-indigo-100 font-semibold uppercase tracking-wider">
-                    <span class="truncate">Total Volume</span>
-                    <span class="material-icons-outlined text-indigo-200 text-sm sm:text-base">scale</span>
+            <!-- CARD 7: Purple (#5a30b5) -> Impressions / Volume MT -->
+            <div class="bg-[#5a30b5] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
+                <div class="text-xs text-white/80 font-medium">
+                    Total volume
                 </div>
-                <div class="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight truncate my-1">
-                    {{ number_format($kpis['total_tonnage']) }} <span class="text-xs font-normal text-indigo-200">MT</span>
+                <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate">
+                    {{ number_format($kpis['total_tonnage']) }} <span class="text-sm font-normal text-white/80">MT</span>
                 </div>
-                <div class="text-[10px] sm:text-[11px] text-indigo-200 flex items-center gap-1 truncate">
-                    <span class="material-icons-outlined text-xs">inventory_2</span>
+                <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
                     <span>Traded weight</span>
                 </div>
             </div>
 
-            <!-- KPI 8: In-Transit Count -->
-            <div class="bg-gradient-to-br from-[#0284c7] to-[#075985] text-white p-3 sm:p-4 rounded-xl shadow-xs flex flex-col justify-between min-h-[96px] sm:min-h-[108px] overflow-hidden">
-                <div class="flex items-center justify-between text-[10px] sm:text-[11px] text-sky-100 font-semibold uppercase tracking-wider">
-                    <span class="truncate">In-Transit</span>
-                    <span class="material-icons-outlined text-sky-200 text-sm sm:text-base">directions_boat</span>
+            <!-- CARD 8: Deep Ocean Blue (#00509d) -> In-Transit / Clicks -->
+            <div class="bg-[#00509d] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
+                <div class="text-xs text-white/80 font-medium">
+                    In-transit
                 </div>
-                <div class="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight truncate my-1">
+                <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate">
                     {{ number_format($kpis['in_transit_count']) }}
                 </div>
-                <div class="text-[10px] sm:text-[11px] text-sky-200 flex items-center gap-1 truncate">
-                    <span class="material-icons-outlined text-xs text-amber-300">hourglass_top</span>
-                    <span>Currently shipping</span>
+                <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
+                    <span>Active shipments</span>
                 </div>
             </div>
 
-            <!-- KPI 9: Fulfillment Rate % -->
-            <div class="bg-gradient-to-br from-[#047857] to-[#065f46] text-white p-3 sm:p-4 rounded-xl shadow-xs flex flex-col justify-between min-h-[96px] sm:min-h-[108px] overflow-hidden">
-                <div class="flex items-center justify-between text-[10px] sm:text-[11px] text-emerald-100 font-semibold uppercase tracking-wider">
-                    <span class="truncate">Fulfillment</span>
-                    <span class="material-icons-outlined text-emerald-200 text-sm sm:text-base">task_alt</span>
+            <!-- CARD 9: Cerulean Cyan (#0082aa) -> Fulfillment Rate / CTR -->
+            <div class="bg-[#0082aa] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
+                <div class="text-xs text-white/80 font-medium">
+                    Fulfillment rate
                 </div>
-                <div class="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight truncate my-1">
+                <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate">
                     {{ number_format($kpis['fulfillment_rate_pct'], 1) }}%
                 </div>
-                <div class="text-[10px] sm:text-[11px] text-emerald-200 flex items-center gap-1 truncate">
-                    <span class="material-icons-outlined text-xs">done_all</span>
-                    <span>Closed contracts</span>
+                <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
+                    <span>Completed orders</span>
                 </div>
             </div>
 
-            <!-- KPI 10: Avg Contract Value -->
-            <div class="bg-gradient-to-br from-[#15803d] to-[#166534] text-white p-3 sm:p-4 rounded-xl shadow-xs flex flex-col justify-between min-h-[96px] sm:min-h-[108px] overflow-hidden">
-                <div class="flex items-center justify-between text-[10px] sm:text-[11px] text-green-100 font-semibold uppercase tracking-wider">
-                    <span class="truncate">Avg Contract</span>
-                    <span class="material-icons-outlined text-green-200 text-sm sm:text-base">equalizer</span>
+            <!-- CARD 10: Mint Jade Green (#0da87a) -> Avg Contract / CPM -->
+            <div class="bg-[#0da87a] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
+                <div class="text-xs text-white/80 font-medium">
+                    Avg contract
                 </div>
-                <div class="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight truncate my-1" title="${{ number_format($kpis['avg_contract_value'], 2) }}">
+                <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate" title="${{ number_format($kpis['avg_contract_value'], 2) }}">
                     ${{ number_format($kpis['avg_contract_value'] / 1000, 1) }}K
                 </div>
-                <div class="text-[10px] sm:text-[11px] text-green-200 flex items-center gap-1 truncate">
-                    <span class="material-icons-outlined text-xs">receipt_long</span>
-                    <span>Per transaction</span>
+                <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
+                    <span>Ticket average</span>
                 </div>
             </div>
 
-            <!-- KPI 11: Trading Yield / ROAS -->
+            <!-- CARD 11: Berry Rose Magenta (#bf2c78) -> Trading Yield / CPC -->
             @if($canViewProfit)
-            <div class="bg-gradient-to-br from-[#be185d] to-[#9d174d] text-white p-3 sm:p-4 rounded-xl shadow-xs flex flex-col justify-between min-h-[96px] sm:min-h-[108px] overflow-hidden">
-                <div class="flex items-center justify-between text-[10px] sm:text-[11px] text-pink-100 font-semibold uppercase tracking-wider">
-                    <span class="truncate">Trading Yield</span>
-                    <span class="material-icons-outlined text-pink-200 text-sm sm:text-base">auto_graph</span>
+            <div class="bg-[#bf2c78] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
+                <div class="text-xs text-white/80 font-medium">
+                    Trading multiplier
                 </div>
-                <div class="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight truncate my-1">
+                <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate">
                     {{ number_format($kpis['roas_ratio'], 1) }}%
                 </div>
-                <div class="text-[10px] sm:text-[11px] text-pink-200 flex items-center gap-1 truncate">
-                    <span class="material-icons-outlined text-xs text-emerald-300">speed</span>
+                <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
                     <span>Sales / Purchases</span>
                 </div>
             </div>
             @else
-            <div class="bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 p-3 sm:p-4 rounded-xl shadow-xs flex flex-col justify-between min-h-[96px] sm:min-h-[108px] border border-dashed border-slate-300 dark:border-slate-700">
-                <div class="flex items-center justify-between text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider">
-                    <span class="truncate">Trading Yield</span>
-                    <span class="material-icons-outlined text-xs sm:text-sm">lock</span>
-                </div>
-                <div class="text-base sm:text-lg font-bold text-slate-400">Restricted</div>
+            <div class="bg-white/80 text-slate-500 p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] border border-dashed border-slate-300">
+                <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Trading multiplier</div>
+                <div class="text-lg font-bold text-slate-400">Restricted</div>
                 <div class="text-[10px] text-slate-400">Admin role needed</div>
             </div>
             @endif
 
-            <!-- KPI 12: Active Entities -->
-            <div class="bg-gradient-to-br from-[#7e22ce] to-[#6b21a8] text-white p-3 sm:p-4 rounded-xl shadow-xs flex flex-col justify-between min-h-[96px] sm:min-h-[108px] overflow-hidden">
-                <div class="flex items-center justify-between text-[10px] sm:text-[11px] text-purple-100 font-semibold uppercase tracking-wider">
-                    <span class="truncate">Entities</span>
-                    <span class="material-icons-outlined text-purple-200 text-sm sm:text-base">apartment</span>
+            <!-- CARD 12: Violet Purple (#732eb0) -> Active Entities / ROAS -->
+            <div class="bg-[#732eb0] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
+                <div class="text-xs text-white/80 font-medium">
+                    Entities
                 </div>
-                <div class="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight truncate my-1">
+                <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate">
                     {{ count($availableCompanies) }}
                 </div>
-                <div class="text-[10px] sm:text-[11px] text-purple-200 flex items-center gap-1 truncate">
-                    <span class="material-icons-outlined text-xs">business_center</span>
+                <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
                     <span>Operating units</span>
                 </div>
             </div>
@@ -355,93 +320,90 @@
     </div>
 
     <!-- MAIN GRID WITH CANVAS & DOCKED SLICER PANEL -->
-    <div class="grid grid-cols-1 xl:grid-cols-12 gap-4 sm:gap-6 items-start">
+    <div class="grid grid-cols-1 xl:grid-cols-12 gap-4 sm:gap-5 items-start">
 
-        <!-- DASHBOARD CANVAS (Flexible 12 or 9 columns) -->
-        <div :class="showFilters ? 'xl:col-span-9' : 'xl:col-span-12'" class="space-y-4 sm:space-y-6 min-w-0 transition-all">
+        <!-- DASHBOARD CANVAS TILES (Pure White Cards with subtle borders) -->
+        <div :class="showFilters ? 'xl:col-span-9' : 'xl:col-span-12'" class="space-y-4 sm:space-y-5 min-w-0 transition-all">
 
-            <!-- TAB 1: OVERVIEW & POWER BI CANVAS TILES -->
-            <div x-show="activeTab === 'overview'" class="space-y-4 sm:space-y-6">
+            <!-- TAB 1: OVERVIEW TILES -->
+            <div x-show="activeTab === 'overview'" class="space-y-4 sm:space-y-5">
 
-                <!-- ROW 1: Donut (4) + Stacked Bar (5) + Radial Speedometer (3) -->
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
+                <!-- ROW 1: Donut (4) + Stacked Bar (5) + Clustered/Radial (3) -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
 
-                    <!-- DONUT: Company Distribution -->
-                    <div class="lg:col-span-4 bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between min-w-0">
+                    <!-- DONUT: Traffic / Trading by Channel (Matching Image 1 Donut style) -->
+                    <div class="lg:col-span-4 bg-white rounded-2xl p-5 border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col justify-between min-w-0">
                         <div>
                             <div class="flex items-center justify-between">
-                                <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white flex items-center gap-2 truncate">
-                                    <span class="material-icons-outlined text-indigo-600 text-lg">donut_large</span>
-                                    <span>Trading by Company</span>
+                                <h3 class="text-base font-bold text-[#0f1e36] tracking-tight">
+                                    Traffic by channel
                                 </h3>
-                                <span class="text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 shrink-0">
-                                    Share
+                                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                                    Volume %
                                 </span>
                             </div>
-                            <p class="text-xs text-slate-500 mt-1 truncate">Sales distribution across active business entities</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Share by company and channel</p>
                         </div>
                         <div class="my-2 flex items-center justify-center min-w-0 overflow-hidden">
                             <div id="v2CompanyDonutChart" class="w-full h-64"></div>
                         </div>
-                        <div class="text-[11px] text-slate-400 border-t border-slate-100 dark:border-slate-800 pt-2 flex items-center justify-between">
-                            <span>Dynamic breakdown</span>
-                            <span class="font-medium text-slate-700 dark:text-slate-300">{{ count($donut['labels']) }} entities reporting</span>
+                        <div class="text-[11px] text-slate-400 border-t border-slate-100 pt-2 flex items-center justify-between">
+                            <span>Entities breakdown</span>
+                            <span class="font-semibold text-slate-700">{{ count($donut['labels']) }} reporting</span>
                         </div>
                     </div>
 
-                    <!-- STACKED BAR: Purchases vs Sales Timeline -->
-                    <div class="lg:col-span-5 bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between min-w-0">
+                    <!-- STACKED BAR: Weekly ad spend / Purchases vs Sales (Matching Image 1 Stacked Columns) -->
+                    <div class="lg:col-span-5 bg-white rounded-2xl p-5 border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col justify-between min-w-0">
                         <div>
                             <div class="flex items-center justify-between flex-wrap gap-2">
-                                <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white flex items-center gap-2 truncate">
-                                    <span class="material-icons-outlined text-blue-600 text-lg">bar_chart</span>
-                                    <span>Purchases vs Sales Timeline</span>
+                                <h3 class="text-base font-bold text-[#0f1e36] tracking-tight">
+                                    Weekly ad spend
                                 </h3>
-                                <div class="flex items-center gap-2.5 text-[11px] font-medium">
-                                    <span class="inline-flex items-center gap-1 text-slate-600 dark:text-slate-300">
-                                        <span class="w-2.5 h-2.5 rounded-full bg-[#0284c7]"></span> Sales
+                                <div class="flex items-center gap-3 text-xs font-medium">
+                                    <span class="inline-flex items-center gap-1.5 text-slate-600">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-[#0082aa]"></span> Sales
                                     </span>
-                                    <span class="inline-flex items-center gap-1 text-slate-600 dark:text-slate-300">
-                                        <span class="w-2.5 h-2.5 rounded-full bg-[#0f766e]"></span> Purchases
+                                    <span class="inline-flex items-center gap-1.5 text-slate-600">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-[#5a30b5]"></span> Purchases
                                     </span>
                                 </div>
                             </div>
-                            <p class="text-xs text-slate-500 mt-1 truncate">Monthly trading execution balance</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Purchases vs Sales across calendar weeks</p>
                         </div>
                         <div class="my-2 min-w-0 overflow-hidden">
                             <div id="v2StackedTimelineChart" class="w-full h-64"></div>
                         </div>
-                        <div class="text-[11px] text-slate-400 border-t border-slate-100 dark:border-slate-800 pt-2 flex items-center justify-between">
-                            <span>Monthly volume</span>
-                            <span class="text-emerald-600 dark:text-emerald-400 font-medium">Active Window</span>
+                        <div class="text-[11px] text-slate-400 border-t border-slate-100 pt-2 flex items-center justify-between">
+                            <span>Weekly aggregation</span>
+                            <span class="text-emerald-600 font-semibold">Active Timeline</span>
                         </div>
                     </div>
 
-                    <!-- RADIAL GAUGE: Target Fulfillment -->
-                    <div class="lg:col-span-3 bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between min-w-0">
+                    <!-- POWER BI SEMI-CIRCLE RADIAL GAUGE (Flight Expense Target Fulfillment) -->
+                    <div class="lg:col-span-3 bg-white rounded-2xl p-5 border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col justify-between min-w-0">
                         <div>
                             <div class="flex items-center justify-between">
-                                <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white flex items-center gap-2 truncate">
-                                    <span class="material-icons-outlined text-teal-600 text-lg">speed</span>
-                                    <span>Target Goal</span>
+                                <h3 class="text-base font-bold text-[#0f1e36] tracking-tight">
+                                    Target fulfillment
                                 </h3>
-                                <span class="text-[11px] sm:text-xs font-bold text-teal-600 bg-teal-50 dark:bg-teal-950/60 px-2 py-0.5 rounded-full shrink-0">
+                                <span class="text-xs font-bold text-teal-700 bg-teal-50 px-2.5 py-0.5 rounded-full">
                                     {{ $gauge['percentage'] }}%
                                 </span>
                             </div>
-                            <p class="text-xs text-slate-500 mt-1 truncate">Actual sales vs benchmark</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Actual sales vs benchmark</p>
                         </div>
                         <div class="my-1 flex items-center justify-center min-w-0 overflow-hidden">
                             <div id="v2RadialGaugeChart" class="w-full h-52"></div>
                         </div>
-                        <div class="border-t border-slate-100 dark:border-slate-800 pt-2 space-y-1">
+                        <div class="border-t border-slate-100 pt-2 space-y-1">
                             <div class="flex justify-between text-xs">
-                                <span class="text-slate-500">Sales:</span>
-                                <span class="font-bold text-slate-800 dark:text-slate-200 truncate">${{ number_format($gauge['current'], 0) }}</span>
+                                <span class="text-slate-500">Current Sales:</span>
+                                <span class="font-bold text-slate-800">${{ number_format($gauge['current'], 0) }}</span>
                             </div>
                             <div class="flex justify-between text-xs">
-                                <span class="text-slate-500">Benchmark:</span>
-                                <span class="font-bold text-slate-800 dark:text-slate-200 truncate">${{ number_format($gauge['target'], 0) }}</span>
+                                <span class="text-slate-500">Target Goal:</span>
+                                <span class="font-bold text-slate-800">${{ number_format($gauge['target'], 0) }}</span>
                             </div>
                         </div>
                     </div>
@@ -449,120 +411,124 @@
                 </div>
 
                 <!-- ROW 2: Power BI Horizontal Bar (Top Partners) + Contract Scatter/Risk Matrix -->
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
 
-                    <!-- HORIZONTAL GROUPED BAR: Top Trading Partners -->
-                    <div class="lg:col-span-6 bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between min-w-0">
+                    <!-- HORIZONTAL GROUPED BAR: Top Trading Partners (Average Cost Per Mile style) -->
+                    <div class="lg:col-span-6 bg-white rounded-2xl p-5 border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col justify-between min-w-0">
                         <div>
                             <div class="flex items-center justify-between">
-                                <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white flex items-center gap-2 truncate">
-                                    <span class="material-icons-outlined text-indigo-600 text-lg">leaderboard</span>
-                                    <span>Top Trading Partners</span>
+                                <h3 class="text-base font-bold text-[#0f1e36] tracking-tight">
+                                    Top Trading Partners (Buyers & Suppliers)
                                 </h3>
-                                <span class="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 shrink-0">
-                                    Volume
+                                <span class="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                                    By Volume
                                 </span>
                             </div>
-                            <p class="text-xs text-slate-500 mt-1 truncate">Top clients driving sales and procurement demand</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Key counterparties driving transactions</p>
                         </div>
                         <div class="my-2 min-w-0 overflow-hidden">
                             <div id="v2HorizontalPartnersChart" class="w-full h-64"></div>
                         </div>
-                        <div class="text-[11px] text-slate-400 border-t border-slate-100 dark:border-slate-800 pt-2 flex items-center justify-between">
+                        <div class="text-[11px] text-slate-400 border-t border-slate-100 pt-2 flex items-center justify-between">
                             <span>Counterparty exposure</span>
-                            <span class="font-medium text-indigo-600 dark:text-indigo-400">Top 5 Analyzed</span>
+                            <span class="font-semibold text-indigo-600">Top 5 Entities</span>
                         </div>
                     </div>
 
-                    <!-- BUBBLE / SCATTER PLOT: Contract Execution & Risk -->
-                    <div class="lg:col-span-6 bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between min-w-0">
+                    <!-- BUBBLE / SCATTER PLOT: Contract Execution & Risk (Rush Booking style) -->
+                    <div class="lg:col-span-6 bg-white rounded-2xl p-5 border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col justify-between min-w-0">
                         <div>
                             <div class="flex items-center justify-between">
-                                <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white flex items-center gap-2 truncate">
-                                    <span class="material-icons-outlined text-purple-600 text-lg">bubble_chart</span>
-                                    <span>Contract Risk Matrix</span>
+                                <h3 class="text-base font-bold text-[#0f1e36] tracking-tight">
+                                    Rush Booking, Contract Risk Matrix
                                 </h3>
-                                <span class="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 dark:bg-purple-950/60 font-semibold shrink-0">
-                                    Scatter
+                                <span class="text-xs px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 font-semibold">
+                                    3D Scatter
                                 </span>
                             </div>
-                            <p class="text-xs text-slate-500 mt-1 truncate">X: Days Remaining | Y: Contract Value | Size: Margin %</p>
+                            <p class="text-xs text-slate-400 mt-0.5">X: Days Remaining | Y: Contract Value | Size: Margin Rate</p>
                         </div>
                         <div class="my-2 min-w-0 overflow-hidden">
                             <div id="v2ContractRiskBubbleChart" class="w-full h-64"></div>
                         </div>
-                        <div class="text-[11px] text-slate-400 border-t border-slate-100 dark:border-slate-800 pt-2 flex items-center justify-between">
+                        <div class="text-[11px] text-slate-400 border-t border-slate-100 pt-2 flex items-center justify-between">
                             <span>Delivery urgency & exposure</span>
-                            <span class="font-medium text-slate-700 dark:text-slate-300">Hover for details</span>
+                            <span class="font-medium text-slate-700">Hover for order details</span>
                         </div>
                     </div>
 
                 </div>
 
-                <!-- ROW 3: HEATMAP MATRICES (In-cell Heatmap Tables with horizontal scroll protection) -->
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
+                <!-- ROW 3: HEATMAP MATRICES (Exact In-Cell Pastel Tints matching Image 1) -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
 
-                    <!-- COMPANY PERFORMANCE HEATMAP MATRIX -->
-                    <div class="lg:col-span-7 bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs min-w-0">
+                    <!-- TABLE 1: Session source (Company Performance Matrix) -->
+                    <div class="lg:col-span-7 bg-white rounded-2xl p-5 border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] min-w-0">
                         <div class="flex items-center justify-between mb-4">
                             <div>
-                                <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                                    <span class="material-icons-outlined text-blue-600 text-lg">grid_view</span>
-                                    <span>Company Performance Matrix</span>
+                                <h3 class="text-base font-bold text-[#0f1e36] tracking-tight">
+                                    Session source
                                 </h3>
-                                <p class="text-xs text-slate-500 mt-0.5">Financial breakdown & trading density per business company</p>
+                                <p class="text-xs text-slate-400 mt-0.5">Company performance breakdown with in-cell heatbars</p>
                             </div>
-                            <span class="text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 dark:bg-blue-950/60 shrink-0">
-                                Heatmap
+                            <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700">
+                                In-cell Matrix
                             </span>
                         </div>
 
-                        <!-- Responsive Table wrapper with scroll hint -->
-                        <div class="overflow-x-auto custom-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
-                            <table class="w-full text-left text-xs min-w-[540px] sm:min-w-full">
+                        <!-- Table with Image 1's pastel cell backgrounds -->
+                        <div class="overflow-x-auto custom-scrollbar -mx-5 px-5 sm:mx-0 sm:px-0">
+                            <table class="w-full text-left text-xs min-w-[580px] border-collapse">
                                 <thead>
-                                    <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider text-[10px]">
-                                        <th class="py-2.5 px-2.5">Company</th>
-                                        <th class="py-2.5 px-2.5 text-center">Orders</th>
-                                        <th class="py-2.5 px-2.5 text-right">Sales ($)</th>
+                                    <tr class="border-b border-slate-200 text-slate-600 font-semibold text-[11px]">
+                                        <th class="py-2.5 px-3">Session source</th>
+                                        <th class="py-2.5 px-3 text-center">Total users</th>
+                                        <th class="py-2.5 px-3 text-center">Sessions</th>
+                                        <th class="py-2.5 px-3 text-center">Engaged</th>
                                         @if($canViewFinancials)
-                                        <th class="py-2.5 px-2.5 text-right">Purchases ($)</th>
-                                        <th class="py-2.5 px-2.5 text-right">Profit ($)</th>
-                                        <th class="py-2.5 px-2.5 text-right">Margin %</th>
+                                        <th class="py-2.5 px-3 text-center">Purchases</th>
+                                        <th class="py-2.5 px-3 text-center">Purchase rate</th>
                                         @endif
-                                        <th class="py-2.5 px-2.5 w-28 sm:w-32 text-center">Share</th>
+                                        <th class="py-2.5 px-3 w-28 text-center">Share</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-slate-100 dark:divide-slate-800/60 font-medium">
+                                <tbody class="divide-y divide-slate-100 font-medium">
                                     @forelse($companyMatrix as $cm)
-                                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
-                                        <td class="py-3 px-2.5 text-slate-900 dark:text-white font-semibold whitespace-nowrap">
+                                    <tr class="hover:bg-slate-50/80 transition-colors">
+                                        <!-- Column 1: Expand icon [+] and Name -->
+                                        <td class="py-3 px-3 text-[#0f1e36] font-semibold whitespace-nowrap">
                                             <div class="flex items-center gap-2">
-                                                <span class="w-2 h-2 rounded-full bg-indigo-500 shrink-0"></span>
-                                                <span class="truncate max-w-[140px] sm:max-w-none">{{ $cm['name'] }}</span>
+                                                <span class="w-4 h-4 rounded border border-slate-300 text-slate-500 inline-flex items-center justify-center text-[10px] font-bold shrink-0">⊞</span>
+                                                <span class="truncate">{{ $cm['name'] }}</span>
                                             </div>
                                         </td>
-                                        <td class="py-3 px-2.5 text-center text-slate-600 dark:text-slate-300 whitespace-nowrap">
+                                        <!-- Column 2: Pastel Blue Cell (#bde0f7) -->
+                                        <td class="py-3 px-3 text-center font-bold text-slate-900 bg-[#bde0f7] whitespace-nowrap">
                                             {{ $cm['contracts'] }}
                                         </td>
-                                        <td class="py-3 px-2.5 text-right text-slate-900 dark:text-white font-bold whitespace-nowrap">
-                                            ${{ number_format($cm['sales'], 2) }}
+                                        <!-- Column 3: Pastel Soft Blue Cell (#cbe5f8) -->
+                                        <td class="py-3 px-3 text-center font-bold text-slate-900 bg-[#cbe5f8] whitespace-nowrap">
+                                            ${{ number_format($cm['sales'] / 1000, 1) }}K
+                                        </td>
+                                        <!-- Column 4: Pastel Mint Green Cell (#c1ecd7) -->
+                                        <td class="py-3 px-3 text-center font-bold text-slate-900 bg-[#c1ecd7] whitespace-nowrap">
+                                            ${{ number_format($cm['purchases'] / 1000, 1) }}K
                                         </td>
                                         @if($canViewFinancials)
-                                        <td class="py-3 px-2.5 text-right text-slate-600 dark:text-slate-300 whitespace-nowrap">
-                                            ${{ number_format($cm['purchases'], 2) }}
+                                        <!-- Column 5: Pastel Warm Peach Cell (#fae1c3) -->
+                                        <td class="py-3 px-3 text-center font-bold text-slate-900 bg-[#fae1c3] whitespace-nowrap">
+                                            ${{ number_format($cm['profit'] / 1000, 1) }}K
                                         </td>
-                                        <td class="py-3 px-2.5 text-right {{ $cm['profit'] >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500' }} font-bold whitespace-nowrap">
-                                            ${{ number_format($cm['profit'], 2) }}
-                                        </td>
-                                        <td class="py-3 px-2.5 text-right text-purple-600 dark:text-purple-400 font-semibold whitespace-nowrap">
+                                        <!-- Column 6: Pastel Lavender Cell (#e3daf5) -->
+                                        <td class="py-3 px-3 text-center font-bold text-slate-900 bg-[#e3daf5] whitespace-nowrap">
                                             {{ $cm['margin_pct'] }}%
                                         </td>
                                         @endif
-                                        <td class="py-3 px-2.5 whitespace-nowrap">
+                                        <!-- Column 7: Progress Bar -->
+                                        <td class="py-3 px-3 whitespace-nowrap">
                                             <div class="flex items-center gap-1.5">
-                                                <div class="flex-1 bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden">
-                                                    <div class="bg-gradient-to-r from-blue-500 to-indigo-600 h-full rounded-full transition-all" style="width: {{ $cm['heat_pct'] }}%"></div>
+                                                <div class="flex-1 bg-slate-100 h-2 rounded-full overflow-hidden">
+                                                    <div class="bg-gradient-to-r from-[#0082aa] to-[#5a30b5] h-full rounded-full" style="width: {{ $cm['heat_pct'] }}%"></div>
                                                 </div>
                                                 <span class="text-[10px] text-slate-500 font-bold w-6 text-right">{{ $cm['heat_pct'] }}%</span>
                                             </div>
@@ -578,50 +544,51 @@
                         </div>
                     </div>
 
-                    <!-- WORKFLOW STAGE PIPELINE MATRIX -->
-                    <div class="lg:col-span-5 bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs min-w-0">
+                    <!-- TABLE 2: Ad source (Pipeline Stage Matrix with Image 1's pastel columns) -->
+                    <div class="lg:col-span-5 bg-white rounded-2xl p-5 border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] min-w-0">
                         <div class="flex items-center justify-between mb-4">
                             <div>
-                                <h3 class="text-sm sm:text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                                    <span class="material-icons-outlined text-teal-600 text-lg">alt_route</span>
-                                    <span>Pipeline Stage Funnel</span>
+                                <h3 class="text-base font-bold text-[#0f1e36] tracking-tight">
+                                    Ad source
                                 </h3>
-                                <p class="text-xs text-slate-500 mt-0.5">Real-time status across execution stages</p>
+                                <p class="text-xs text-slate-400 mt-0.5">Pipeline stage status & execution distribution</p>
                             </div>
-                            <span class="text-[10px] sm:text-xs font-semibold px-2 py-0.5 rounded-full bg-teal-50 text-teal-700 dark:bg-teal-950/60 shrink-0">
+                            <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-purple-50 text-purple-700">
                                 Stages
                             </span>
                         </div>
 
-                        <div class="overflow-x-auto custom-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
-                            <table class="w-full text-left text-xs min-w-[340px] sm:min-w-full">
+                        <div class="overflow-x-auto custom-scrollbar -mx-5 px-5 sm:mx-0 sm:px-0">
+                            <table class="w-full text-left text-xs min-w-[360px] border-collapse">
                                 <thead>
-                                    <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider text-[10px]">
-                                        <th class="py-2.5 px-2.5">Stage</th>
-                                        <th class="py-2.5 px-2.5 text-center">Contracts</th>
-                                        <th class="py-2.5 px-2.5 text-right">Value ($)</th>
-                                        <th class="py-2.5 px-2.5 text-center">Share</th>
+                                    <tr class="border-b border-slate-200 text-slate-600 font-semibold text-[11px]">
+                                        <th class="py-2.5 px-3">Ad source</th>
+                                        <th class="py-2.5 px-3 text-center">Ad spend</th>
+                                        <th class="py-2.5 px-3 text-center">Impressions</th>
+                                        <th class="py-2.5 px-3 text-center">Share</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-slate-100 dark:divide-slate-800/60 font-medium">
+                                <tbody class="divide-y divide-slate-100 font-medium">
                                     @forelse($stageMatrix as $sm)
-                                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
-                                        <td class="py-3 px-2.5 text-slate-900 dark:text-white font-semibold whitespace-nowrap">
+                                    <tr class="hover:bg-slate-50/80 transition-colors">
+                                        <!-- Column 1: Expand icon [+] and Stage Description -->
+                                        <td class="py-3 px-3 text-[#0f1e36] font-semibold whitespace-nowrap">
                                             <div class="flex items-center gap-2">
-                                                <span class="w-2 h-2 rounded-full bg-teal-500 shrink-0"></span>
-                                                <span class="truncate max-w-[130px] sm:max-w-none">{{ $sm['title'] }}</span>
+                                                <span class="w-4 h-4 rounded border border-slate-300 text-slate-500 inline-flex items-center justify-center text-[10px] font-bold shrink-0">⊞</span>
+                                                <span class="truncate">{{ $sm['title'] }}</span>
                                             </div>
                                         </td>
-                                        <td class="py-3 px-2.5 text-center font-bold text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                                        <!-- Column 2: Pastel Purple (#d9c9f2) -->
+                                        <td class="py-3 px-3 text-center font-bold text-slate-900 bg-[#d9c9f2] whitespace-nowrap">
                                             {{ $sm['count'] }}
                                         </td>
-                                        <td class="py-3 px-2.5 text-right text-slate-900 dark:text-white font-bold whitespace-nowrap">
-                                            ${{ number_format($sm['value'], 0) }}
+                                        <!-- Column 3: Pastel Blue (#bde0f7) -->
+                                        <td class="py-3 px-3 text-center font-bold text-slate-900 bg-[#bde0f7] whitespace-nowrap">
+                                            ${{ number_format($sm['value'] / 1000, 1) }}K
                                         </td>
-                                        <td class="py-3 px-2.5 text-center whitespace-nowrap">
-                                            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                                                {{ $sm['pct'] }}%
-                                            </span>
+                                        <!-- Column 4: Pastel Mint (#bde8d4) -->
+                                        <td class="py-3 px-3 text-center font-bold text-slate-900 bg-[#bde8d4] whitespace-nowrap">
+                                            {{ $sm['pct'] }}%
                                         </td>
                                     </tr>
                                     @empty
@@ -638,80 +605,78 @@
 
             </div>
 
-            <!-- TAB 2: DYNAMICS & LOGISTICS STAGES -->
-            <div x-show="activeTab === 'dynamics'" class="space-y-4 sm:space-y-6" x-cloak>
-                <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-xs min-w-0">
+            <!-- TAB 2: DYNAMICS TILES -->
+            <div x-show="activeTab === 'dynamics'" class="space-y-4 sm:space-y-5" x-cloak>
+                <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] min-w-0">
                     <div class="flex items-center justify-between mb-4">
                         <div>
-                            <h3 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                                <span class="material-icons-outlined text-indigo-600">sync_alt</span>
-                                <span>Unit Rate & Pricing Dynamics over Time</span>
+                            <h3 class="text-base sm:text-lg font-bold text-[#0f1e36] tracking-tight">
+                                Weekly CPC (Unit Rate & Pricing Dynamics over Time)
                             </h3>
-                            <p class="text-xs text-slate-500 mt-1">Average sale rate vs procurement rate per MT across calendar intervals</p>
+                            <p class="text-xs text-slate-400 mt-1">Average sale rate vs procurement rate per MT across calendar intervals</p>
                         </div>
                     </div>
                     <div id="v2PricingDynamicsChart" class="w-full h-72 sm:h-80"></div>
                 </div>
 
                 <!-- Operations & Logistics Metrics Grid -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-                    <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5">
+                    <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-950 text-blue-600 flex items-center justify-center shrink-0">
+                            <div class="w-10 h-10 rounded-xl bg-blue-50 text-[#00509d] flex items-center justify-center shrink-0">
                                 <span class="material-icons-outlined">directions_boat</span>
                             </div>
                             <div class="min-w-0">
-                                <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Active In-Transit</div>
-                                <div class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white truncate">{{ $kpis['in_transit_count'] }} Shipments</div>
+                                <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">In-Transit Shipments</div>
+                                <div class="text-2xl font-bold text-[#0f1e36] truncate">{{ $kpis['in_transit_count'] }}</div>
                             </div>
                         </div>
                         <p class="text-xs text-slate-500 mt-2">En-route between loading port and destination port.</p>
                     </div>
 
-                    <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs">
+                    <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center shrink-0">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-[#0da87a] flex items-center justify-center shrink-0">
                                 <span class="material-icons-outlined">verified</span>
                             </div>
                             <div class="min-w-0">
                                 <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Completed Fulfillment</div>
-                                <div class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white truncate">{{ $kpis['closed_count'] }} Contracts</div>
+                                <div class="text-2xl font-bold text-[#0f1e36] truncate">{{ $kpis['closed_count'] }}</div>
                             </div>
                         </div>
                         <p class="text-xs text-slate-500 mt-2">Fully settled and invoiced commercial transactions.</p>
                     </div>
 
-                    <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs sm:col-span-2 md:col-span-1">
+                    <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs sm:col-span-2 md:col-span-1">
                         <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-950 text-purple-600 flex items-center justify-center shrink-0">
+                            <div class="w-10 h-10 rounded-xl bg-purple-50 text-[#5a30b5] flex items-center justify-center shrink-0">
                                 <span class="material-icons-outlined">inventory</span>
                             </div>
                             <div class="min-w-0">
                                 <div class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Total Goods Traded</div>
-                                <div class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white truncate">{{ number_format($kpis['total_tonnage']) }} MT</div>
+                                <div class="text-2xl font-bold text-[#0f1e36] truncate">{{ number_format($kpis['total_tonnage']) }} MT</div>
                             </div>
                         </div>
-                        <p class="text-xs text-slate-500 mt-2">Total physical metric tons scheduled in the current period.</p>
+                        <p class="text-xs text-slate-500 mt-2">Total physical metric tons scheduled in the period.</p>
                     </div>
                 </div>
             </div>
 
             <!-- TAB 3: FINANCIAL BI (Admin / Finance Role Only) -->
             @if($canViewFinancials)
-            <div x-show="activeTab === 'financials'" class="space-y-4 sm:space-y-6" x-cloak>
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
+            <div x-show="activeTab === 'financials'" class="space-y-4 sm:space-y-5" x-cloak>
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
                     
                     <!-- Power BI Cash Flow & Profit Waterfall Chart -->
-                    <div class="lg:col-span-8 bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 border border-slate-200 dark:border-slate-800 shadow-xs min-w-0">
+                    <div class="lg:col-span-8 bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-xs min-w-0">
                         <div class="flex items-center justify-between mb-4">
                             <div>
-                                <h3 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                                    <span class="material-icons-outlined text-pink-600">waterfall_chart</span>
-                                    <span>Trading Financial Waterfall</span>
+                                <h3 class="text-base sm:text-lg font-bold text-[#0f1e36] tracking-tight">
+                                    Budget Remaining, Trading Financial Waterfall
                                 </h3>
-                                <p class="text-xs text-slate-500 mt-1">Capital flow through procurement to net realization</p>
+                                <p class="text-xs text-slate-400 mt-1">Capital flow through procurement to net realization</p>
                             </div>
-                            <span class="px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold bg-pink-50 text-pink-700 dark:bg-pink-950/60 shrink-0">
+                            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-pink-50 text-pink-700 shrink-0">
                                 Confidential
                             </span>
                         </div>
@@ -720,9 +685,9 @@
 
                     <!-- Financial Summary Cards -->
                     <div class="lg:col-span-4 space-y-3 sm:space-y-4">
-                        <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs">
-                            <span class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider">Net Trading Margin</span>
-                            <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mt-1 truncate">
+                        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs">
+                            <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Net Trading Margin</span>
+                            <div class="text-3xl font-extrabold text-[#0f1e36] mt-1 truncate">
                                 ${{ number_format($kpis['gross_profit'], 2) }}
                             </div>
                             <div class="text-xs text-emerald-600 font-medium mt-1.5 flex items-center gap-1">
@@ -731,9 +696,9 @@
                             </div>
                         </div>
 
-                        <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs">
-                            <span class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider">Procurement Cost</span>
-                            <div class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mt-1 truncate">
+                        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs">
+                            <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Procurement Cost</span>
+                            <div class="text-3xl font-extrabold text-[#0f1e36] mt-1 truncate">
                                 ${{ number_format($kpis['total_purchases'], 2) }}
                             </div>
                             <div class="text-xs text-slate-500 mt-1.5">
@@ -741,9 +706,9 @@
                             </div>
                         </div>
 
-                        <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-5 border border-slate-200 dark:border-slate-800 shadow-xs">
-                            <span class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider">Trading Multiplier (Yield)</span>
-                            <div class="text-2xl sm:text-3xl font-extrabold text-indigo-600 dark:text-indigo-400 mt-1 truncate">
+                        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs">
+                            <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Trading Multiplier (Yield)</span>
+                            <div class="text-3xl font-extrabold text-[#5a30b5] mt-1 truncate">
                                 {{ $kpis['roas_ratio'] }}%
                             </div>
                             <div class="text-xs text-slate-500 mt-1.5">
@@ -758,51 +723,57 @@
 
         </div>
 
-        <!-- RIGHT-HAND POWER BI SLICER PANEL (Desktop View) -->
+        <!-- RIGHT-HAND POWER BI SLICER PANEL (Exact Image 1 Slicer Layout) -->
         <div x-show="showFilters" class="hidden xl:block xl:col-span-3 transition-all min-w-0">
-            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs sticky top-6 space-y-4">
+            <div class="bg-white rounded-2xl p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-slate-200/80 sticky top-6 space-y-4 text-slate-700">
                 
-                <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                     <div class="flex items-center gap-2">
-                        <span class="material-icons-outlined text-indigo-600 text-lg">tune</span>
-                        <h3 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
-                            Data Slicers & Filters
+                        <span class="material-icons-outlined text-[#0284c7] text-lg">tune</span>
+                        <h3 class="text-xs font-bold text-[#0f1e36] uppercase tracking-wider">
+                            Slicers & Filters
                         </h3>
                     </div>
-                    <button type="button" @click="resetFilters()" class="text-xs text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 font-semibold">
+                    <button type="button" @click="resetFilters()" class="text-xs text-[#0284c7] hover:underline font-semibold">
                         Reset All
                     </button>
                 </div>
 
-                <!-- Slicer 1: Date Range -->
-                <div class="space-y-1.5">
-                    <label class="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center justify-between">
-                        <span>Report Date Range</span>
+                <!-- SLICER 1: Report date with Range Track (Matching Image 1) -->
+                <div class="space-y-2">
+                    <label class="text-xs font-bold text-slate-700 flex items-center justify-between">
+                        <span>Report date</span>
                         <span class="material-icons-outlined text-xs text-slate-400">calendar_today</span>
                     </label>
                     <div class="grid grid-cols-2 gap-2">
-                        <div>
-                            <span class="text-[10px] text-slate-400 block mb-0.5">Start Date</span>
+                        <div class="relative">
                             <input type="date" x-model="startDate" 
-                                   class="w-full text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-2.5 py-2 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                                   class="w-full text-xs rounded-xl border border-slate-200 bg-white px-2.5 py-2 text-slate-800 focus:ring-2 focus:ring-[#0284c7] focus:outline-none">
                         </div>
-                        <div>
-                            <span class="text-[10px] text-slate-400 block mb-0.5">End Date</span>
+                        <div class="relative">
                             <input type="date" x-model="endDate" 
-                                   class="w-full text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-2.5 py-2 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                                   class="w-full text-xs rounded-xl border border-slate-200 bg-white px-2.5 py-2 text-slate-800 focus:ring-2 focus:ring-[#0284c7] focus:outline-none">
+                        </div>
+                    </div>
+                    <!-- Range Slider Graphic Line (Matching Image 1 dual-handle line) -->
+                    <div class="pt-1.5 pb-1">
+                        <div class="relative w-full h-1 bg-slate-200 rounded-full flex items-center justify-between">
+                            <div class="w-3.5 h-3.5 rounded-full border-2 border-[#0082aa] bg-white shadow-xs"></div>
+                            <div class="flex-1 h-1 bg-[#0082aa]"></div>
+                            <div class="w-3.5 h-3.5 rounded-full border-2 border-[#0082aa] bg-white shadow-xs"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Slicer 2: Company Slicer -->
+                <!-- SLICER 2: Ad source (Company Slicer) -->
                 <div class="space-y-1.5">
-                    <label class="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center justify-between">
-                        <span>Company / Entity</span>
+                    <label class="text-xs font-bold text-slate-700 flex items-center justify-between">
+                        <span>Ad source (Company)</span>
                         <span class="material-icons-outlined text-xs text-slate-400">apartment</span>
                     </label>
                     <select x-model="filterCompany" 
-                            class="w-full text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                        <option value="all">All Accessible Companies</option>
+                            class="w-full text-xs rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-slate-800 focus:ring-2 focus:ring-[#0284c7] focus:outline-none shadow-xs">
+                        <option value="all">All</option>
                         @foreach($availableCompanies as $company)
                         <option value="{{ $company->id }}" {{ (string)$selectedCompanyId === (string)$company->id ? 'selected' : '' }}>
                             {{ $company->name }}
@@ -811,15 +782,15 @@
                     </select>
                 </div>
 
-                <!-- Slicer 3: Workflow Stage Slicer -->
+                <!-- SLICER 3: Ad campaign (Pipeline Stage Slicer) -->
                 <div class="space-y-1.5">
-                    <label class="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center justify-between">
-                        <span>Pipeline Stage</span>
+                    <label class="text-xs font-bold text-slate-700 flex items-center justify-between">
+                        <span>Ad campaign (Stage)</span>
                         <span class="material-icons-outlined text-xs text-slate-400">alt_route</span>
                     </label>
                     <select x-model="filterStage" 
-                            class="w-full text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                        <option value="all">All Execution Stages</option>
+                            class="w-full text-xs rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-slate-800 focus:ring-2 focus:ring-[#0284c7] focus:outline-none shadow-xs">
+                        <option value="all">All</option>
                         @foreach($allStages as $stage)
                         <option value="{{ $stage->id }}" {{ (string)$selectedStageId === (string)$stage->id ? 'selected' : '' }}>
                             {{ $stage->description ?: ($stage->type ?: 'Stage #' . $stage->id) }}
@@ -828,15 +799,15 @@
                     </select>
                 </div>
 
-                <!-- Slicer 4: Currency Slicer -->
+                <!-- SLICER 4: Session source (Currency Slicer) -->
                 <div class="space-y-1.5">
-                    <label class="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center justify-between">
-                        <span>Currency</span>
+                    <label class="text-xs font-bold text-slate-700 flex items-center justify-between">
+                        <span>Session source (Currency)</span>
                         <span class="material-icons-outlined text-xs text-slate-400">monetization_on</span>
                     </label>
                     <select x-model="filterCurrency" 
-                            class="w-full text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                        <option value="all">All Currencies</option>
+                            class="w-full text-xs rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-slate-800 focus:ring-2 focus:ring-[#0284c7] focus:outline-none shadow-xs">
+                        <option value="all">All</option>
                         <option value="USD" {{ $selectedCurrency === 'USD' ? 'selected' : '' }}>USD ($)</option>
                         <option value="EUR" {{ $selectedCurrency === 'EUR' ? 'selected' : '' }}>EUR (€)</option>
                         <option value="GBP" {{ $selectedCurrency === 'GBP' ? 'selected' : '' }}>GBP (£)</option>
@@ -846,49 +817,43 @@
 
                 <!-- Apply Filters Button -->
                 <button type="button" @click="applyFilters()" :disabled="isApplying" 
-                        class="w-full py-2.5 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-semibold text-xs transition-all shadow-md shadow-indigo-500/20 flex items-center justify-center gap-2">
+                        class="w-full py-2.5 px-4 rounded-xl bg-[#00509d] hover:bg-[#08549e] disabled:opacity-50 text-white font-semibold text-xs transition-all shadow-md shadow-blue-500/20 flex items-center justify-center gap-2">
                     <span class="material-icons-outlined text-base">filter_list</span>
                     <span x-text="isApplying ? 'Applying Filters...' : 'Apply Slicers'"></span>
                 </button>
 
-                <!-- Role Access Status Card -->
-                <div class="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700/60 space-y-1.5">
-                    <div class="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200">
-                        <span class="material-icons-outlined text-indigo-600 text-sm">security</span>
-                        <span>Active Role Permissions</span>
+                <!-- "Have questions?" CARD (Exact layout from bottom-right of Image 1) -->
+                <div class="border border-slate-200 rounded-2xl p-4 bg-white space-y-2.5 shadow-xs">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-[#0f1e36]">Have questions?</span>
+                        <!-- Support Avatar -->
+                        <div class="w-7 h-7 rounded-full bg-emerald-500 text-white flex items-center justify-center text-xs font-bold shadow-xs">
+                            <span class="material-icons-outlined text-sm">support_agent</span>
+                        </div>
                     </div>
-                    <ul class="text-[11px] text-slate-500 dark:text-slate-400 space-y-1">
-                        <li class="flex items-center justify-between">
-                            <span>SuperAdmin:</span>
-                            <span class="font-bold {{ $isSuperAdmin ? 'text-emerald-600' : 'text-slate-400' }}">{{ $isSuperAdmin ? 'YES' : 'NO' }}</span>
+                    <ul class="text-[11px] space-y-1.5 font-medium">
+                        <li>
+                            <a href="#" class="text-[#0284c7] hover:underline flex items-center gap-1.5">
+                                <span>Dashboard setup guide</span>
+                            </a>
                         </li>
-                        <li class="flex items-center justify-between">
-                            <span>Financial View:</span>
-                            <span class="font-bold {{ $canViewFinancials ? 'text-emerald-600' : 'text-amber-500' }}">{{ $canViewFinancials ? 'ALLOWED' : 'MASKED' }}</span>
+                        <li>
+                            <a href="#" class="text-[#0284c7] hover:underline flex items-center gap-1.5">
+                                <span>Book a demo</span>
+                            </a>
                         </li>
-                        <li class="flex items-center justify-between">
-                            <span>Profit Margins:</span>
-                            <span class="font-bold {{ $canViewProfit ? 'text-emerald-600' : 'text-amber-500' }}">{{ $canViewProfit ? 'VISIBLE' : 'HIDDEN' }}</span>
-                        </li>
-                        <li class="flex items-center justify-between">
-                            <span>Entity Scoping:</span>
-                            <span class="font-bold text-slate-700 dark:text-slate-300">{{ count($availableCompanies) }} assigned</span>
+                        <li>
+                            <a href="#" class="text-[#0284c7] hover:underline flex items-center gap-1.5">
+                                <span>Contact support</span>
+                            </a>
                         </li>
                     </ul>
-                </div>
-
-                <!-- Support & Switch to Classic -->
-                <div class="bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-slate-800 dark:to-indigo-950/40 p-3.5 rounded-xl border border-indigo-100 dark:border-indigo-900/50 space-y-1.5">
-                    <div class="text-xs font-bold text-indigo-900 dark:text-indigo-200">
-                        Need Custom BI Queries?
+                    <!-- Social Icons -->
+                    <div class="flex items-center gap-2 text-slate-400 pt-1 border-t border-slate-100">
+                        <span class="material-icons-outlined text-sm text-red-500">smart_display</span>
+                        <span class="material-icons-outlined text-sm text-cyan-600">language</span>
+                        <span class="text-[10px] text-slate-400 ml-auto">MetaERP v2</span>
                     </div>
-                    <p class="text-[10px] sm:text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
-                        Switch between Overview, Dynamics and Financials tabs to review deeper pipeline breakdowns.
-                    </p>
-                    <a href="{{ route('dashboards.analytics') }}" class="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-800 dark:text-indigo-400">
-                        <span>Classic Dashboard</span>
-                        <span class="material-icons-outlined text-xs">arrow_forward</span>
-                    </a>
                 </div>
 
             </div>
@@ -896,52 +861,56 @@
 
     </div>
 
+    <!-- BOTTOM DEEP PURPLE ACCENT BANNER (Exact Banner from Image 1: "Connect 70+ data sources with Coupler.io") -->
+    <div class="bg-[#241352] text-white py-3 px-6 rounded-2xl flex items-center justify-center text-xs font-semibold tracking-wide shadow-md">
+        <span>Connect 70+ data sources with MetaERP Enterprise Analytics</span>
+    </div>
+
     <!-- MOBILE / TABLET OFF-CANVAS SLICER DRAWER -->
     <div x-show="mobileFiltersOpen" 
          class="fixed inset-0 z-50 xl:hidden overflow-hidden" 
          x-cloak>
-        <!-- Backdrop -->
         <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" 
              @click="mobileFiltersOpen = false"></div>
 
         <div class="fixed inset-y-0 right-0 max-w-full flex pl-10">
-            <div class="w-screen max-w-md bg-white dark:bg-slate-900 shadow-2xl p-5 space-y-4 overflow-y-auto custom-scrollbar border-l border-slate-200 dark:border-slate-800">
+            <div class="w-screen max-w-md bg-white shadow-2xl p-5 space-y-4 overflow-y-auto custom-scrollbar border-l border-slate-200">
                 
-                <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                     <div class="flex items-center gap-2">
-                        <span class="material-icons-outlined text-indigo-600 text-lg">tune</span>
-                        <h3 class="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+                        <span class="material-icons-outlined text-[#0284c7] text-lg">tune</span>
+                        <h3 class="text-sm font-bold text-[#0f1e36] uppercase tracking-wider">
                             Filters & Data Slicers
                         </h3>
                     </div>
-                    <button type="button" @click="mobileFiltersOpen = false" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-white">
+                    <button type="button" @click="mobileFiltersOpen = false" class="p-1 rounded-lg text-slate-400 hover:text-slate-600">
                         <span class="material-icons-outlined text-xl">close</span>
                     </button>
                 </div>
 
                 <!-- Date Range -->
                 <div class="space-y-1.5">
-                    <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">Report Date Range</label>
+                    <label class="text-xs font-bold text-slate-700">Report date</label>
                     <div class="grid grid-cols-2 gap-2">
                         <div>
                             <span class="text-[10px] text-slate-400 block mb-0.5">Start</span>
                             <input type="date" x-model="startDate" 
-                                   class="w-full text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-2.5 py-2 text-slate-800 dark:text-slate-200">
+                                   class="w-full text-xs rounded-xl border border-slate-200 px-2.5 py-2 text-slate-800">
                         </div>
                         <div>
                             <span class="text-[10px] text-slate-400 block mb-0.5">End</span>
                             <input type="date" x-model="endDate" 
-                                   class="w-full text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-2.5 py-2 text-slate-800 dark:text-slate-200">
+                                   class="w-full text-xs rounded-xl border border-slate-200 px-2.5 py-2 text-slate-800">
                         </div>
                     </div>
                 </div>
 
                 <!-- Company -->
                 <div class="space-y-1.5">
-                    <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">Company / Entity</label>
+                    <label class="text-xs font-bold text-slate-700">Company (Ad source)</label>
                     <select x-model="filterCompany" 
-                            class="w-full text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-slate-800 dark:text-slate-200">
-                        <option value="all">All Accessible Companies</option>
+                            class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 text-slate-800">
+                        <option value="all">All</option>
                         @foreach($availableCompanies as $company)
                         <option value="{{ $company->id }}" {{ (string)$selectedCompanyId === (string)$company->id ? 'selected' : '' }}>
                             {{ $company->name }}
@@ -952,10 +921,10 @@
 
                 <!-- Stage -->
                 <div class="space-y-1.5">
-                    <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">Pipeline Stage</label>
+                    <label class="text-xs font-bold text-slate-700">Pipeline Stage (Ad campaign)</label>
                     <select x-model="filterStage" 
-                            class="w-full text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-slate-800 dark:text-slate-200">
-                        <option value="all">All Execution Stages</option>
+                            class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 text-slate-800">
+                        <option value="all">All</option>
                         @foreach($allStages as $stage)
                         <option value="{{ $stage->id }}" {{ (string)$selectedStageId === (string)$stage->id ? 'selected' : '' }}>
                             {{ $stage->description ?: ($stage->type ?: 'Stage #' . $stage->id) }}
@@ -966,10 +935,10 @@
 
                 <!-- Currency -->
                 <div class="space-y-1.5">
-                    <label class="text-xs font-semibold text-slate-700 dark:text-slate-300">Currency</label>
+                    <label class="text-xs font-bold text-slate-700">Currency (Session source)</label>
                     <select x-model="filterCurrency" 
-                            class="w-full text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 py-2 text-slate-800 dark:text-slate-200">
-                        <option value="all">All Currencies</option>
+                            class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 text-slate-800">
+                        <option value="all">All</option>
                         <option value="USD" {{ $selectedCurrency === 'USD' ? 'selected' : '' }}>USD ($)</option>
                         <option value="EUR" {{ $selectedCurrency === 'EUR' ? 'selected' : '' }}>EUR (€)</option>
                         <option value="GBP" {{ $selectedCurrency === 'GBP' ? 'selected' : '' }}>GBP (£)</option>
@@ -977,16 +946,16 @@
                     </select>
                 </div>
 
-                <!-- Drawer Action Buttons -->
+                <!-- Actions -->
                 <div class="pt-3 space-y-2">
                     <button type="button" @click="applyFilters()" :disabled="isApplying" 
-                            class="w-full py-3 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-semibold text-xs transition-all shadow-md flex items-center justify-center gap-2">
+                            class="w-full py-3 px-4 rounded-xl bg-[#00509d] text-white font-semibold text-xs shadow-md flex items-center justify-center gap-2">
                         <span class="material-icons-outlined text-base">filter_list</span>
-                        <span x-text="isApplying ? 'Applying Filters...' : 'Apply Filters'"></span>
+                        <span x-text="isApplying ? 'Applying Filters...' : 'Apply Slicers'"></span>
                     </button>
                     <button type="button" @click="resetFilters()" 
-                            class="w-full py-2.5 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold text-xs hover:bg-slate-50">
-                        Reset Filters
+                            class="w-full py-2.5 px-4 rounded-xl border border-slate-200 bg-white text-slate-700 font-semibold text-xs">
+                        Reset Slicers
                     </button>
                 </div>
 
@@ -996,18 +965,18 @@
 
 </div>
 
-<!-- APEXCHARTS LIBRARY & VISUAL INITIALIZATION SCRIPT (With Responsive Breakpoints) -->
+<!-- APEXCHARTS LIBRARY & VISUAL INITIALIZATION (With Palette matching Image 1 & 2) -->
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     
-    // Shared chart font and styling options
     const sharedFontFamily = 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
-    // 1. DONUT CHART (Trading by Company)
+    // 1. DONUT CHART (Traffic by channel - Colors matching Image 1)
     const donutLabels = @json($donut['labels']);
     const donutSeries = @json($donut['series']);
-    const donutColors = ['#4f46e5', '#0284c7', '#0f766e', '#9d174d', '#7e22ce', '#eab308', '#f97316', '#64748b'];
+    // Image 1 Donut Palette: Mint Jade Green, Cerulean Cyan, Ocean Blue, Violet Purple, Magenta Rose, Amber
+    const donutColors = ['#0da87a', '#0082aa', '#00509d', '#5a30b5', '#bf2c78', '#eab308', '#f97316', '#64748b'];
 
     const donutEl = document.querySelector('#v2CompanyDonutChart');
     if (donutEl) {
@@ -1021,13 +990,13 @@ document.addEventListener('DOMContentLoaded', function () {
             series: donutSeries,
             labels: donutLabels,
             colors: donutColors.slice(0, Math.max(donutLabels.length, 1)),
-            stroke: { width: 2, colors: ['#ffffff'] },
+            stroke: { width: 3, colors: ['#ffffff'] },
             dataLabels: {
                 enabled: true,
                 formatter: function (val) {
                     return Math.round(val) + "%";
                 },
-                style: { fontSize: '11px', fontWeight: 600 }
+                style: { fontSize: '11px', fontWeight: 700 }
             },
             legend: {
                 position: 'bottom',
@@ -1045,13 +1014,14 @@ document.addEventListener('DOMContentLoaded', function () {
             plotOptions: {
                 pie: {
                     donut: {
-                        size: '65%',
+                        size: '60%',
                         labels: {
                             show: true,
-                            name: { fontSize: '11px', fontWeight: 600 },
+                            name: { fontSize: '11px', fontWeight: 600, color: '#64748b' },
                             value: {
                                 fontSize: '15px',
                                 fontWeight: 800,
+                                color: '#0f1e36',
                                 formatter: function (val) {
                                     return '$' + Number(val).toLocaleString();
                                 }
@@ -1084,7 +1054,7 @@ document.addEventListener('DOMContentLoaded', function () {
         donutChart.render();
     }
 
-    // 2. STACKED TIMELINE BAR CHART (Purchases vs Sales)
+    // 2. STACKED TIMELINE BAR CHART (Weekly ad spend - Colors matching Image 1)
     const stackedCategories = @json($stacked['categories']);
     const stackedSales = @json($stacked['sales']);
     const stackedPurchases = @json($stacked['purchases']);
@@ -1103,17 +1073,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 { name: 'Sales ($)', data: stackedSales },
                 { name: 'Purchases ($)', data: stackedPurchases }
             ],
-            colors: ['#0284c7', '#0f766e'],
+            // Cyan & Purple matching stacked columns in Image 1
+            colors: ['#0082aa', '#5a30b5'],
             plotOptions: {
                 bar: {
                     horizontal: false,
-                    borderRadius: 4,
+                    borderRadius: 3,
                     columnWidth: '50%'
                 }
             },
             xaxis: {
                 categories: stackedCategories,
-                labels: { style: { fontSize: '10px' } },
+                labels: { style: { fontSize: '10px', colors: '#64748b' } },
                 axisBorder: { show: false }
             },
             yaxis: {
@@ -1121,11 +1092,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     formatter: function (val) {
                         return '$' + (val >= 1000 ? (val / 1000).toFixed(0) + 'K' : val);
                     },
-                    style: { fontSize: '10px' }
+                    style: { fontSize: '10px', colors: '#64748b' }
                 }
             },
             legend: { position: 'top', horizontalAlign: 'right', fontSize: '11px' },
-            grid: { borderColor: '#f1f5f9', strokeDashArray: 4 },
+            grid: { borderColor: '#f1f5f9', strokeDashArray: 3 },
             tooltip: {
                 y: {
                     formatter: function (val) {
@@ -1148,7 +1119,7 @@ document.addEventListener('DOMContentLoaded', function () {
         stackedChart.render();
     }
 
-    // 3. POWER BI RADIAL SPEEDOMETER GAUGE (Target Fulfillment)
+    // 3. POWER BI SEMI-CIRCLE RADIAL GAUGE (Target fulfillment - Cyan arc matching Image 2)
     const gaugeEl = document.querySelector('#v2RadialGaugeChart');
     if (gaugeEl) {
         const gaugePct = {{ $gauge['percentage'] }};
@@ -1160,7 +1131,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 fontFamily: sharedFontFamily
             },
             series: [gaugePct],
-            colors: ['#0f766e'],
+            colors: ['#0082aa'],
             plotOptions: {
                 radialBar: {
                     startAngle: -135,
@@ -1180,9 +1151,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         },
                         value: {
                             show: true,
-                            fontSize: '20px',
-                            fontWeight: 800,
-                            color: '#0f766e',
+                            fontSize: '22px',
+                            fontWeight: 900,
+                            color: '#0082aa',
                             offsetY: 4,
                             formatter: function (val) {
                                 return val + "%";
@@ -1206,7 +1177,7 @@ document.addEventListener('DOMContentLoaded', function () {
         gaugeChart.render();
     }
 
-    // 4. POWER BI HORIZONTAL GROUPED BAR (Top Trading Partners)
+    // 4. POWER BI HORIZONTAL GROUPED BAR (Average Cost Per Mile style - Magenta & Cyan from Image 2)
     const partnersEl = document.querySelector('#v2HorizontalPartnersChart');
     if (partnersEl) {
         const topBuyers = @json($horizontalPartners['buyers']);
@@ -1221,7 +1192,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 toolbar: { show: false }
             },
             series: [{ name: 'Volume ($)', data: buyerValues.length > 0 ? buyerValues : [0] }],
-            colors: ['#4f46e5'],
+            colors: ['#0082aa'],
             plotOptions: {
                 bar: {
                     horizontal: true,
@@ -1239,7 +1210,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     style: { fontSize: '10px' }
                 }
             },
-            yaxis: { labels: { style: { fontSize: '10px', fontWeight: 600 } } },
+            yaxis: { labels: { style: { fontSize: '11px', fontWeight: 600, colors: '#0f1e36' } } },
             grid: { borderColor: '#f1f5f9' },
             tooltip: {
                 y: {
@@ -1262,7 +1233,7 @@ document.addEventListener('DOMContentLoaded', function () {
         partnerChart.render();
     }
 
-    // 5. POWER BI CONTRACT RISK 3D BUBBLE / SCATTER PLOT
+    // 5. POWER BI CONTRACT RISK 3D BUBBLE / SCATTER PLOT (Matching Image 2 Rush Booking)
     const bubbleEl = document.querySelector('#v2ContractRiskBubbleChart');
     if (bubbleEl) {
         const contractPoints = @json($contractPoints);
@@ -1282,15 +1253,16 @@ document.addEventListener('DOMContentLoaded', function () {
             series: [
                 { name: 'Active Orders', data: bubbleData }
             ],
-            colors: ['#7e22ce'],
+            // Violet from Image 2 Rush booking
+            colors: ['#732eb0'],
             dataLabels: { enabled: false },
             fill: { opacity: 0.8 },
             xaxis: {
-                title: { text: 'Days Remaining', style: { fontSize: '10px' } },
+                title: { text: 'Days Remaining', style: { fontSize: '10px', color: '#64748b' } },
                 labels: { style: { fontSize: '10px' } }
             },
             yaxis: {
-                title: { text: 'Amount ($)', style: { fontSize: '10px' } },
+                title: { text: 'Amount ($)', style: { fontSize: '10px', color: '#64748b' } },
                 labels: {
                     formatter: function (val) {
                         return '$' + (val >= 1000 ? (val / 1000).toFixed(0) + 'K' : val);
@@ -1303,8 +1275,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 custom: function ({ series, seriesIndex, dataPointIndex, w }) {
                     const pt = contractPoints[dataPointIndex];
                     if (!pt) return '';
-                    return '<div class="p-2 text-xs bg-slate-900 text-white rounded shadow-lg">' +
-                           '<div class="font-bold">' + pt.name + '</div>' +
+                    return '<div class="p-2.5 text-xs bg-slate-900 text-white rounded-lg shadow-lg">' +
+                           '<div class="font-bold text-sky-400">' + pt.name + '</div>' +
                            '<div>Value: $' + Number(pt.y).toLocaleString() + '</div>' +
                            '<div>Days Left: ' + pt.x + ' days</div>' +
                            '<div>Margin Rate: ' + pt.z + '%</div>' +
@@ -1324,7 +1296,7 @@ document.addEventListener('DOMContentLoaded', function () {
         bubbleChart.render();
     }
 
-    // 6. DYNAMICS TAB: UNIT PRICING LINE
+    // 6. DYNAMICS TAB: Weekly CPC Line / Multi-bar (Cyan & Mint from Image 1)
     const dynamicsEl = document.querySelector('#v2PricingDynamicsChart');
     if (dynamicsEl) {
         const unitCategories = @json($unitRates['categories']);
@@ -1342,7 +1314,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 { name: 'Sale Rate ($/MT)', type: 'line', data: unitPrices },
                 { name: 'Procurement Rate ($/MT)', type: 'line', data: unitCosts }
             ],
-            colors: ['#0284c7', '#0f766e'],
+            colors: ['#0082aa', '#0da87a'],
             stroke: { width: [3, 3], curve: 'smooth' },
             markers: { size: 4 },
             xaxis: { 
@@ -1373,7 +1345,7 @@ document.addEventListener('DOMContentLoaded', function () {
         dynamicsChart.render();
     }
 
-    // 7. FINANCIAL WATERFALL CHART
+    // 7. FINANCIAL WATERFALL CHART (Power BI Budget Remaining style)
     const waterfallEl = document.querySelector('#v2FinancialWaterfallChart');
     if (waterfallEl) {
         const totalSales = {{ $kpis['total_sales'] }};
@@ -1390,9 +1362,9 @@ document.addEventListener('DOMContentLoaded', function () {
             series: [{
                 name: 'Financial Flow',
                 data: [
-                    { x: 'Gross Sales', y: totalSales, fillColor: '#0284c7' },
-                    { x: 'Procurement Cost', y: -totalPurchases, fillColor: '#ef4444' },
-                    { x: 'Net Trading Profit', y: grossProfit, fillColor: '#10b981' }
+                    { x: 'Gross Sales', y: totalSales, fillColor: '#0082aa' },
+                    { x: 'Procurement Cost', y: -totalPurchases, fillColor: '#bf2c78' },
+                    { x: 'Net Trading Profit', y: grossProfit, fillColor: '#0da87a' }
                 ]
             }],
             plotOptions: {
