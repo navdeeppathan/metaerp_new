@@ -136,200 +136,412 @@
         </div>
     </div>
 
-    <!-- 12 VIBRANT COUPLER KPI CARDS (Exact Hex Colors & Flat Solid Layout from Image 1) -->
+    <!-- 12 EXECUTIVE KPI CARDS (MetaERP Logo Blue Gradients & Theme Accent System) -->
     <div class="space-y-3">
-        <!-- ROW 1 (6 Cards: Purple, Blue, Teal Cyan, Mint Green, Magenta Rose, Deep Violet) -->
+        <!-- ROW 1 (6 Cards: MetaERP Brand Blues + Theme Emerald + Theme Rose + Theme Violet) -->
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
             
-            <!-- CARD 1: Purple (#5a30b5) -> Total Contracts -->
-            <div class="bg-[#5a30b5] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
-                <div class="text-xs text-white/80 font-medium">
-                    Total Contracts
+            <!-- CARD 1: MetaERP Corporate Navy -> Total Contracts -->
+            <div class="relative overflow-hidden bg-gradient-to-br from-[#10519D] to-[#1565C0] text-white p-3.5 sm:p-4 rounded-2xl shadow-xs hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 group min-h-[110px] flex flex-col justify-between cursor-default">
+                <!-- MetaERP Logo Watermark -->
+                <svg class="absolute -right-2 -bottom-2 w-16 h-16 opacity-10 pointer-events-none text-white transition-transform group-hover:scale-110" viewBox="0 0 32 32" fill="currentColor">
+                    <path d="M16 6.75556V0L1.02839 14.6389C0.462304 15.1924 0.457197 16.1016 1.01703 16.6615L3.55556 19.2"/>
+                    <path d="M16 6.75556V0L30.9716 14.6389C31.5377 15.1924 31.5428 16.1016 30.983 16.6615L28.4444 19.2"/>
+                    <path d="M3.55556 19.2L9.6 13.1556H16V19.2"/>
+                    <path d="M28.4444 19.2L22.4 13.1556H16V19.2"/>
+                    <path d="M16 25.9556H9.95555L12.9778 22.7556L16 25.9556Z"/>
+                    <path d="M16 32L22.0444 25.9556L16 25.9556V32Z"/>
+                    <path d="M16 32L9.95555 25.9556H16V32Z"/>
+                    <path d="M16 25.9556H22.0444L19.0222 22.7556L16 25.9556Z"/>
+                    <path d="M7.72363 21.7502C7.18605 22.3085 7.19441 23.1944 7.74243 23.7424L9.95556 25.9556L16 19.5556V13.1556"/>
+                    <path d="M24.2764 21.7502C24.814 22.3085 24.8056 23.1944 24.2576 23.7424L22.0444 25.9556L16 19.5556V13.1556"/>
+                </svg>
+                <div class="flex items-center justify-between gap-1 z-10">
+                    <span class="text-xs text-white/90 font-medium truncate">Total Contracts</span>
+                    <span class="w-6 h-6 rounded-lg bg-white/20 backdrop-blur-xs flex items-center justify-center shrink-0">
+                        <span class="material-icons-outlined text-sm text-white">assignment</span>
+                    </span>
                 </div>
-                <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate">
+                <div class="text-2xl sm:text-2xl xl:text-3xl font-extrabold tracking-tight text-white my-0.5 truncate z-10">
                     {{ number_format($kpis['total_contracts']) }}
                 </div>
-                <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
+                <div class="text-[11px] text-white/75 flex items-center gap-1 truncate z-10">
                     <span>Active execution</span>
                 </div>
             </div>
 
-            <!-- CARD 2: Deep Ocean Blue (#00509d) -> Active Deals -->
-            <div class="bg-[#00509d] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
-                <div class="text-xs text-white/80 font-medium">
-                    Active Deals
+            <!-- CARD 2: MetaERP Royal Blue -> Active Deals -->
+            <div class="relative overflow-hidden bg-gradient-to-br from-[#1565C0] to-[#1878C6] text-white p-3.5 sm:p-4 rounded-2xl shadow-xs hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 group min-h-[110px] flex flex-col justify-between cursor-default">
+                <!-- MetaERP Logo Watermark -->
+                <svg class="absolute -right-2 -bottom-2 w-16 h-16 opacity-10 pointer-events-none text-white transition-transform group-hover:scale-110" viewBox="0 0 32 32" fill="currentColor">
+                    <path d="M16 6.75556V0L1.02839 14.6389C0.462304 15.1924 0.457197 16.1016 1.01703 16.6615L3.55556 19.2"/>
+                    <path d="M16 6.75556V0L30.9716 14.6389C31.5377 15.1924 31.5428 16.1016 30.983 16.6615L28.4444 19.2"/>
+                    <path d="M3.55556 19.2L9.6 13.1556H16V19.2"/>
+                    <path d="M28.4444 19.2L22.4 13.1556H16V19.2"/>
+                    <path d="M16 25.9556H9.95555L12.9778 22.7556L16 25.9556Z"/>
+                    <path d="M16 32L22.0444 25.9556L16 25.9556V32Z"/>
+                    <path d="M16 32L9.95555 25.9556H16V32Z"/>
+                    <path d="M16 25.9556H22.0444L19.0222 22.7556L16 25.9556Z"/>
+                    <path d="M7.72363 21.7502C7.18605 22.3085 7.19441 23.1944 7.74243 23.7424L9.95556 25.9556L16 19.5556V13.1556"/>
+                    <path d="M24.2764 21.7502C24.814 22.3085 24.8056 23.1944 24.2576 23.7424L22.0444 25.9556L16 19.5556V13.1556"/>
+                </svg>
+                <div class="flex items-center justify-between gap-1 z-10">
+                    <span class="text-xs text-white/90 font-medium truncate">Active Deals</span>
+                    <span class="w-6 h-6 rounded-lg bg-white/20 backdrop-blur-xs flex items-center justify-center shrink-0">
+                        <span class="material-icons-outlined text-sm text-white">sync_alt</span>
+                    </span>
                 </div>
-                <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate">
+                <div class="text-2xl sm:text-2xl xl:text-3xl font-extrabold tracking-tight text-white my-0.5 truncate z-10">
                     {{ number_format($kpis['active_deals']) }}
                 </div>
-                <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
+                <div class="text-[11px] text-white/75 flex items-center gap-1 truncate z-10">
                     <span>Purchase & sales</span>
                 </div>
             </div>
 
-            <!-- CARD 3: Cerulean Cyan (#0082aa) -> Gross Sales Revenue -->
-            <div class="bg-[#0082aa] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
-                <div class="text-xs text-white/80 font-medium">
-                    Gross Sales Revenue
+            <!-- CARD 3: MetaERP Ocean/Sky Blue -> Gross Sales Revenue -->
+            <div class="relative overflow-hidden bg-gradient-to-br from-[#1878C6] to-[#0284c7] text-white p-3.5 sm:p-4 rounded-2xl shadow-xs hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 group min-h-[110px] flex flex-col justify-between cursor-default">
+                <!-- MetaERP Logo Watermark -->
+                <svg class="absolute -right-2 -bottom-2 w-16 h-16 opacity-10 pointer-events-none text-white transition-transform group-hover:scale-110" viewBox="0 0 32 32" fill="currentColor">
+                    <path d="M16 6.75556V0L1.02839 14.6389C0.462304 15.1924 0.457197 16.1016 1.01703 16.6615L3.55556 19.2"/>
+                    <path d="M16 6.75556V0L30.9716 14.6389C31.5377 15.1924 31.5428 16.1016 30.983 16.6615L28.4444 19.2"/>
+                    <path d="M3.55556 19.2L9.6 13.1556H16V19.2"/>
+                    <path d="M28.4444 19.2L22.4 13.1556H16V19.2"/>
+                    <path d="M16 25.9556H9.95555L12.9778 22.7556L16 25.9556Z"/>
+                    <path d="M16 32L22.0444 25.9556L16 25.9556V32Z"/>
+                    <path d="M16 32L9.95555 25.9556H16V32Z"/>
+                    <path d="M16 25.9556H22.0444L19.0222 22.7556L16 25.9556Z"/>
+                    <path d="M7.72363 21.7502C7.18605 22.3085 7.19441 23.1944 7.74243 23.7424L9.95556 25.9556L16 19.5556V13.1556"/>
+                    <path d="M24.2764 21.7502C24.814 22.3085 24.8056 23.1944 24.2576 23.7424L22.0444 25.9556L16 19.5556V13.1556"/>
+                </svg>
+                <div class="flex items-center justify-between gap-1 z-10">
+                    <span class="text-xs text-white/90 font-medium truncate">Gross Sales Revenue</span>
+                    <span class="w-6 h-6 rounded-lg bg-white/20 backdrop-blur-xs flex items-center justify-center shrink-0">
+                        <span class="material-icons-outlined text-sm text-white">payments</span>
+                    </span>
                 </div>
-                <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate" title="${{ number_format($kpis['total_sales'], 2) }}">
-                    ${{ number_format($kpis['total_sales'] / 1000, 1) }}K
+                <div class="text-2xl sm:text-2xl xl:text-3xl font-extrabold tracking-tight text-white my-0.5 truncate z-10" title="${{ number_format($kpis['total_sales'], 2) }}">
+                    {{ $kpis['total_sales'] >= 1000000 ? '$' . number_format($kpis['total_sales'] / 1000000, 1) . 'M' : '$' . number_format($kpis['total_sales'] / 1000, 1) . 'K' }}
                 </div>
-                <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
+                <div class="text-[11px] text-white/75 flex items-center gap-1 truncate z-10">
                     <span>Invoiced sales</span>
                 </div>
             </div>
 
-            <!-- CARD 4: Mint Jade Green (#0da87a) -> Procurement Cost -->
+            <!-- CARD 4: Theme Emerald Green -> Procurement Cost -->
             @if($canViewFinancials)
-            <div class="bg-[#0da87a] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
-                <div class="text-xs text-white/80 font-medium">
-                    Procurement Cost
+            <div class="relative overflow-hidden bg-gradient-to-br from-[#047857] to-[#059669] text-white p-3.5 sm:p-4 rounded-2xl shadow-xs hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 group min-h-[110px] flex flex-col justify-between cursor-default">
+                <!-- MetaERP Logo Watermark -->
+                <svg class="absolute -right-2 -bottom-2 w-16 h-16 opacity-10 pointer-events-none text-white transition-transform group-hover:scale-110" viewBox="0 0 32 32" fill="currentColor">
+                    <path d="M16 6.75556V0L1.02839 14.6389C0.462304 15.1924 0.457197 16.1016 1.01703 16.6615L3.55556 19.2"/>
+                    <path d="M16 6.75556V0L30.9716 14.6389C31.5377 15.1924 31.5428 16.1016 30.983 16.6615L28.4444 19.2"/>
+                    <path d="M3.55556 19.2L9.6 13.1556H16V19.2"/>
+                    <path d="M28.4444 19.2L22.4 13.1556H16V19.2"/>
+                    <path d="M16 25.9556H9.95555L12.9778 22.7556L16 25.9556Z"/>
+                    <path d="M16 32L22.0444 25.9556L16 25.9556V32Z"/>
+                    <path d="M16 32L9.95555 25.9556H16V32Z"/>
+                    <path d="M16 25.9556H22.0444L19.0222 22.7556L16 25.9556Z"/>
+                    <path d="M7.72363 21.7502C7.18605 22.3085 7.19441 23.1944 7.74243 23.7424L9.95556 25.9556L16 19.5556V13.1556"/>
+                    <path d="M24.2764 21.7502C24.814 22.3085 24.8056 23.1944 24.2576 23.7424L22.0444 25.9556L16 19.5556V13.1556"/>
+                </svg>
+                <div class="flex items-center justify-between gap-1 z-10">
+                    <span class="text-xs text-white/90 font-medium truncate">Procurement Cost</span>
+                    <span class="w-6 h-6 rounded-lg bg-white/20 backdrop-blur-xs flex items-center justify-center shrink-0">
+                        <span class="material-icons-outlined text-sm text-white">shopping_bag</span>
+                    </span>
                 </div>
-                <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate" title="${{ number_format($kpis['total_purchases'], 2) }}">
-                    ${{ number_format($kpis['total_purchases'] / 1000, 1) }}K
+                <div class="text-2xl sm:text-2xl xl:text-3xl font-extrabold tracking-tight text-white my-0.5 truncate z-10" title="${{ number_format($kpis['total_purchases'], 2) }}">
+                    {{ $kpis['total_purchases'] >= 1000000 ? '$' . number_format($kpis['total_purchases'] / 1000000, 1) . 'M' : '$' . number_format($kpis['total_purchases'] / 1000, 1) . 'K' }}
                 </div>
-                <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
+                <div class="text-[11px] text-white/75 flex items-center gap-1 truncate z-10">
                     <span>Purchase contracts</span>
                 </div>
             </div>
             @else
-            <div class="bg-white/80 text-slate-500 p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] border border-dashed border-slate-300">
-                <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Procurement Cost</div>
-                <div class="text-lg font-bold text-slate-400">Restricted</div>
+            <div class="relative overflow-hidden bg-white/90 backdrop-blur-xs text-slate-500 p-3.5 sm:p-4 rounded-2xl shadow-xs border border-dashed border-slate-300 min-h-[110px] flex flex-col justify-between">
+                <div class="flex items-center justify-between gap-1">
+                    <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider truncate">Procurement Cost</span>
+                    <span class="w-6 h-6 rounded-md bg-slate-100 flex items-center justify-center shrink-0">
+                        <span class="material-icons-outlined text-xs text-slate-400">lock</span>
+                    </span>
+                </div>
+                <div class="text-base sm:text-lg font-bold text-slate-400 my-0.5">Restricted</div>
                 <div class="text-[10px] text-slate-400">Finance role needed</div>
             </div>
             @endif
 
-            <!-- CARD 5: Berry Rose Magenta (#bf2c78) -> Net Trading Margin -->
+            <!-- CARD 5: Theme Rose/Ruby -> Trading Profit -->
             @if($canViewProfit)
-            <div class="bg-[#bf2c78] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
-                <div class="text-xs text-white/80 font-medium">
-                    Trading Profit
+            <div class="relative overflow-hidden bg-gradient-to-br from-[#9f1239] to-[#be185d] text-white p-3.5 sm:p-4 rounded-2xl shadow-xs hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 group min-h-[110px] flex flex-col justify-between cursor-default">
+                <!-- MetaERP Logo Watermark -->
+                <svg class="absolute -right-2 -bottom-2 w-16 h-16 opacity-10 pointer-events-none text-white transition-transform group-hover:scale-110" viewBox="0 0 32 32" fill="currentColor">
+                    <path d="M16 6.75556V0L1.02839 14.6389C0.462304 15.1924 0.457197 16.1016 1.01703 16.6615L3.55556 19.2"/>
+                    <path d="M16 6.75556V0L30.9716 14.6389C31.5377 15.1924 31.5428 16.1016 30.983 16.6615L28.4444 19.2"/>
+                    <path d="M3.55556 19.2L9.6 13.1556H16V19.2"/>
+                    <path d="M28.4444 19.2L22.4 13.1556H16V19.2"/>
+                    <path d="M16 25.9556H9.95555L12.9778 22.7556L16 25.9556Z"/>
+                    <path d="M16 32L22.0444 25.9556L16 25.9556V32Z"/>
+                    <path d="M16 32L9.95555 25.9556H16V32Z"/>
+                    <path d="M16 25.9556H22.0444L19.0222 22.7556L16 25.9556Z"/>
+                    <path d="M7.72363 21.7502C7.18605 22.3085 7.19441 23.1944 7.74243 23.7424L9.95556 25.9556L16 19.5556V13.1556"/>
+                    <path d="M24.2764 21.7502C24.814 22.3085 24.8056 23.1944 24.2576 23.7424L22.0444 25.9556L16 19.5556V13.1556"/>
+                </svg>
+                <div class="flex items-center justify-between gap-1 z-10">
+                    <span class="text-xs text-white/90 font-medium truncate">Trading Profit</span>
+                    <span class="w-6 h-6 rounded-lg bg-white/20 backdrop-blur-xs flex items-center justify-center shrink-0">
+                        <span class="material-icons-outlined text-sm text-white">trending_up</span>
+                    </span>
                 </div>
-                <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate" title="${{ number_format($kpis['gross_profit'], 2) }}">
-                    ${{ number_format($kpis['gross_profit'] / 1000, 1) }}K
+                <div class="text-2xl sm:text-2xl xl:text-3xl font-extrabold tracking-tight text-white my-0.5 truncate z-10" title="${{ number_format($kpis['gross_profit'], 2) }}">
+                    {{ $kpis['gross_profit'] >= 1000000 ? '$' . number_format($kpis['gross_profit'] / 1000000, 1) . 'M' : '$' . number_format($kpis['gross_profit'] / 1000, 1) . 'K' }}
                 </div>
-                <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
+                <div class="text-[11px] text-white/75 flex items-center gap-1 truncate z-10">
                     <span>Net trading margin</span>
                 </div>
             </div>
             @else
-            <div class="bg-white/80 text-slate-500 p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] border border-dashed border-slate-300">
-                <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Trading Profit</div>
-                <div class="text-lg font-bold text-slate-400">Restricted</div>
+            <div class="relative overflow-hidden bg-white/90 backdrop-blur-xs text-slate-500 p-3.5 sm:p-4 rounded-2xl shadow-xs border border-dashed border-slate-300 min-h-[110px] flex flex-col justify-between">
+                <div class="flex items-center justify-between gap-1">
+                    <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider truncate">Trading Profit</span>
+                    <span class="w-6 h-6 rounded-md bg-slate-100 flex items-center justify-center shrink-0">
+                        <span class="material-icons-outlined text-xs text-slate-400">lock</span>
+                    </span>
+                </div>
+                <div class="text-base sm:text-lg font-bold text-slate-400 my-0.5">Restricted</div>
                 <div class="text-[10px] text-slate-400">Admin role needed</div>
             </div>
             @endif
 
-            <!-- CARD 6: Violet Purple (#732eb0) -> Gross Margin Rate -->
+            <!-- CARD 6: Theme Deep Violet/Purple -> Gross Margin Rate -->
             @if($canViewProfit)
-            <div class="bg-[#732eb0] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
-                <div class="text-xs text-white/80 font-medium">
-                    Gross Margin Rate
+            <div class="relative overflow-hidden bg-gradient-to-br from-[#5b21b6] to-[#7c3aed] text-white p-3.5 sm:p-4 rounded-2xl shadow-xs hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 group min-h-[110px] flex flex-col justify-between cursor-default">
+                <!-- MetaERP Logo Watermark -->
+                <svg class="absolute -right-2 -bottom-2 w-16 h-16 opacity-10 pointer-events-none text-white transition-transform group-hover:scale-110" viewBox="0 0 32 32" fill="currentColor">
+                    <path d="M16 6.75556V0L1.02839 14.6389C0.462304 15.1924 0.457197 16.1016 1.01703 16.6615L3.55556 19.2"/>
+                    <path d="M16 6.75556V0L30.9716 14.6389C31.5377 15.1924 31.5428 16.1016 30.983 16.6615L28.4444 19.2"/>
+                    <path d="M3.55556 19.2L9.6 13.1556H16V19.2"/>
+                    <path d="M28.4444 19.2L22.4 13.1556H16V19.2"/>
+                    <path d="M16 25.9556H9.95555L12.9778 22.7556L16 25.9556Z"/>
+                    <path d="M16 32L22.0444 25.9556L16 25.9556V32Z"/>
+                    <path d="M16 32L9.95555 25.9556H16V32Z"/>
+                    <path d="M16 25.9556H22.0444L19.0222 22.7556L16 25.9556Z"/>
+                    <path d="M7.72363 21.7502C7.18605 22.3085 7.19441 23.1944 7.74243 23.7424L9.95556 25.9556L16 19.5556V13.1556"/>
+                    <path d="M24.2764 21.7502C24.814 22.3085 24.8056 23.1944 24.2576 23.7424L22.0444 25.9556L16 19.5556V13.1556"/>
+                </svg>
+                <div class="flex items-center justify-between gap-1 z-10">
+                    <span class="text-xs text-white/90 font-medium truncate">Gross Margin Rate</span>
+                    <span class="w-6 h-6 rounded-lg bg-white/20 backdrop-blur-xs flex items-center justify-center shrink-0">
+                        <span class="material-icons-outlined text-sm text-white">pie_chart</span>
+                    </span>
                 </div>
-                <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate">
+                <div class="text-2xl sm:text-2xl xl:text-3xl font-extrabold tracking-tight text-white my-0.5 truncate z-10">
                     {{ number_format($kpis['profit_margin_pct'], 1) }}%
                 </div>
-                <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
+                <div class="text-[11px] text-white/75 flex items-center gap-1 truncate z-10">
                     <span>Realized margin %</span>
                 </div>
             </div>
             @else
-            <div class="bg-white/80 text-slate-500 p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] border border-dashed border-slate-300">
-                <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Gross Margin Rate</div>
-                <div class="text-lg font-bold text-slate-400">Restricted</div>
+            <div class="relative overflow-hidden bg-white/90 backdrop-blur-xs text-slate-500 p-3.5 sm:p-4 rounded-2xl shadow-xs border border-dashed border-slate-300 min-h-[110px] flex flex-col justify-between">
+                <div class="flex items-center justify-between gap-1">
+                    <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider truncate">Gross Margin Rate</span>
+                    <span class="w-6 h-6 rounded-md bg-slate-100 flex items-center justify-center shrink-0">
+                        <span class="material-icons-outlined text-xs text-slate-400">lock</span>
+                    </span>
+                </div>
+                <div class="text-base sm:text-lg font-bold text-slate-400 my-0.5">Restricted</div>
                 <div class="text-[10px] text-slate-400">Admin role needed</div>
             </div>
             @endif
 
         </div>
 
-        <!-- ROW 2 (6 Cards: Symmetrical color pairs from Image 1) -->
+        <!-- ROW 2 (6 Cards: Symmetrical MetaERP Blues + Theme Accents) -->
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
 
-            <!-- CARD 7: Purple (#5a30b5) -> Physical Tonnage Traded -->
-            <div class="bg-[#5a30b5] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
-                <div class="text-xs text-white/80 font-medium">
-                    Physical Tonnage
+            <!-- CARD 7: MetaERP Corporate Navy -> Physical Tonnage Traded -->
+            <div class="relative overflow-hidden bg-gradient-to-br from-[#10519D] to-[#1565C0] text-white p-3.5 sm:p-4 rounded-2xl shadow-xs hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 group min-h-[110px] flex flex-col justify-between cursor-default">
+                <!-- MetaERP Logo Watermark -->
+                <svg class="absolute -right-2 -bottom-2 w-16 h-16 opacity-10 pointer-events-none text-white transition-transform group-hover:scale-110" viewBox="0 0 32 32" fill="currentColor">
+                    <path d="M16 6.75556V0L1.02839 14.6389C0.462304 15.1924 0.457197 16.1016 1.01703 16.6615L3.55556 19.2"/>
+                    <path d="M16 6.75556V0L30.9716 14.6389C31.5377 15.1924 31.5428 16.1016 30.983 16.6615L28.4444 19.2"/>
+                    <path d="M3.55556 19.2L9.6 13.1556H16V19.2"/>
+                    <path d="M28.4444 19.2L22.4 13.1556H16V19.2"/>
+                    <path d="M16 25.9556H9.95555L12.9778 22.7556L16 25.9556Z"/>
+                    <path d="M16 32L22.0444 25.9556L16 25.9556V32Z"/>
+                    <path d="M16 32L9.95555 25.9556H16V32Z"/>
+                    <path d="M16 25.9556H22.0444L19.0222 22.7556L16 25.9556Z"/>
+                    <path d="M7.72363 21.7502C7.18605 22.3085 7.19441 23.1944 7.74243 23.7424L9.95556 25.9556L16 19.5556V13.1556"/>
+                    <path d="M24.2764 21.7502C24.814 22.3085 24.8056 23.1944 24.2576 23.7424L22.0444 25.9556L16 19.5556V13.1556"/>
+                </svg>
+                <div class="flex items-center justify-between gap-1 z-10">
+                    <span class="text-xs text-white/90 font-medium truncate">Physical Tonnage</span>
+                    <span class="w-6 h-6 rounded-lg bg-white/20 backdrop-blur-xs flex items-center justify-center shrink-0">
+                        <span class="material-icons-outlined text-sm text-white">scale</span>
+                    </span>
                 </div>
-                <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate">
-                    {{ number_format($kpis['total_tonnage']) }} <span class="text-sm font-normal text-white/80">MT</span>
+                <div class="text-2xl sm:text-2xl xl:text-3xl font-extrabold tracking-tight text-white my-0.5 truncate z-10">
+                    {{ number_format($kpis['total_tonnage']) }} <span class="text-xs font-semibold text-white/80">MT</span>
                 </div>
-                <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
+                <div class="text-[11px] text-white/75 flex items-center gap-1 truncate z-10">
                     <span>Traded volume</span>
                 </div>
             </div>
 
-            <!-- CARD 8: Deep Ocean Blue (#00509d) -> In-Transit Shipments -->
-            <div class="bg-[#00509d] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
-                <div class="text-xs text-white/80 font-medium">
-                    In-Transit Shipments
+            <!-- CARD 8: MetaERP Royal Blue -> In-Transit Shipments -->
+            <div class="relative overflow-hidden bg-gradient-to-br from-[#1565C0] to-[#1878C6] text-white p-3.5 sm:p-4 rounded-2xl shadow-xs hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 group min-h-[110px] flex flex-col justify-between cursor-default">
+                <!-- MetaERP Logo Watermark -->
+                <svg class="absolute -right-2 -bottom-2 w-16 h-16 opacity-10 pointer-events-none text-white transition-transform group-hover:scale-110" viewBox="0 0 32 32" fill="currentColor">
+                    <path d="M16 6.75556V0L1.02839 14.6389C0.462304 15.1924 0.457197 16.1016 1.01703 16.6615L3.55556 19.2"/>
+                    <path d="M16 6.75556V0L30.9716 14.6389C31.5377 15.1924 31.5428 16.1016 30.983 16.6615L28.4444 19.2"/>
+                    <path d="M3.55556 19.2L9.6 13.1556H16V19.2"/>
+                    <path d="M28.4444 19.2L22.4 13.1556H16V19.2"/>
+                    <path d="M16 25.9556H9.95555L12.9778 22.7556L16 25.9556Z"/>
+                    <path d="M16 32L22.0444 25.9556L16 25.9556V32Z"/>
+                    <path d="M16 32L9.95555 25.9556H16V32Z"/>
+                    <path d="M16 25.9556H22.0444L19.0222 22.7556L16 25.9556Z"/>
+                    <path d="M7.72363 21.7502C7.18605 22.3085 7.19441 23.1944 7.74243 23.7424L9.95556 25.9556L16 19.5556V13.1556"/>
+                    <path d="M24.2764 21.7502C24.814 22.3085 24.8056 23.1944 24.2576 23.7424L22.0444 25.9556L16 19.5556V13.1556"/>
+                </svg>
+                <div class="flex items-center justify-between gap-1 z-10">
+                    <span class="text-xs text-white/90 font-medium truncate">In-Transit Shipments</span>
+                    <span class="w-6 h-6 rounded-lg bg-white/20 backdrop-blur-xs flex items-center justify-center shrink-0">
+                        <span class="material-icons-outlined text-sm text-white">directions_boat</span>
+                    </span>
                 </div>
-                <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate">
+                <div class="text-2xl sm:text-2xl xl:text-3xl font-extrabold tracking-tight text-white my-0.5 truncate z-10">
                     {{ number_format($kpis['in_transit_count']) }}
                 </div>
-                <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
+                <div class="text-[11px] text-white/75 flex items-center gap-1 truncate z-10">
                     <span>Active logistics</span>
                 </div>
             </div>
 
-            <!-- CARD 9: Cerulean Cyan (#0082aa) -> Order Fulfillment Rate -->
-            <div class="bg-[#0082aa] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
-                <div class="text-xs text-white/80 font-medium">
-                    Order Fulfillment
+            <!-- CARD 9: MetaERP Ocean/Sky Blue -> Order Fulfillment Rate -->
+            <div class="relative overflow-hidden bg-gradient-to-br from-[#1878C6] to-[#0284c7] text-white p-3.5 sm:p-4 rounded-2xl shadow-xs hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 group min-h-[110px] flex flex-col justify-between cursor-default">
+                <!-- MetaERP Logo Watermark -->
+                <svg class="absolute -right-2 -bottom-2 w-16 h-16 opacity-10 pointer-events-none text-white transition-transform group-hover:scale-110" viewBox="0 0 32 32" fill="currentColor">
+                    <path d="M16 6.75556V0L1.02839 14.6389C0.462304 15.1924 0.457197 16.1016 1.01703 16.6615L3.55556 19.2"/>
+                    <path d="M16 6.75556V0L30.9716 14.6389C31.5377 15.1924 31.5428 16.1016 30.983 16.6615L28.4444 19.2"/>
+                    <path d="M3.55556 19.2L9.6 13.1556H16V19.2"/>
+                    <path d="M28.4444 19.2L22.4 13.1556H16V19.2"/>
+                    <path d="M16 25.9556H9.95555L12.9778 22.7556L16 25.9556Z"/>
+                    <path d="M16 32L22.0444 25.9556L16 25.9556V32Z"/>
+                    <path d="M16 32L9.95555 25.9556H16V32Z"/>
+                    <path d="M16 25.9556H22.0444L19.0222 22.7556L16 25.9556Z"/>
+                    <path d="M7.72363 21.7502C7.18605 22.3085 7.19441 23.1944 7.74243 23.7424L9.95556 25.9556L16 19.5556V13.1556"/>
+                    <path d="M24.2764 21.7502C24.814 22.3085 24.8056 23.1944 24.2576 23.7424L22.0444 25.9556L16 19.5556V13.1556"/>
+                </svg>
+                <div class="flex items-center justify-between gap-1 z-10">
+                    <span class="text-xs text-white/90 font-medium truncate">Order Fulfillment</span>
+                    <span class="w-6 h-6 rounded-lg bg-white/20 backdrop-blur-xs flex items-center justify-center shrink-0">
+                        <span class="material-icons-outlined text-sm text-white">verified</span>
+                    </span>
                 </div>
-                <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate">
+                <div class="text-2xl sm:text-2xl xl:text-3xl font-extrabold tracking-tight text-white my-0.5 truncate z-10">
                     {{ number_format($kpis['fulfillment_rate_pct'], 1) }}%
                 </div>
-                <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
+                <div class="text-[11px] text-white/75 flex items-center gap-1 truncate z-10">
                     <span>Completed orders</span>
                 </div>
             </div>
 
-            <!-- CARD 10: Mint Jade Green (#0da87a) -> Average Order Value -->
-            <div class="bg-[#0da87a] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
-                <div class="text-xs text-white/80 font-medium">
-                    Average Order Value
+            <!-- CARD 10: Theme Emerald Green -> Average Order Value -->
+            <div class="relative overflow-hidden bg-gradient-to-br from-[#047857] to-[#059669] text-white p-3.5 sm:p-4 rounded-2xl shadow-xs hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 group min-h-[110px] flex flex-col justify-between cursor-default">
+                <!-- MetaERP Logo Watermark -->
+                <svg class="absolute -right-2 -bottom-2 w-16 h-16 opacity-10 pointer-events-none text-white transition-transform group-hover:scale-110" viewBox="0 0 32 32" fill="currentColor">
+                    <path d="M16 6.75556V0L1.02839 14.6389C0.462304 15.1924 0.457197 16.1016 1.01703 16.6615L3.55556 19.2"/>
+                    <path d="M16 6.75556V0L30.9716 14.6389C31.5377 15.1924 31.5428 16.1016 30.983 16.6615L28.4444 19.2"/>
+                    <path d="M3.55556 19.2L9.6 13.1556H16V19.2"/>
+                    <path d="M28.4444 19.2L22.4 13.1556H16V19.2"/>
+                    <path d="M16 25.9556H9.95555L12.9778 22.7556L16 25.9556Z"/>
+                    <path d="M16 32L22.0444 25.9556L16 25.9556V32Z"/>
+                    <path d="M16 32L9.95555 25.9556H16V32Z"/>
+                    <path d="M16 25.9556H22.0444L19.0222 22.7556L16 25.9556Z"/>
+                    <path d="M7.72363 21.7502C7.18605 22.3085 7.19441 23.1944 7.74243 23.7424L9.95556 25.9556L16 19.5556V13.1556"/>
+                    <path d="M24.2764 21.7502C24.814 22.3085 24.8056 23.1944 24.2576 23.7424L22.0444 25.9556L16 19.5556V13.1556"/>
+                </svg>
+                <div class="flex items-center justify-between gap-1 z-10">
+                    <span class="text-xs text-white/90 font-medium truncate">Average Order Value</span>
+                    <span class="w-6 h-6 rounded-lg bg-white/20 backdrop-blur-xs flex items-center justify-center shrink-0">
+                        <span class="material-icons-outlined text-sm text-white">receipt_long</span>
+                    </span>
                 </div>
-                <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate" title="${{ number_format($kpis['avg_contract_value'], 2) }}">
-                    ${{ number_format($kpis['avg_contract_value'] / 1000, 1) }}K
+                <div class="text-2xl sm:text-2xl xl:text-3xl font-extrabold tracking-tight text-white my-0.5 truncate z-10" title="${{ number_format($kpis['avg_contract_value'], 2) }}">
+                    {{ $kpis['avg_contract_value'] >= 1000000 ? '$' . number_format($kpis['avg_contract_value'] / 1000000, 1) . 'M' : '$' . number_format($kpis['avg_contract_value'] / 1000, 1) . 'K' }}
                 </div>
-                <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
+                <div class="text-[11px] text-white/75 flex items-center gap-1 truncate z-10">
                     <span>Revenue per contract</span>
                 </div>
             </div>
 
-            <!-- CARD 11: Berry Rose Magenta (#bf2c78) -> Capital Return (ROAS) -->
+            <!-- CARD 11: Theme Rose/Ruby -> Capital Return (ROAS) -->
             @if($canViewProfit)
-            <div class="bg-[#bf2c78] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
-                <div class="text-xs text-white/80 font-medium">
-                    Capital Return (ROAS)
+            <div class="relative overflow-hidden bg-gradient-to-br from-[#9f1239] to-[#be185d] text-white p-3.5 sm:p-4 rounded-2xl shadow-xs hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 group min-h-[110px] flex flex-col justify-between cursor-default">
+                <!-- MetaERP Logo Watermark -->
+                <svg class="absolute -right-2 -bottom-2 w-16 h-16 opacity-10 pointer-events-none text-white transition-transform group-hover:scale-110" viewBox="0 0 32 32" fill="currentColor">
+                    <path d="M16 6.75556V0L1.02839 14.6389C0.462304 15.1924 0.457197 16.1016 1.01703 16.6615L3.55556 19.2"/>
+                    <path d="M16 6.75556V0L30.9716 14.6389C31.5377 15.1924 31.5428 16.1016 30.983 16.6615L28.4444 19.2"/>
+                    <path d="M3.55556 19.2L9.6 13.1556H16V19.2"/>
+                    <path d="M28.4444 19.2L22.4 13.1556H16V19.2"/>
+                    <path d="M16 25.9556H9.95555L12.9778 22.7556L16 25.9556Z"/>
+                    <path d="M16 32L22.0444 25.9556L16 25.9556V32Z"/>
+                    <path d="M16 32L9.95555 25.9556H16V32Z"/>
+                    <path d="M16 25.9556H22.0444L19.0222 22.7556L16 25.9556Z"/>
+                    <path d="M7.72363 21.7502C7.18605 22.3085 7.19441 23.1944 7.74243 23.7424L9.95556 25.9556L16 19.5556V13.1556"/>
+                    <path d="M24.2764 21.7502C24.814 22.3085 24.8056 23.1944 24.2576 23.7424L22.0444 25.9556L16 19.5556V13.1556"/>
+                </svg>
+                <div class="flex items-center justify-between gap-1 z-10">
+                    <span class="text-xs text-white/90 font-medium truncate">Capital Return (ROAS)</span>
+                    <span class="w-6 h-6 rounded-lg bg-white/20 backdrop-blur-xs flex items-center justify-center shrink-0">
+                        <span class="material-icons-outlined text-sm text-white">auto_graph</span>
+                    </span>
                 </div>
-                <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate">
+                <div class="text-2xl sm:text-2xl xl:text-3xl font-extrabold tracking-tight text-white my-0.5 truncate z-10">
                     {{ number_format($kpis['roas_ratio'], 1) }}%
                 </div>
-                <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
+                <div class="text-[11px] text-white/75 flex items-center gap-1 truncate z-10">
                     <span>Sales / Procurement</span>
                 </div>
             </div>
             @else
-            <div class="bg-white/80 text-slate-500 p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] border border-dashed border-slate-300">
-                <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Capital Return (ROAS)</div>
-                <div class="text-lg font-bold text-slate-400">Restricted</div>
+            <div class="relative overflow-hidden bg-white/90 backdrop-blur-xs text-slate-500 p-3.5 sm:p-4 rounded-2xl shadow-xs border border-dashed border-slate-300 min-h-[110px] flex flex-col justify-between">
+                <div class="flex items-center justify-between gap-1">
+                    <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider truncate">Capital Return (ROAS)</span>
+                    <span class="w-6 h-6 rounded-md bg-slate-100 flex items-center justify-center shrink-0">
+                        <span class="material-icons-outlined text-xs text-slate-400">lock</span>
+                    </span>
+                </div>
+                <div class="text-base sm:text-lg font-bold text-slate-400 my-0.5">Restricted</div>
                 <div class="text-[10px] text-slate-400">Admin role needed</div>
             </div>
             @endif
 
-            <!-- CARD 12: Violet Purple (#732eb0) -> Operating Trading Entities -->
-            <div class="bg-[#732eb0] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
-                <div class="text-xs text-white/80 font-medium">
-                    Trading Entities
+            <!-- CARD 12: Theme Deep Violet/Purple -> Operating Trading Entities -->
+            <div class="relative overflow-hidden bg-gradient-to-br from-[#5b21b6] to-[#7c3aed] text-white p-3.5 sm:p-4 rounded-2xl shadow-xs hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 group min-h-[110px] flex flex-col justify-between cursor-default">
+                <!-- MetaERP Logo Watermark -->
+                <svg class="absolute -right-2 -bottom-2 w-16 h-16 opacity-10 pointer-events-none text-white transition-transform group-hover:scale-110" viewBox="0 0 32 32" fill="currentColor">
+                    <path d="M16 6.75556V0L1.02839 14.6389C0.462304 15.1924 0.457197 16.1016 1.01703 16.6615L3.55556 19.2"/>
+                    <path d="M16 6.75556V0L30.9716 14.6389C31.5377 15.1924 31.5428 16.1016 30.983 16.6615L28.4444 19.2"/>
+                    <path d="M3.55556 19.2L9.6 13.1556H16V19.2"/>
+                    <path d="M28.4444 19.2L22.4 13.1556H16V19.2"/>
+                    <path d="M16 25.9556H9.95555L12.9778 22.7556L16 25.9556Z"/>
+                    <path d="M16 32L22.0444 25.9556L16 25.9556V32Z"/>
+                    <path d="M16 32L9.95555 25.9556H16V32Z"/>
+                    <path d="M16 25.9556H22.0444L19.0222 22.7556L16 25.9556Z"/>
+                    <path d="M7.72363 21.7502C7.18605 22.3085 7.19441 23.1944 7.74243 23.7424L9.95556 25.9556L16 19.5556V13.1556"/>
+                    <path d="M24.2764 21.7502C24.814 22.3085 24.8056 23.1944 24.2576 23.7424L22.0444 25.9556L16 19.5556V13.1556"/>
+                </svg>
+                <div class="flex items-center justify-between gap-1 z-10">
+                    <span class="text-xs text-white/90 font-medium truncate">Trading Entities</span>
+                    <span class="w-6 h-6 rounded-lg bg-white/20 backdrop-blur-xs flex items-center justify-center shrink-0">
+                        <span class="material-icons-outlined text-sm text-white">business</span>
+                    </span>
                 </div>
-                <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate">
+                <div class="text-2xl sm:text-2xl xl:text-3xl font-extrabold tracking-tight text-white my-0.5 truncate z-10">
                     {{ count($availableCompanies) }}
                 </div>
-                <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
+                <div class="text-[11px] text-white/75 flex items-center gap-1 truncate z-10">
                     <span>Reporting companies</span>
                 </div>
             </div>
