@@ -250,7 +250,7 @@
             </a>
 
             <!-- Power BI Dashboard v2 -->
-            <a href="{{ route('dashboards.v2') }}"
+            {{-- <a href="{{ route('dashboards.v2') }}"
                class="flex items-center rounded-xl transition-all {{ request()->routeIs('dashboards.v2') ? 'bg-indigo-600 text-white shadow-xs font-semibold' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}"
                :class="isExpanded ? 'gap-3 px-3 py-2 justify-start' : 'p-2.5 justify-center'"
                title="Power BI Dashboard v2">
@@ -259,7 +259,7 @@
                     <span class="truncate">Dashboard v2</span>
                     <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300 uppercase tracking-wider">BI</span>
                 </div>
-            </a>
+            </a> --}}
 
             <!-- Users -->
             @hasPermission('USERS')
