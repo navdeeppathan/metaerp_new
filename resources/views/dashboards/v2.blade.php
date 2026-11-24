@@ -6,6 +6,7 @@
 <!-- OUTER WRAPPER WITH EXACT CANVAS BACKGROUND (#eaf1fa matching Image 1) -->
 <div x-data="{
     activeTab: 'overview',
+    waterfallView: 'flow',
     showFilters: true,
     mobileFiltersOpen: false,
     filterCompany: '{{ $selectedCompanyId ?? 'all' }}',
@@ -14,6 +15,23 @@
     startDate: '{{ $startDate ?? '' }}',
     endDate: '{{ $endDate ?? '' }}',
     isApplying: false,
+    setTab(tab) {
+        this.activeTab = tab;
+        this.$nextTick(() => {
+            setTimeout(() => {
+                window.dispatchEvent(new Event('resize'));
+                if (tab === 'financials' && window.renderWaterfallChart) {
+                    window.renderWaterfallChart(this.waterfallView || 'flow');
+                }
+            }, 60);
+        });
+    },
+    switchWaterfall(mode) {
+        this.waterfallView = mode;
+        if (window.renderWaterfallChart) {
+            window.renderWaterfallChart(mode);
+        }
+    },
     applyFilters() {
         this.isApplying = true;
         const params = new URLSearchParams();
@@ -67,20 +85,20 @@
                 
                 <!-- Dark Navy Nav Capsule -->
                 <div class="bg-[#1c4b82] p-1 rounded-xl flex items-center text-xs font-semibold text-white shadow-xs overflow-x-auto custom-scrollbar">
-                    <button type="button" @click="activeTab = 'overview'" 
+                    <button type="button" @click="setTab('overview')" 
                             :class="activeTab === 'overview' ? 'bg-[#2563eb] text-white shadow-xs' : 'text-white/80 hover:text-white'"
                             class="px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0">
                         <span class="material-icons-outlined text-base">dashboard</span>
                         <span>Overview</span>
                     </button>
-                    <button type="button" @click="activeTab = 'dynamics'" 
+                    <button type="button" @click="setTab('dynamics')" 
                             :class="activeTab === 'dynamics' ? 'bg-[#2563eb] text-white shadow-xs' : 'text-white/80 hover:text-white'"
                             class="px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0">
                         <span class="material-icons-outlined text-base">trending_up</span>
                         <span>Dynamics</span>
                     </button>
                     @if($canViewFinancials)
-                    <button type="button" @click="activeTab = 'financials'" 
+                    <button type="button" @click="setTab('financials')" 
                             :class="activeTab === 'financials' ? 'bg-[#2563eb] text-white shadow-xs' : 'text-white/80 hover:text-white'"
                             class="px-4 py-2 rounded-lg transition-all flex items-center gap-1.5 whitespace-nowrap shrink-0">
                         <span class="material-icons-outlined text-base">account_balance</span>
@@ -665,56 +683,155 @@
             <!-- TAB 3: FINANCIAL BI (Admin / Finance Role Only) -->
             @if($canViewFinancials)
             <div x-show="activeTab === 'financials'" class="space-y-4 sm:space-y-5" x-cloak>
-                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-stretch">
                     
-                    <!-- Power BI Cash Flow & Profit Waterfall Chart -->
-                    <div class="lg:col-span-8 bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-xs min-w-0">
-                        <div class="flex items-center justify-between mb-4">
+                    <!-- Power BI Cash Flow & Profit Waterfall Chart Card -->
+                    <div class="lg:col-span-8 bg-white rounded-2xl p-4 sm:p-5 lg:p-6 border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] min-w-0 flex flex-col justify-between">
+                        <div class="flex items-center justify-between mb-3 sm:mb-4 flex-wrap gap-2">
                             <div>
                                 <h3 class="text-base sm:text-lg font-bold text-[#0f1e36] tracking-tight">
                                     Budget Remaining, Trading Financial Waterfall
                                 </h3>
-                                <p class="text-xs text-slate-400 mt-1">Capital flow through procurement to net realization</p>
+                                <p class="text-xs text-slate-400 mt-0.5">Capital flow through procurement to net realized profit</p>
                             </div>
-                            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-pink-50 text-pink-700 shrink-0">
-                                Confidential
-                            </span>
+
+                            <!-- Interactive Mode Switcher & Visual Badges -->
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <div class="inline-flex rounded-lg bg-slate-100 p-0.5 border border-slate-200/80 shadow-xs">
+                                    <button type="button" 
+                                            @click="switchWaterfall('flow')" 
+                                            :class="waterfallView === 'flow' ? 'bg-white text-[#0f1e36] shadow-xs font-bold' : 'text-slate-500 hover:text-slate-900 font-medium'"
+                                            class="px-2.5 py-1 text-[11px] rounded-md transition-all">
+                                        Waterfall Flow
+                                    </button>
+                                    <button type="button" 
+                                            @click="switchWaterfall('monthly')" 
+                                            :class="waterfallView === 'monthly' ? 'bg-white text-[#0f1e36] shadow-xs font-bold' : 'text-slate-500 hover:text-slate-900 font-medium'"
+                                            class="px-2.5 py-1 text-[11px] rounded-md transition-all">
+                                        Monthly Budget
+                                    </button>
+                                </div>
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60 hidden sm:inline-flex">
+                                    Power BI Visual
+                                </span>
+                            </div>
                         </div>
-                        <div id="v2FinancialWaterfallChart" class="w-full h-72 sm:h-80"></div>
+
+                        <!-- Waterfall ApexChart Container -->
+                        <div class="my-2 min-w-0 w-full overflow-hidden">
+                            <div id="v2FinancialWaterfallChart" class="w-full min-h-[290px] sm:min-h-[320px]"></div>
+                        </div>
+
+                        <div class="text-[11px] text-slate-400 border-t border-slate-100 pt-2.5 flex flex-wrap items-center justify-between gap-1.5">
+                            <span class="flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span x-text="waterfallView === 'flow' ? 'Stepwise margin realization' : 'Monthly budget variance from procurement'"></span>
+                            </span>
+                            <span class="font-semibold text-slate-700" x-text="waterfallView === 'flow' ? 'Gross Sales &rarr; Procurement Cost &rarr; Net Realized Margin' : 'Timeline Variance to Budget ($)'"></span>
+                        </div>
                     </div>
 
-                    <!-- Financial Summary Cards -->
-                    <div class="lg:col-span-4 space-y-3 sm:space-y-4">
-                        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs">
-                            <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Net Trading Margin</span>
-                            <div class="text-3xl font-extrabold text-[#0f1e36] mt-1 truncate">
-                                ${{ number_format($kpis['gross_profit'], 2) }}
+                    <!-- 3 Financial Summary Cards (Fully responsive: 1 col on mobile, 3 cols on tablet, 1 col on desktop) -->
+                    <div class="lg:col-span-4 grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 gap-3 sm:gap-4">
+                        
+                        <!-- Card 1: Net Trading Margin / Variance to Budget (Matching Power BI Image 2 style) -->
+                        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col justify-between min-w-0">
+                            <div class="flex items-center justify-between gap-1">
+                                <span class="text-[11px] text-slate-400 font-bold uppercase tracking-wider truncate">Variance to Budget</span>
+                                <span class="material-icons-outlined text-sm {{ $kpis['gross_profit'] >= 0 ? 'text-emerald-500' : 'text-red-500' }} shrink-0">
+                                    {{ $kpis['gross_profit'] >= 0 ? 'trending_up' : 'trending_down' }}
+                                </span>
                             </div>
-                            <div class="text-xs text-emerald-600 font-medium mt-1.5 flex items-center gap-1">
-                                <span class="material-icons-outlined text-sm">trending_up</span>
-                                <span>{{ $kpis['profit_margin_pct'] }}% net margin</span>
+                            
+                            <div class="my-2">
+                                @php
+                                    $gp = $kpis['gross_profit'];
+                                    $absGp = abs($gp);
+                                @endphp
+                                <div class="text-2xl sm:text-xl md:text-2xl lg:text-3xl font-black {{ $gp >= 0 ? 'text-[#0f1e36]' : 'text-red-600' }} tracking-tight truncate" title="${{ number_format($gp, 2) }}">
+                                    @if($gp < 0)
+                                        @if($absGp >= 1000000)
+                                            (${{ number_format($absGp / 1000000, 2) }}M)
+                                        @elseif($absGp >= 1000)
+                                            (${{ number_format($absGp / 1000, 1) }}K)
+                                        @else
+                                            (${{ number_format($absGp, 2) }})
+                                        @endif
+                                    @else
+                                        @if($gp >= 1000000)
+                                            ${{ number_format($gp / 1000000, 2) }}M
+                                        @elseif($gp >= 1000)
+                                            ${{ number_format($gp / 1000, 1) }}K
+                                        @else
+                                            ${{ number_format($gp, 2) }}
+                                        @endif
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="text-xs text-slate-500 flex items-center justify-between border-t border-slate-100 pt-2 gap-2">
+                                <span class="px-2 py-0.5 rounded-md font-bold text-[11px] {{ $gp >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700' }} shrink-0">
+                                    {{ $kpis['profit_margin_pct'] }}% margin
+                                </span>
+                                <span class="text-[11px] text-slate-400 font-medium truncate ml-auto" title="${{ number_format($gp, 2) }}">
+                                    @if($gp < 0)
+                                        -${{ number_format($absGp, 0) }}
+                                    @else
+                                        ${{ number_format($gp, 0) }}
+                                    @endif
+                                </span>
                             </div>
                         </div>
 
-                        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs">
-                            <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Procurement Cost</span>
-                            <div class="text-3xl font-extrabold text-[#0f1e36] mt-1 truncate">
-                                ${{ number_format($kpis['total_purchases'], 2) }}
+                        <!-- Card 2: Procurement Cost -->
+                        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col justify-between min-w-0">
+                            <div class="flex items-center justify-between gap-1">
+                                <span class="text-[11px] text-slate-400 font-bold uppercase tracking-wider truncate">Procurement Cost</span>
+                                <span class="material-icons-outlined text-sm text-[#bf2c78] shrink-0">shopping_bag</span>
                             </div>
-                            <div class="text-xs text-slate-500 mt-1.5">
-                                Total capital deployed in purchase contracts
+                            
+                            <div class="my-2">
+                                @php
+                                    $purch = $kpis['total_purchases'];
+                                @endphp
+                                <div class="text-2xl sm:text-xl md:text-2xl lg:text-3xl font-black text-[#0f1e36] tracking-tight truncate" title="${{ number_format($purch, 2) }}">
+                                    @if($purch >= 1000000)
+                                        ${{ number_format($purch / 1000000, 2) }}M
+                                    @elseif($purch >= 1000)
+                                        ${{ number_format($purch / 1000, 1) }}K
+                                    @else
+                                        ${{ number_format($purch, 2) }}
+                                    @endif
+                                </div>
+                            </div>
+
+                            <div class="text-xs text-slate-500 flex items-center justify-between border-t border-slate-100 pt-2 gap-2">
+                                <span class="text-slate-500 text-[11px] font-medium shrink-0">Capital deployed</span>
+                                <span class="text-[11px] text-slate-400 font-medium truncate ml-auto" title="${{ number_format($purch, 2) }}">
+                                    ${{ number_format($purch, 0) }}
+                                </span>
                             </div>
                         </div>
 
-                        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs">
-                            <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Trading Multiplier (Yield)</span>
-                            <div class="text-3xl font-extrabold text-[#5a30b5] mt-1 truncate">
-                                {{ $kpis['roas_ratio'] }}%
+                        <!-- Card 3: Trading Multiplier (Yield / ROAS) -->
+                        <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col justify-between min-w-0">
+                            <div class="flex items-center justify-between gap-1">
+                                <span class="text-[11px] text-slate-400 font-bold uppercase tracking-wider truncate">Trading Multiplier</span>
+                                <span class="material-icons-outlined text-sm text-[#5a30b5] shrink-0">auto_graph</span>
                             </div>
-                            <div class="text-xs text-slate-500 mt-1.5">
-                                Ratio of gross sales returned per procurement dollar
+                            
+                            <div class="my-2">
+                                <div class="text-2xl sm:text-xl md:text-2xl lg:text-3xl font-black text-[#5a30b5] tracking-tight truncate">
+                                    {{ number_format($kpis['roas_ratio'], 1) }}%
+                                </div>
+                            </div>
+
+                            <div class="text-xs text-slate-500 flex items-center justify-between border-t border-slate-100 pt-2 gap-2">
+                                <span class="text-slate-500 text-[11px] font-medium shrink-0">Sales / Procurement</span>
+                                <span class="text-indigo-600 font-bold text-[11px] shrink-0">Yield Ratio</span>
                             </div>
                         </div>
+
                     </div>
 
                 </div>
@@ -1345,67 +1462,215 @@ document.addEventListener('DOMContentLoaded', function () {
         dynamicsChart.render();
     }
 
+    // Formatters for Financial BI & Waterfall Visuals
+    function formatMoneyCompact(val, withSign = true) {
+        if (val === null || val === undefined || isNaN(val)) return '$0';
+        const isNeg = Number(val) < 0;
+        const absVal = Math.abs(Number(val));
+        let numStr = '';
+        if (absVal >= 1000000) {
+            numStr = (absVal / 1000000).toFixed(2).replace(/\.00$/, '') + 'M';
+        } else if (absVal >= 1000) {
+            numStr = (absVal / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+        } else {
+            numStr = absVal.toFixed(0);
+        }
+        if (!withSign) return '$' + numStr;
+        return isNeg ? '(-$' + numStr + ')' : '+$' + numStr;
+    }
+
+    function formatAxisMoney(val) {
+        if (val === null || val === undefined || isNaN(val)) return '$0';
+        const isNeg = Number(val) < 0;
+        const absVal = Math.abs(Number(val));
+        let numStr = '';
+        if (absVal >= 1000000) {
+            numStr = (absVal / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+        } else if (absVal >= 1000) {
+            numStr = (absVal / 1000).toFixed(0) + 'K';
+        } else {
+            numStr = absVal.toFixed(0);
+        }
+        return isNeg ? '-$' + numStr : '$' + numStr;
+    }
+
     // 7. FINANCIAL WATERFALL CHART (Power BI Budget Remaining style)
-    const waterfallEl = document.querySelector('#v2FinancialWaterfallChart');
-    if (waterfallEl) {
-        const totalSales = {{ $kpis['total_sales'] }};
-        const totalPurchases = {{ $kpis['total_purchases'] }};
-        const grossProfit = {{ $kpis['gross_profit'] }};
+    window.waterfallChartInstance = null;
+    window.renderWaterfallChart = function(mode = 'flow') {
+        const waterfallEl = document.querySelector('#v2FinancialWaterfallChart');
+        if (!waterfallEl) return;
+
+        if (window.waterfallChartInstance) {
+            try {
+                window.waterfallChartInstance.destroy();
+            } catch(e) {}
+            window.waterfallChartInstance = null;
+        }
+
+        let seriesData = [];
+        if (mode === 'monthly') {
+            const categories = @json($stacked['categories'] ?? []);
+            const sales = @json($stacked['sales'] ?? []);
+            const purchases = @json($stacked['purchases'] ?? []);
+
+            seriesData = categories.map((cat, idx) => {
+                const s = Number(sales[idx] || 0);
+                const p = Number(purchases[idx] || 0);
+                const diff = s - p;
+                return {
+                    x: cat,
+                    y: diff,
+                    fillColor: diff >= 0 ? '#0082aa' : '#bf2c78'
+                };
+            });
+            if (seriesData.length === 0) {
+                seriesData = [{ x: 'Current Period', y: {{ $kpis['gross_profit'] }}, fillColor: '{{ $kpis['gross_profit'] >= 0 ? '#0da87a' : '#bf2c78' }}' }];
+            }
+        } else {
+            const totalSales = {{ $kpis['total_sales'] }};
+            const totalPurchases = {{ $kpis['total_purchases'] }};
+            const grossProfit = {{ $kpis['gross_profit'] }};
+
+            seriesData = [
+                { x: 'Gross Sales', y: totalSales, fillColor: '#0082aa' },
+                { x: 'Procurement Cost', y: -totalPurchases, fillColor: '#bf2c78' },
+                { x: 'Net Trading Profit', y: grossProfit, fillColor: grossProfit >= 0 ? '#0da87a' : '#dc2626' }
+            ];
+        }
 
         const waterfallOptions = {
             chart: {
                 type: 'bar',
-                height: 300,
+                height: 310,
                 fontFamily: sharedFontFamily,
-                toolbar: { show: false }
+                toolbar: { show: false },
+                animations: {
+                    enabled: true,
+                    easing: 'easeinout',
+                    speed: 400
+                }
             },
             series: [{
-                name: 'Financial Flow',
-                data: [
-                    { x: 'Gross Sales', y: totalSales, fillColor: '#0082aa' },
-                    { x: 'Procurement Cost', y: -totalPurchases, fillColor: '#bf2c78' },
-                    { x: 'Net Trading Profit', y: grossProfit, fillColor: '#0da87a' }
-                ]
+                name: mode === 'monthly' ? 'Monthly Budget Variance' : 'Financial Flow',
+                data: seriesData
             }],
             plotOptions: {
                 bar: {
                     horizontal: false,
                     borderRadius: 4,
-                    columnWidth: '45%'
+                    columnWidth: mode === 'monthly' ? '50%' : '42%',
+                    dataLabels: {
+                        position: 'top'
+                    }
+                }
+            },
+            dataLabels: {
+                enabled: true,
+                formatter: function (val) {
+                    return formatMoneyCompact(val, true);
+                },
+                offsetY: -8,
+                style: {
+                    fontSize: '11px',
+                    fontFamily: sharedFontFamily,
+                    fontWeight: '700',
+                    colors: ['#0f1e36']
+                },
+                background: {
+                    enabled: true,
+                    foreColor: '#0f1e36',
+                    padding: 5,
+                    borderRadius: 5,
+                    borderWidth: 1,
+                    borderColor: '#cbd5e1',
+                    opacity: 0.96,
+                    dropShadow: { enabled: false }
                 }
             },
             xaxis: {
-                labels: { style: { fontSize: '10px', fontWeight: 600 } }
+                labels: {
+                    style: {
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        colors: '#475569',
+                        fontFamily: sharedFontFamily
+                    }
+                },
+                axisBorder: { show: true, color: '#e2e8f0' },
+                axisTicks: { show: true, color: '#e2e8f0' }
             },
             yaxis: {
                 labels: {
                     formatter: function (val) {
-                        return '$' + (Math.abs(val) >= 1000 ? (val / 1000).toFixed(0) + 'K' : val);
+                        return formatAxisMoney(val);
                     },
-                    style: { fontSize: '10px' }
+                    style: {
+                        fontSize: '10px',
+                        colors: '#64748b',
+                        fontFamily: sharedFontFamily
+                    }
                 }
             },
-            grid: { borderColor: '#f1f5f9' },
+            grid: {
+                borderColor: '#f1f5f9',
+                strokeDashArray: 3
+            },
             tooltip: {
+                theme: 'light',
                 y: {
                     formatter: function (val) {
-                        return '$' + Number(val).toLocaleString();
+                        const isNeg = Number(val) < 0;
+                        const absVal = Math.abs(Number(val));
+                        const formatted = Number(absVal).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                        return (isNeg ? '(-$' : '$') + formatted + (isNeg ? ')' : '');
                     }
                 }
             },
             responsive: [
                 {
-                    breakpoint: 640,
+                    breakpoint: 768,
+                    options: {
+                        chart: { height: 270 },
+                        plotOptions: { bar: { columnWidth: '55%' } },
+                        dataLabels: {
+                            offsetY: -6,
+                            style: { fontSize: '10px' }
+                        },
+                        xaxis: {
+                            labels: {
+                                rotate: -15,
+                                style: { fontSize: '10px' }
+                            }
+                        }
+                    }
+                },
+                {
+                    breakpoint: 480,
                     options: {
                         chart: { height: 250 },
-                        plotOptions: { bar: { columnWidth: '60%' } },
-                        xaxis: { labels: { rotate: -20, style: { fontSize: '9px' } } }
+                        plotOptions: { bar: { columnWidth: '65%' } },
+                        dataLabels: {
+                            offsetY: -4,
+                            style: { fontSize: '9px' }
+                        },
+                        xaxis: {
+                            labels: {
+                                rotate: -25,
+                                style: { fontSize: '9px' }
+                            }
+                        }
                     }
                 }
             ]
         };
-        const waterfallChart = new ApexCharts(waterfallEl, waterfallOptions);
-        waterfallChart.render();
+
+        window.waterfallChartInstance = new ApexCharts(waterfallEl, waterfallOptions);
+        window.waterfallChartInstance.render();
+    };
+
+    // Render immediately on load
+    if (document.querySelector('#v2FinancialWaterfallChart')) {
+        window.renderWaterfallChart('flow');
     }
 
 });
