@@ -141,10 +141,10 @@
         <!-- ROW 1 (6 Cards: Purple, Blue, Teal Cyan, Mint Green, Magenta Rose, Deep Violet) -->
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
             
-            <!-- CARD 1: Purple (#5a30b5) -> Total contracts / users -->
+            <!-- CARD 1: Purple (#5a30b5) -> Total Contracts -->
             <div class="bg-[#5a30b5] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
                 <div class="text-xs text-white/80 font-medium">
-                    Total contracts
+                    Total Contracts
                 </div>
                 <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate">
                     {{ number_format($kpis['total_contracts']) }}
@@ -154,10 +154,10 @@
                 </div>
             </div>
 
-            <!-- CARD 2: Deep Ocean Blue (#00509d) -> Active deals / sessions -->
+            <!-- CARD 2: Deep Ocean Blue (#00509d) -> Active Deals -->
             <div class="bg-[#00509d] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
                 <div class="text-xs text-white/80 font-medium">
-                    Active deals
+                    Active Deals
                 </div>
                 <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate">
                     {{ number_format($kpis['active_deals']) }}
@@ -167,77 +167,77 @@
                 </div>
             </div>
 
-            <!-- CARD 3: Cerulean Cyan (#0082aa) -> Gross Sales / Engagement -->
+            <!-- CARD 3: Cerulean Cyan (#0082aa) -> Gross Sales Revenue -->
             <div class="bg-[#0082aa] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
                 <div class="text-xs text-white/80 font-medium">
-                    Gross sales
+                    Gross Sales Revenue
                 </div>
                 <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate" title="${{ number_format($kpis['total_sales'], 2) }}">
                     ${{ number_format($kpis['total_sales'] / 1000, 1) }}K
                 </div>
                 <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
-                    <span>Invoiced volume</span>
+                    <span>Invoiced sales</span>
                 </div>
             </div>
 
-            <!-- CARD 4: Mint Jade Green (#0da87a) -> Purchases / Purchase rate -->
+            <!-- CARD 4: Mint Jade Green (#0da87a) -> Procurement Cost -->
             @if($canViewFinancials)
             <div class="bg-[#0da87a] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
                 <div class="text-xs text-white/80 font-medium">
-                    Procurement
+                    Procurement Cost
                 </div>
                 <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate" title="${{ number_format($kpis['total_purchases'], 2) }}">
                     ${{ number_format($kpis['total_purchases'] / 1000, 1) }}K
                 </div>
                 <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
-                    <span>Goods purchased</span>
+                    <span>Purchase contracts</span>
                 </div>
             </div>
             @else
             <div class="bg-white/80 text-slate-500 p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] border border-dashed border-slate-300">
-                <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Procurement</div>
+                <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Procurement Cost</div>
                 <div class="text-lg font-bold text-slate-400">Restricted</div>
                 <div class="text-[10px] text-slate-400">Finance role needed</div>
             </div>
             @endif
 
-            <!-- CARD 5: Berry Rose Magenta (#bf2c78) -> Gross Profit / Purchases count -->
+            <!-- CARD 5: Berry Rose Magenta (#bf2c78) -> Net Trading Margin -->
             @if($canViewProfit)
             <div class="bg-[#bf2c78] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
                 <div class="text-xs text-white/80 font-medium">
-                    Gross profit
+                    Trading Profit
                 </div>
                 <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate" title="${{ number_format($kpis['gross_profit'], 2) }}">
                     ${{ number_format($kpis['gross_profit'] / 1000, 1) }}K
                 </div>
                 <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
-                    <span>Trading margin</span>
+                    <span>Net trading margin</span>
                 </div>
             </div>
             @else
             <div class="bg-white/80 text-slate-500 p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] border border-dashed border-slate-300">
-                <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Gross profit</div>
+                <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Trading Profit</div>
                 <div class="text-lg font-bold text-slate-400">Restricted</div>
                 <div class="text-[10px] text-slate-400">Admin role needed</div>
             </div>
             @endif
 
-            <!-- CARD 6: Violet Purple (#732eb0) -> Profit Margin / Revenue -->
+            <!-- CARD 6: Violet Purple (#732eb0) -> Gross Margin Rate -->
             @if($canViewProfit)
             <div class="bg-[#732eb0] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
                 <div class="text-xs text-white/80 font-medium">
-                    Profit margin
+                    Gross Margin Rate
                 </div>
                 <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate">
                     {{ number_format($kpis['profit_margin_pct'], 1) }}%
                 </div>
                 <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
-                    <span>Net realization</span>
+                    <span>Realized margin %</span>
                 </div>
             </div>
             @else
             <div class="bg-white/80 text-slate-500 p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] border border-dashed border-slate-300">
-                <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Profit margin</div>
+                <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Gross Margin Rate</div>
                 <div class="text-lg font-bold text-slate-400">Restricted</div>
                 <div class="text-[10px] text-slate-400">Admin role needed</div>
             </div>
@@ -248,36 +248,36 @@
         <!-- ROW 2 (6 Cards: Symmetrical color pairs from Image 1) -->
         <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
 
-            <!-- CARD 7: Purple (#5a30b5) -> Impressions / Volume MT -->
+            <!-- CARD 7: Purple (#5a30b5) -> Physical Tonnage Traded -->
             <div class="bg-[#5a30b5] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
                 <div class="text-xs text-white/80 font-medium">
-                    Total volume
+                    Physical Tonnage
                 </div>
                 <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate">
                     {{ number_format($kpis['total_tonnage']) }} <span class="text-sm font-normal text-white/80">MT</span>
                 </div>
                 <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
-                    <span>Traded weight</span>
+                    <span>Traded volume</span>
                 </div>
             </div>
 
-            <!-- CARD 8: Deep Ocean Blue (#00509d) -> In-Transit / Clicks -->
+            <!-- CARD 8: Deep Ocean Blue (#00509d) -> In-Transit Shipments -->
             <div class="bg-[#00509d] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
                 <div class="text-xs text-white/80 font-medium">
-                    In-transit
+                    In-Transit Shipments
                 </div>
                 <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate">
                     {{ number_format($kpis['in_transit_count']) }}
                 </div>
                 <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
-                    <span>Active shipments</span>
+                    <span>Active logistics</span>
                 </div>
             </div>
 
-            <!-- CARD 9: Cerulean Cyan (#0082aa) -> Fulfillment Rate / CTR -->
+            <!-- CARD 9: Cerulean Cyan (#0082aa) -> Order Fulfillment Rate -->
             <div class="bg-[#0082aa] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
                 <div class="text-xs text-white/80 font-medium">
-                    Fulfillment rate
+                    Order Fulfillment
                 </div>
                 <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate">
                     {{ number_format($kpis['fulfillment_rate_pct'], 1) }}%
@@ -287,50 +287,50 @@
                 </div>
             </div>
 
-            <!-- CARD 10: Mint Jade Green (#0da87a) -> Avg Contract / CPM -->
+            <!-- CARD 10: Mint Jade Green (#0da87a) -> Average Order Value -->
             <div class="bg-[#0da87a] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
                 <div class="text-xs text-white/80 font-medium">
-                    Avg contract
+                    Average Order Value
                 </div>
                 <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate" title="${{ number_format($kpis['avg_contract_value'], 2) }}">
                     ${{ number_format($kpis['avg_contract_value'] / 1000, 1) }}K
                 </div>
                 <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
-                    <span>Ticket average</span>
+                    <span>Revenue per contract</span>
                 </div>
             </div>
 
-            <!-- CARD 11: Berry Rose Magenta (#bf2c78) -> Trading Yield / CPC -->
+            <!-- CARD 11: Berry Rose Magenta (#bf2c78) -> Capital Return (ROAS) -->
             @if($canViewProfit)
             <div class="bg-[#bf2c78] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
                 <div class="text-xs text-white/80 font-medium">
-                    Trading multiplier
+                    Capital Return (ROAS)
                 </div>
                 <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate">
                     {{ number_format($kpis['roas_ratio'], 1) }}%
                 </div>
                 <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
-                    <span>Sales / Purchases</span>
+                    <span>Sales / Procurement</span>
                 </div>
             </div>
             @else
             <div class="bg-white/80 text-slate-500 p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] border border-dashed border-slate-300">
-                <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Trading multiplier</div>
+                <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Capital Return (ROAS)</div>
                 <div class="text-lg font-bold text-slate-400">Restricted</div>
                 <div class="text-[10px] text-slate-400">Admin role needed</div>
             </div>
             @endif
 
-            <!-- CARD 12: Violet Purple (#732eb0) -> Active Entities / ROAS -->
+            <!-- CARD 12: Violet Purple (#732eb0) -> Operating Trading Entities -->
             <div class="bg-[#732eb0] text-white p-4 rounded-2xl shadow-xs flex flex-col justify-between min-h-[105px] overflow-hidden">
                 <div class="text-xs text-white/80 font-medium">
-                    Entities
+                    Trading Entities
                 </div>
                 <div class="text-3xl font-extrabold tracking-tight text-white my-0.5 truncate">
                     {{ count($availableCompanies) }}
                 </div>
                 <div class="text-[11px] text-white/70 flex items-center gap-1 truncate">
-                    <span>Operating units</span>
+                    <span>Reporting companies</span>
                 </div>
             </div>
 
@@ -349,78 +349,78 @@
                 <!-- ROW 1: Donut (4) + Stacked Bar (5) + Clustered/Radial (3) -->
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
 
-                    <!-- DONUT: Traffic / Trading by Channel (Matching Image 1 Donut style) -->
+                    <!-- DONUT: Sales Revenue by Company (Matching Image 1 Donut style) -->
                     <div class="lg:col-span-4 bg-white rounded-2xl p-5 border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col justify-between min-w-0">
                         <div>
                             <div class="flex items-center justify-between">
                                 <h3 class="text-base font-bold text-[#0f1e36] tracking-tight">
-                                    Traffic by channel
+                                    Sales Revenue by Company
                                 </h3>
                                 <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
-                                    Volume %
+                                    Market Share
                                 </span>
                             </div>
-                            <p class="text-xs text-slate-400 mt-0.5">Share by company and channel</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Revenue distribution across operating trading entities</p>
                         </div>
                         <div class="my-2 flex items-center justify-center min-w-0 overflow-hidden">
                             <div id="v2CompanyDonutChart" class="w-full h-64"></div>
                         </div>
                         <div class="text-[11px] text-slate-400 border-t border-slate-100 pt-2 flex items-center justify-between">
-                            <span>Entities breakdown</span>
-                            <span class="font-semibold text-slate-700">{{ count($donut['labels']) }} reporting</span>
+                            <span>Reporting Entities</span>
+                            <span class="font-semibold text-slate-700">{{ count($donut['labels']) }} companies reporting</span>
                         </div>
                     </div>
 
-                    <!-- STACKED BAR: Weekly ad spend / Purchases vs Sales (Matching Image 1 Stacked Columns) -->
+                    <!-- STACKED BAR: Sales vs Procurement Timeline (Matching Image 1 Stacked Columns) -->
                     <div class="lg:col-span-5 bg-white rounded-2xl p-5 border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col justify-between min-w-0">
                         <div>
                             <div class="flex items-center justify-between flex-wrap gap-2">
                                 <h3 class="text-base font-bold text-[#0f1e36] tracking-tight">
-                                    Weekly ad spend
+                                    Sales vs Procurement Timeline
                                 </h3>
                                 <div class="flex items-center gap-3 text-xs font-medium">
                                     <span class="inline-flex items-center gap-1.5 text-slate-600">
-                                        <span class="w-2.5 h-2.5 rounded-full bg-[#0082aa]"></span> Sales
+                                        <span class="w-2.5 h-2.5 rounded-full bg-[#0082aa]"></span> Sales Revenue
                                     </span>
                                     <span class="inline-flex items-center gap-1.5 text-slate-600">
-                                        <span class="w-2.5 h-2.5 rounded-full bg-[#5a30b5]"></span> Purchases
+                                        <span class="w-2.5 h-2.5 rounded-full bg-[#5a30b5]"></span> Procurement Cost
                                     </span>
                                 </div>
                             </div>
-                            <p class="text-xs text-slate-400 mt-0.5">Purchases vs Sales across calendar weeks</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Monthly commercial sales revenue vs procurement cost over time</p>
                         </div>
                         <div class="my-2 min-w-0 overflow-hidden">
                             <div id="v2StackedTimelineChart" class="w-full h-64"></div>
                         </div>
                         <div class="text-[11px] text-slate-400 border-t border-slate-100 pt-2 flex items-center justify-between">
-                            <span>Weekly aggregation</span>
+                            <span>Periodic Financial Flow</span>
                             <span class="text-emerald-600 font-semibold">Active Timeline</span>
                         </div>
                     </div>
 
-                    <!-- POWER BI SEMI-CIRCLE RADIAL GAUGE (Flight Expense Target Fulfillment) -->
+                    <!-- POWER BI SEMI-CIRCLE RADIAL GAUGE (Annual Sales Target Fulfillment) -->
                     <div class="lg:col-span-3 bg-white rounded-2xl p-5 border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col justify-between min-w-0">
                         <div>
                             <div class="flex items-center justify-between">
                                 <h3 class="text-base font-bold text-[#0f1e36] tracking-tight">
-                                    Target fulfillment
+                                    Sales Target Fulfillment
                                 </h3>
                                 <span class="text-xs font-bold text-teal-700 bg-teal-50 px-2.5 py-0.5 rounded-full">
                                     {{ $gauge['percentage'] }}%
                                 </span>
                             </div>
-                            <p class="text-xs text-slate-400 mt-0.5">Actual sales vs benchmark</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Cumulative sales revenue vs target benchmark</p>
                         </div>
                         <div class="my-1 flex items-center justify-center min-w-0 overflow-hidden">
                             <div id="v2RadialGaugeChart" class="w-full h-52"></div>
                         </div>
                         <div class="border-t border-slate-100 pt-2 space-y-1">
                             <div class="flex justify-between text-xs">
-                                <span class="text-slate-500">Current Sales:</span>
+                                <span class="text-slate-500">Realized Sales:</span>
                                 <span class="font-bold text-slate-800">${{ number_format($gauge['current'], 0) }}</span>
                             </div>
                             <div class="flex justify-between text-xs">
-                                <span class="text-slate-500">Target Goal:</span>
+                                <span class="text-slate-500">Annual Target:</span>
                                 <span class="font-bold text-slate-800">${{ number_format($gauge['target'], 0) }}</span>
                             </div>
                         </div>
@@ -431,47 +431,47 @@
                 <!-- ROW 2: Power BI Horizontal Bar (Top Partners) + Contract Scatter/Risk Matrix -->
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
 
-                    <!-- HORIZONTAL GROUPED BAR: Top Trading Partners (Average Cost Per Mile style) -->
+                    <!-- HORIZONTAL GROUPED BAR: Top Commercial Counterparties (Key Buyers) -->
                     <div class="lg:col-span-6 bg-white rounded-2xl p-5 border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col justify-between min-w-0">
                         <div>
                             <div class="flex items-center justify-between">
                                 <h3 class="text-base font-bold text-[#0f1e36] tracking-tight">
-                                    Top Trading Partners (Buyers & Suppliers)
+                                    Top Commercial Counterparties (Key Buyers)
                                 </h3>
                                 <span class="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
-                                    By Volume
+                                    By Sales Volume
                                 </span>
                             </div>
-                            <p class="text-xs text-slate-400 mt-0.5">Key counterparties driving transactions</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Highest-volume purchasing clients & corporate trading counterparties</p>
                         </div>
                         <div class="my-2 min-w-0 overflow-hidden">
                             <div id="v2HorizontalPartnersChart" class="w-full h-64"></div>
                         </div>
                         <div class="text-[11px] text-slate-400 border-t border-slate-100 pt-2 flex items-center justify-between">
-                            <span>Counterparty exposure</span>
-                            <span class="font-semibold text-indigo-600">Top 5 Entities</span>
+                            <span>Counterparty Exposure</span>
+                            <span class="font-semibold text-indigo-600">Top 5 Buyers</span>
                         </div>
                     </div>
 
-                    <!-- BUBBLE / SCATTER PLOT: Contract Execution & Risk (Rush Booking style) -->
+                    <!-- BUBBLE / SCATTER PLOT: Contract Maturity & Value Exposure Matrix -->
                     <div class="lg:col-span-6 bg-white rounded-2xl p-5 border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col justify-between min-w-0">
                         <div>
                             <div class="flex items-center justify-between">
                                 <h3 class="text-base font-bold text-[#0f1e36] tracking-tight">
-                                    Rush Booking, Contract Risk Matrix
+                                    Contract Maturity & Value Exposure Matrix
                                 </h3>
                                 <span class="text-xs px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 font-semibold">
-                                    3D Scatter
+                                    Maturity Risk
                                 </span>
                             </div>
-                            <p class="text-xs text-slate-400 mt-0.5">X: Days Remaining | Y: Contract Value | Size: Margin Rate</p>
+                            <p class="text-xs text-slate-400 mt-0.5">X: Days to Due Date | Y: Contract Value ($) | Size: Margin Rate (%)</p>
                         </div>
                         <div class="my-2 min-w-0 overflow-hidden">
                             <div id="v2ContractRiskBubbleChart" class="w-full h-64"></div>
                         </div>
                         <div class="text-[11px] text-slate-400 border-t border-slate-100 pt-2 flex items-center justify-between">
                             <span>Delivery urgency & exposure</span>
-                            <span class="font-medium text-slate-700">Hover for order details</span>
+                            <span class="font-medium text-slate-700">Hover for contract details</span>
                         </div>
                     </div>
 
@@ -480,17 +480,17 @@
                 <!-- ROW 3: HEATMAP MATRICES (Exact In-Cell Pastel Tints matching Image 1) -->
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
 
-                    <!-- TABLE 1: Session source (Company Performance Matrix) -->
+                    <!-- TABLE 1: Operating Entity Trading Matrix -->
                     <div class="lg:col-span-7 bg-white rounded-2xl p-5 border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] min-w-0">
                         <div class="flex items-center justify-between mb-4">
                             <div>
                                 <h3 class="text-base font-bold text-[#0f1e36] tracking-tight">
-                                    Session source
+                                    Operating Entity Trading Matrix
                                 </h3>
-                                <p class="text-xs text-slate-400 mt-0.5">Company performance breakdown with in-cell heatbars</p>
+                                <p class="text-xs text-slate-400 mt-0.5">Multi-company contract execution, procurement, sales and margin breakdown</p>
                             </div>
                             <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-50 text-blue-700">
-                                In-cell Matrix
+                                Entity Matrix
                             </span>
                         </div>
 
@@ -499,15 +499,15 @@
                             <table class="w-full text-left text-xs min-w-[580px] border-collapse">
                                 <thead>
                                     <tr class="border-b border-slate-200 text-slate-600 font-semibold text-[11px]">
-                                        <th class="py-2.5 px-3">Session source</th>
-                                        <th class="py-2.5 px-3 text-center">Total users</th>
-                                        <th class="py-2.5 px-3 text-center">Sessions</th>
-                                        <th class="py-2.5 px-3 text-center">Engaged</th>
+                                        <th class="py-2.5 px-3">Operating Company</th>
+                                        <th class="py-2.5 px-3 text-center">Contracts</th>
+                                        <th class="py-2.5 px-3 text-center">Sales ($)</th>
+                                        <th class="py-2.5 px-3 text-center">Procurement ($)</th>
                                         @if($canViewFinancials)
-                                        <th class="py-2.5 px-3 text-center">Purchases</th>
-                                        <th class="py-2.5 px-3 text-center">Purchase rate</th>
+                                        <th class="py-2.5 px-3 text-center">Gross Margin ($)</th>
+                                        <th class="py-2.5 px-3 text-center">Margin %</th>
                                         @endif
-                                        <th class="py-2.5 px-3 w-28 text-center">Share</th>
+                                        <th class="py-2.5 px-3 w-28 text-center">Volume Share</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-100 font-medium">
@@ -515,7 +515,7 @@
                                     <tr class="hover:bg-slate-50/80 transition-colors">
                                         <!-- Column 1: Expand icon [+] and Name -->
                                         <td class="py-3 px-3 text-[#0f1e36] font-semibold whitespace-nowrap">
-                                            <div class="flex items-center gap-2">
+                                             <div class="flex items-center gap-2">
                                                 <span class="w-4 h-4 rounded border border-slate-300 text-slate-500 inline-flex items-center justify-center text-[10px] font-bold shrink-0">⊞</span>
                                                 <span class="truncate">{{ $cm['name'] }}</span>
                                             </div>
@@ -562,17 +562,17 @@
                         </div>
                     </div>
 
-                    <!-- TABLE 2: Ad source (Pipeline Stage Matrix with Image 1's pastel columns) -->
+                    <!-- TABLE 2: Contract Workflow Pipeline by Stage -->
                     <div class="lg:col-span-5 bg-white rounded-2xl p-5 border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] min-w-0">
                         <div class="flex items-center justify-between mb-4">
                             <div>
                                 <h3 class="text-base font-bold text-[#0f1e36] tracking-tight">
-                                    Ad source
+                                    Contract Workflow Pipeline by Stage
                                 </h3>
-                                <p class="text-xs text-slate-400 mt-0.5">Pipeline stage status & execution distribution</p>
+                                <p class="text-xs text-slate-400 mt-0.5">Order progression across execution stages: Draft, Purchase, Sales, Logistics & Completion</p>
                             </div>
                             <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-purple-50 text-purple-700">
-                                Stages
+                                Workflow Stages
                             </span>
                         </div>
 
@@ -580,10 +580,10 @@
                             <table class="w-full text-left text-xs min-w-[360px] border-collapse">
                                 <thead>
                                     <tr class="border-b border-slate-200 text-slate-600 font-semibold text-[11px]">
-                                        <th class="py-2.5 px-3">Ad source</th>
-                                        <th class="py-2.5 px-3 text-center">Ad spend</th>
-                                        <th class="py-2.5 px-3 text-center">Impressions</th>
-                                        <th class="py-2.5 px-3 text-center">Share</th>
+                                        <th class="py-2.5 px-3">Workflow Stage</th>
+                                        <th class="py-2.5 px-3 text-center">Contracts</th>
+                                        <th class="py-2.5 px-3 text-center">Stage Value ($)</th>
+                                        <th class="py-2.5 px-3 text-center">Pipeline %</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-100 font-medium">
@@ -629,9 +629,9 @@
                     <div class="flex items-center justify-between mb-4">
                         <div>
                             <h3 class="text-base sm:text-lg font-bold text-[#0f1e36] tracking-tight">
-                                Weekly CPC (Unit Rate & Pricing Dynamics over Time)
+                                Commodity Unit Pricing Dynamics ($/MT)
                             </h3>
-                            <p class="text-xs text-slate-400 mt-1">Average sale rate vs procurement rate per MT across calendar intervals</p>
+                            <p class="text-xs text-slate-400 mt-1">Average Sale Price vs Procurement Cost per Metric Ton (MT) across calendar periods</p>
                         </div>
                     </div>
                     <div id="v2PricingDynamicsChart" class="w-full h-72 sm:h-80"></div>
@@ -690,9 +690,9 @@
                         <div class="flex items-center justify-between mb-3 sm:mb-4 flex-wrap gap-2">
                             <div>
                                 <h3 class="text-base sm:text-lg font-bold text-[#0f1e36] tracking-tight">
-                                    Budget Remaining, Trading Financial Waterfall
+                                    Trading Margin & Realization Waterfall
                                 </h3>
-                                <p class="text-xs text-slate-400 mt-0.5">Capital flow through procurement to net realized profit</p>
+                                <p class="text-xs text-slate-400 mt-0.5">Stepwise capital realization: Gross Sales Revenue &rarr; Procurement Cost &rarr; Net Trading Margin</p>
                             </div>
 
                             <!-- Interactive Mode Switcher & Visual Badges -->
@@ -702,13 +702,13 @@
                                             @click="switchWaterfall('flow')" 
                                             :class="waterfallView === 'flow' ? 'bg-white text-[#0f1e36] shadow-xs font-bold' : 'text-slate-500 hover:text-slate-900 font-medium'"
                                             class="px-2.5 py-1 text-[11px] rounded-md transition-all">
-                                        Waterfall Flow
+                                        Margin Realization
                                     </button>
                                     <button type="button" 
                                             @click="switchWaterfall('monthly')" 
                                             :class="waterfallView === 'monthly' ? 'bg-white text-[#0f1e36] shadow-xs font-bold' : 'text-slate-500 hover:text-slate-900 font-medium'"
                                             class="px-2.5 py-1 text-[11px] rounded-md transition-all">
-                                        Monthly Budget
+                                        Monthly Variance
                                     </button>
                                 </div>
                                 <span class="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/60 hidden sm:inline-flex">
@@ -737,7 +737,7 @@
                         <!-- Card 1: Net Trading Margin / Variance to Budget (Matching Power BI Image 2 style) -->
                         <div class="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/80 shadow-[0_2px_10px_rgba(0,0,0,0.02)] flex flex-col justify-between min-w-0">
                             <div class="flex items-center justify-between gap-1">
-                                <span class="text-[11px] text-slate-400 font-bold uppercase tracking-wider truncate">Variance to Budget</span>
+                                <span class="text-[11px] text-slate-400 font-bold uppercase tracking-wider truncate">Realized Trading Margin</span>
                                 <span class="material-icons-outlined text-sm {{ $kpis['gross_profit'] >= 0 ? 'text-emerald-500' : 'text-red-500' }} shrink-0">
                                     {{ $kpis['gross_profit'] >= 0 ? 'trending_up' : 'trending_down' }}
                                 </span>
@@ -856,10 +856,10 @@
                     </button>
                 </div>
 
-                <!-- SLICER 1: Report date with Range Track (Matching Image 1) -->
+                <!-- SLICER 1: Contract Date Range with Range Track (Matching Image 1) -->
                 <div class="space-y-2">
                     <label class="text-xs font-bold text-slate-700 flex items-center justify-between">
-                        <span>Report date</span>
+                        <span>Contract Date Range</span>
                         <span class="material-icons-outlined text-xs text-slate-400">calendar_today</span>
                     </label>
                     <div class="grid grid-cols-2 gap-2">
@@ -882,10 +882,10 @@
                     </div>
                 </div>
 
-                <!-- SLICER 2: Ad source (Company Slicer) -->
+                <!-- SLICER 2: Operating Company -->
                 <div class="space-y-1.5">
                     <label class="text-xs font-bold text-slate-700 flex items-center justify-between">
-                        <span>Ad source (Company)</span>
+                        <span>Operating Company</span>
                         <span class="material-icons-outlined text-xs text-slate-400">apartment</span>
                     </label>
                     <select x-model="filterCompany" 
@@ -899,10 +899,10 @@
                     </select>
                 </div>
 
-                <!-- SLICER 3: Ad campaign (Pipeline Stage Slicer) -->
+                <!-- SLICER 3: Workflow Stage -->
                 <div class="space-y-1.5">
                     <label class="text-xs font-bold text-slate-700 flex items-center justify-between">
-                        <span>Ad campaign (Stage)</span>
+                        <span>Workflow Stage</span>
                         <span class="material-icons-outlined text-xs text-slate-400">alt_route</span>
                     </label>
                     <select x-model="filterStage" 
@@ -916,10 +916,10 @@
                     </select>
                 </div>
 
-                <!-- SLICER 4: Session source (Currency Slicer) -->
+                <!-- SLICER 4: Trading Currency -->
                 <div class="space-y-1.5">
                     <label class="text-xs font-bold text-slate-700 flex items-center justify-between">
-                        <span>Session source (Currency)</span>
+                        <span>Trading Currency</span>
                         <span class="material-icons-outlined text-xs text-slate-400">monetization_on</span>
                     </label>
                     <select x-model="filterCurrency" 
@@ -978,9 +978,9 @@
 
     </div>
 
-    <!-- BOTTOM DEEP PURPLE ACCENT BANNER (Exact Banner from Image 1: "Connect 70+ data sources with Coupler.io") -->
+    <!-- BOTTOM DEEP PURPLE ACCENT BANNER -->
     <div class="bg-[#241352] text-white py-3 px-6 rounded-2xl flex items-center justify-center text-xs font-semibold tracking-wide shadow-md">
-        <span>Connect 70+ data sources with MetaERP Enterprise Analytics</span>
+        <span>MetaERP Enterprise Trading & Logistics Intelligence Platform</span>
     </div>
 
     <!-- MOBILE / TABLET OFF-CANVAS SLICER DRAWER -->
@@ -1007,7 +1007,7 @@
 
                 <!-- Date Range -->
                 <div class="space-y-1.5">
-                    <label class="text-xs font-bold text-slate-700">Report date</label>
+                    <label class="text-xs font-bold text-slate-700">Contract Date Range</label>
                     <div class="grid grid-cols-2 gap-2">
                         <div>
                             <span class="text-[10px] text-slate-400 block mb-0.5">Start</span>
@@ -1024,7 +1024,7 @@
 
                 <!-- Company -->
                 <div class="space-y-1.5">
-                    <label class="text-xs font-bold text-slate-700">Company (Ad source)</label>
+                    <label class="text-xs font-bold text-slate-700">Operating Company</label>
                     <select x-model="filterCompany" 
                             class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 text-slate-800">
                         <option value="all">All</option>
@@ -1038,7 +1038,7 @@
 
                 <!-- Stage -->
                 <div class="space-y-1.5">
-                    <label class="text-xs font-bold text-slate-700">Pipeline Stage (Ad campaign)</label>
+                    <label class="text-xs font-bold text-slate-700">Workflow Stage</label>
                     <select x-model="filterStage" 
                             class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 text-slate-800">
                         <option value="all">All</option>
@@ -1052,7 +1052,7 @@
 
                 <!-- Currency -->
                 <div class="space-y-1.5">
-                    <label class="text-xs font-bold text-slate-700">Currency (Session source)</label>
+                    <label class="text-xs font-bold text-slate-700">Trading Currency</label>
                     <select x-model="filterCurrency" 
                             class="w-full text-xs rounded-xl border border-slate-200 px-3 py-2 text-slate-800">
                         <option value="all">All</option>
@@ -1089,7 +1089,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
     const sharedFontFamily = 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
 
-    // 1. DONUT CHART (Traffic by channel - Colors matching Image 1)
+    // 1. DONUT CHART (Sales Revenue by Company - Colors matching Image 1)
     const donutLabels = @json($donut['labels']);
     const donutSeries = @json($donut['series']);
     // Image 1 Donut Palette: Mint Jade Green, Cerulean Cyan, Ocean Blue, Violet Purple, Magenta Rose, Amber
@@ -1171,7 +1171,7 @@ document.addEventListener('DOMContentLoaded', function () {
         donutChart.render();
     }
 
-    // 2. STACKED TIMELINE BAR CHART (Weekly ad spend - Colors matching Image 1)
+    // 2. STACKED TIMELINE BAR CHART (Sales vs Procurement Timeline)
     const stackedCategories = @json($stacked['categories']);
     const stackedSales = @json($stacked['sales']);
     const stackedPurchases = @json($stacked['purchases']);
@@ -1187,8 +1187,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 toolbar: { show: false }
             },
             series: [
-                { name: 'Sales ($)', data: stackedSales },
-                { name: 'Purchases ($)', data: stackedPurchases }
+                { name: 'Sales Revenue ($)', data: stackedSales },
+                { name: 'Procurement Cost ($)', data: stackedPurchases }
             ],
             // Cyan & Purple matching stacked columns in Image 1
             colors: ['#0082aa', '#5a30b5'],
@@ -1236,7 +1236,7 @@ document.addEventListener('DOMContentLoaded', function () {
         stackedChart.render();
     }
 
-    // 3. POWER BI SEMI-CIRCLE RADIAL GAUGE (Target fulfillment - Cyan arc matching Image 2)
+    // 3. POWER BI SEMI-CIRCLE RADIAL GAUGE (Annual Sales Target Fulfillment)
     const gaugeEl = document.querySelector('#v2RadialGaugeChart');
     if (gaugeEl) {
         const gaugePct = {{ $gauge['percentage'] }};
@@ -1280,7 +1280,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             },
             stroke: { lineCap: 'round' },
-            labels: ['Goal Reached'],
+            labels: ['Target Achieved'],
             responsive: [
                 {
                     breakpoint: 480,
@@ -1294,7 +1294,7 @@ document.addEventListener('DOMContentLoaded', function () {
         gaugeChart.render();
     }
 
-    // 4. POWER BI HORIZONTAL GROUPED BAR (Average Cost Per Mile style - Magenta & Cyan from Image 2)
+    // 4. POWER BI HORIZONTAL GROUPED BAR (Top Commercial Counterparties)
     const partnersEl = document.querySelector('#v2HorizontalPartnersChart');
     if (partnersEl) {
         const topBuyers = @json($horizontalPartners['buyers']);
@@ -1308,7 +1308,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 fontFamily: sharedFontFamily,
                 toolbar: { show: false }
             },
-            series: [{ name: 'Volume ($)', data: buyerValues.length > 0 ? buyerValues : [0] }],
+            series: [{ name: 'Sales Value ($)', data: buyerValues.length > 0 ? buyerValues : [0] }],
             colors: ['#0082aa'],
             plotOptions: {
                 bar: {
@@ -1350,7 +1350,7 @@ document.addEventListener('DOMContentLoaded', function () {
         partnerChart.render();
     }
 
-    // 5. POWER BI CONTRACT RISK 3D BUBBLE / SCATTER PLOT (Matching Image 2 Rush Booking)
+    // 5. POWER BI CONTRACT RISK 3D BUBBLE / SCATTER PLOT (Contract Maturity & Exposure Matrix)
     const bubbleEl = document.querySelector('#v2ContractRiskBubbleChart');
     if (bubbleEl) {
         const contractPoints = @json($contractPoints);
@@ -1368,18 +1368,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 toolbar: { show: false }
             },
             series: [
-                { name: 'Active Orders', data: bubbleData }
+                { name: 'Contract Exposure', data: bubbleData }
             ],
-            // Violet from Image 2 Rush booking
+            // Violet color theme for contract exposure
             colors: ['#732eb0'],
             dataLabels: { enabled: false },
             fill: { opacity: 0.8 },
             xaxis: {
-                title: { text: 'Days Remaining', style: { fontSize: '10px', color: '#64748b' } },
+                title: { text: 'Days to Due Date', style: { fontSize: '10px', color: '#64748b' } },
                 labels: { style: { fontSize: '10px' } }
             },
             yaxis: {
-                title: { text: 'Amount ($)', style: { fontSize: '10px', color: '#64748b' } },
+                title: { text: 'Contract Value ($)', style: { fontSize: '10px', color: '#64748b' } },
                 labels: {
                     formatter: function (val) {
                         return '$' + (val >= 1000 ? (val / 1000).toFixed(0) + 'K' : val);
@@ -1394,8 +1394,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (!pt) return '';
                     return '<div class="p-2.5 text-xs bg-slate-900 text-white rounded-lg shadow-lg">' +
                            '<div class="font-bold text-sky-400">' + pt.name + '</div>' +
-                           '<div>Value: $' + Number(pt.y).toLocaleString() + '</div>' +
-                           '<div>Days Left: ' + pt.x + ' days</div>' +
+                           '<div>Contract Value: $' + Number(pt.y).toLocaleString() + '</div>' +
+                           '<div>Days to Maturity: ' + pt.x + ' days</div>' +
                            '<div>Margin Rate: ' + pt.z + '%</div>' +
                            '</div>';
                 }
@@ -1413,7 +1413,7 @@ document.addEventListener('DOMContentLoaded', function () {
         bubbleChart.render();
     }
 
-    // 6. DYNAMICS TAB: Weekly CPC Line / Multi-bar (Cyan & Mint from Image 1)
+    // 6. DYNAMICS TAB: Commodity Unit Pricing Dynamics ($/MT)
     const dynamicsEl = document.querySelector('#v2PricingDynamicsChart');
     if (dynamicsEl) {
         const unitCategories = @json($unitRates['categories']);
@@ -1428,8 +1428,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 toolbar: { show: false }
             },
             series: [
-                { name: 'Sale Rate ($/MT)', type: 'line', data: unitPrices },
-                { name: 'Procurement Rate ($/MT)', type: 'line', data: unitCosts }
+                { name: 'Average Sale Price ($/MT)', type: 'line', data: unitPrices },
+                { name: 'Procurement Cost ($/MT)', type: 'line', data: unitCosts }
             ],
             colors: ['#0082aa', '#0da87a'],
             stroke: { width: [3, 3], curve: 'smooth' },
