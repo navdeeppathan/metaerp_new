@@ -34,7 +34,8 @@ class PackingList extends Model
 
     public function packs()
     {
-        return $this->hasMany(Pack::class, 'packinglist_id', 'id');
+        $fk = \Illuminate\Support\Facades\Schema::hasColumn('packs', 'packing_list_id') ? 'packing_list_id' : 'packinglist_id';
+        return $this->hasMany(Pack::class, $fk, 'id');
     }
 
     public function generatedFiles()

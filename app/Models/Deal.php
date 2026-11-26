@@ -41,6 +41,31 @@ class Deal extends Model
         'payment_date' => 'datetime',
     ];
 
+    protected static array $tableColumnsCache = [];
+
+    public static function getTableColumns(): array
+    {
+        $table = (new static)->getTable();
+        if (!isset(static::$tableColumnsCache[$table])) {
+            try {
+                static::$tableColumnsCache[$table] = \Illuminate\Support\Facades\Schema::getColumnListing($table);
+            } catch (\Throwable $e) {
+                static::$tableColumnsCache[$table] = [];
+            }
+        }
+        return static::$tableColumnsCache[$table];
+    }
+
+    public function save(array $options = [])
+    {
+        $cols = static::getTableColumns();
+        if (!empty($cols)) {
+            $colFlip = array_flip($cols);
+            $this->attributes = array_intersect_key($this->attributes, $colFlip);
+        }
+        return parent::save($options);
+    }
+
     public function setPaymentDateAttribute($value)
     {
         $this->attributes['payment_date'] = \App\Models\Contract::normalizeDateValue($value);

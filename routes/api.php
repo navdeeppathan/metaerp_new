@@ -152,6 +152,12 @@ Route::get('/generated-files/{id}/html', [GeneratedFileController::class, 'getHt
 Route::put('/generated-files/{id}', [GeneratedFileController::class, 'update']);
 Route::delete('/generated-files/{id}', [GeneratedFileController::class, 'destroy']);
 
+// React API parity endpoints (/generatedfiles)
+Route::get('/generatedfiles', [GeneratedFileController::class, 'index']);
+Route::get('/generatedfiles/{id}', [GeneratedFileController::class, 'detail']);
+Route::get('/generatedfiles/download/{id}', [GeneratedFileController::class, 'download']);
+Route::put('/generatedfiles/{id}', [GeneratedFileController::class, 'update']);
+
 Route::get('/templates', [TemplateController::class, 'index']);
 Route::get('/templates/{id}', [TemplateController::class, 'show']);
 Route::get('/templates/type/{type}/language/{lang}', [TemplateController::class, 'findByTypeAndLanguage']);

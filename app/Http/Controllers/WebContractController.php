@@ -123,6 +123,10 @@ class WebContractController extends Controller
             'comments.user'
         ])->findOrFail($id);
 
+        // Ensure stage documents exist
+        $this->docService->ensureDefaultDocumentsForContract($contract);
+        $contract->load('generatedFiles.template');
+
         $stages = Stage::where('model_id', $contract->stage?->model_id ?? 1)->orderBy('position')->get();
         $templates = Template::all();
         $companies = Company::with('bankAccounts')->where('active', true)->get();
@@ -173,6 +177,19 @@ class WebContractController extends Controller
         }
         if ($request->has('port_of_delivery') || $request->has('portOfDelivery')) {
             $contract->port_of_delivery = $request->input('port_of_delivery') ?: $request->input('portOfDelivery');
+        }
+        if ($request->has('loading_date') || $request->has('loadingDate')) {
+            $rawLoad = $request->input('loading_date') ?: $request->input('loadingDate');
+            $contract->loading_date = Contract::normalizeDateValue($rawLoad);
+        }
+        if ($request->has('transport_price_agreed') || $request->has('transportPriceAgreed') || $request->has('priceAgreed')) {
+            $contract->transport_price_agreed = $request->input('transport_price_agreed') ?: ($request->input('transportPriceAgreed') ?: $request->input('priceAgreed'));
+        }
+        if ($request->has('transport_notes') || $request->has('transportNotes')) {
+            $contract->transport_notes = $request->input('transport_notes') ?: $request->input('transportNotes');
+        }
+        if ($request->has('transport_special_notes') || $request->has('transportSpecialNotes') || $request->has('special_notes') || $request->has('specialNotes')) {
+            $contract->transport_special_notes = $request->input('transport_special_notes') ?: ($request->input('transportSpecialNotes') ?: ($request->input('special_notes') ?: $request->input('specialNotes')));
         }
         $contract->save();
 
@@ -467,6 +484,13 @@ class WebContractController extends Controller
             $contract->save();
         }
 
+        // Auto-generate initial documents for the first stage
+        try {
+            $this->docService->ensureDefaultDocumentsForContract($contract, Auth::id());
+        } catch (\Throwable $e) {
+            // Log but don't fail contract creation
+        }
+
         $this->auditService->register('CONTRACT', $contract->id, 'CREATE', json_encode($contract));
 
         return redirect()->route('contracts.board', ['modelId' => $firstStage?->model_id])
@@ -477,9 +501,17 @@ class WebContractController extends Controller
     {
         $contract = Contract::findOrFail($id);
         $contract->contractStatus = 'CANCELLED';
+        $contract->status = 'CANCELLED';
         $contract->save();
 
         $this->auditService->register('CONTRACT', $contract->id, 'CANCEL', null);
+
+        if (request()->expectsJson() || request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Contract {$contract->orderCode} was cancelled"
+            ]);
+        }
         return back()->with('info', "Contract {$contract->orderCode} was cancelled");
     }
 
@@ -490,25 +522,127 @@ class WebContractController extends Controller
             try {
                 $this->associationService->verifyPurchaseContractSaleAssociations($contract->id);
             } catch (\Throwable $e) {
+                if (request()->expectsJson() || request()->ajax()) {
+                    return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
+                }
                 return back()->with('error', $e->getMessage());
             }
         }
 
-        $contract->contractStatus = 'CLOSED';
+        $contract->contractStatus = 'STORED';
+        $contract->status = 'STORED';
         $contract->save();
 
         $this->auditService->register('CONTRACT', $contract->id, 'CLOSE', null);
+
+        if (request()->expectsJson() || request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Contract {$contract->orderCode} finished successfully"
+            ]);
+        }
         return back()->with('success', "Contract {$contract->orderCode} was closed");
+    }
+
+    public function duplicate($id)
+    {
+        $original = Contract::with(['purchase.products', 'sale.products', 'stage'])->findOrFail($id);
+
+        $newContract = $original->replicate([
+            'orderCode', 'order_code', 'created_at', 'updated_at'
+        ]);
+        $newContract->status = 'IN_PROGRESS';
+        $newContract->contractStatus = 'IN_PROGRESS';
+        $newContract->save();
+
+        if ($original->purchase) {
+            $newPurchase = $original->purchase->replicate(['created_at', 'updated_at']);
+            $newPurchase->save();
+
+            if ($original->purchase->products) {
+                foreach ($original->purchase->products as $p) {
+                    $newP = $p->replicate(['created_at', 'updated_at']);
+                    $newP->deal_id = $newPurchase->id;
+                    $newP->save();
+                    try {
+                        $newPurchase->products()->attach($newP->id);
+                    } catch (\Throwable $e) {}
+                }
+            }
+            $newContract->purchase_id = $newPurchase->id;
+        }
+
+        if ($original->sale) {
+            $newSale = $original->sale->replicate(['created_at', 'updated_at']);
+            $newSale->save();
+
+            if ($original->sale->products) {
+                foreach ($original->sale->products as $p) {
+                    $newP = $p->replicate(['created_at', 'updated_at']);
+                    $newP->deal_id = $newSale->id;
+                    $newP->save();
+                    try {
+                        $newSale->products()->attach($newP->id);
+                    } catch (\Throwable $e) {}
+                }
+            }
+            $newContract->sale_id = $newSale->id;
+        }
+
+        try {
+            $newContract->orderCode = $this->orderCodeService->orderCodeGenerator($newContract);
+            $newContract->save();
+        } catch (\Throwable $e) {
+            $newContract->orderCode = sprintf('ME-COM%s-%d', date('y'), $newContract->id);
+            $newContract->save();
+        }
+
+        try {
+            $this->docService->ensureDefaultDocumentsForContract($newContract, Auth::id());
+        } catch (\Throwable $e) {}
+
+        if (request()->expectsJson() || request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Contract duplicated successfully as {$newContract->orderCode}",
+                'contract' => $newContract
+            ]);
+        }
+
+        return redirect()->route('contracts.board', ['modelId' => $newContract->stage?->model_id])
+            ->with('success', "Contract duplicated as {$newContract->orderCode}!");
     }
 
     public function addComment(Request $request, $id)
     {
         $request->validate(['message' => 'required|string']);
-        Comment::create([
+
+        $data = [
             'contract_id' => $id,
-            'user_id' => Auth::id(),
             'message' => $request->input('message'),
-        ]);
+            'time' => now(),
+        ];
+        if (\Illuminate\Support\Facades\Schema::hasColumn('comments', 'id_member')) {
+            $data['id_member'] = Auth::id() ?: 1;
+        }
+        if (\Illuminate\Support\Facades\Schema::hasColumn('comments', 'user_id')) {
+            $data['user_id'] = Auth::id() ?: 1;
+        }
+
+        $comment = Comment::create($data);
+        $comment->load('user');
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'comment' => [
+                    'id' => $comment->id,
+                    'message' => $comment->message,
+                    'userName' => Auth::user()?->name ?? 'User',
+                    'time' => now()->format('d M y H:i'),
+                ]
+            ]);
+        }
 
         return back()->with('success', 'Comment added');
     }
@@ -532,6 +666,68 @@ class WebContractController extends Controller
             return back()->with('success', "Document {$doc->fileName} generated successfully!");
         } catch (\Throwable $e) {
             return back()->with('error', "Document generation failed: " . $e->getMessage());
+        }
+    }
+
+    public function viewDocument($id)
+    {
+        $file = GeneratedFile::findOrFail($id);
+        return response($file->html, 200)->header('Content-Type', 'text/html; charset=utf-8');
+    }
+
+    public function downloadDocument($id)
+    {
+        $file = GeneratedFile::findOrFail($id);
+        $fileName = $file->name . '.html';
+        return response($file->html, 200, [
+            'Content-Type' => 'text/html; charset=utf-8',
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+        ]);
+    }
+
+    public function updateDocument(Request $request, $id)
+    {
+        $file = GeneratedFile::findOrFail($id);
+        if ($request->has('html')) {
+            $file->html = $request->input('html');
+        } elseif ($request->has('content')) {
+            $file->content = $request->input('content');
+        }
+        $file->save();
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Document updated successfully',
+                'file' => $file
+            ]);
+        }
+        return back()->with('success', 'Document updated successfully');
+    }
+
+    public function regenerateDocument(Request $request, $id)
+    {
+        $file = GeneratedFile::findOrFail($id);
+        $contract = $file->contract ?: Contract::findOrFail($request->input('contract_id', $file->contract_id));
+
+        try {
+            $this->docService->regenerate($file, $contract, Auth::id());
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Document updated & overwritten successfully',
+                    'file' => $file
+                ]);
+            }
+            return back()->with('success', 'Document updated & overwritten successfully');
+        } catch (\Throwable $e) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Failed to regenerate document: ' . $e->getMessage()
+                ], 500);
+            }
+            return back()->with('error', 'Failed to regenerate document: ' . $e->getMessage());
         }
     }
 
@@ -561,6 +757,9 @@ class WebContractController extends Controller
             'packingLists.packs.product',
             'comments.user',
         ])->where('id', $id)->orWhere('order_code', $id)->firstOrFail();
+
+        $this->docService->ensureDefaultDocumentsForContract($contract);
+        $contract->load('generatedFiles');
 
         $activities = Log::with('user')
             ->where('module', 'CONTRACT')

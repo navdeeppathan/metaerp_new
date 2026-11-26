@@ -59,6 +59,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/findContracts/{id}', [WebContractController::class, 'show']);
         Route::get('/findContracts', [WebSearchController::class, 'index'])->name('contracts.search');
         Route::get('/search/autocomplete/{text}', [\App\Http\Controllers\Api\SearchController::class, 'search'])->name('search.autocomplete');
+        Route::get('/documents/{id}/view', [WebContractController::class, 'viewDocument'])->name('contracts.documents.view');
+        Route::get('/documents/{id}/download', [WebContractController::class, 'downloadDocument'])->name('contracts.documents.download');
     });
 
     Route::middleware('permission:CONTRACT,FULL')->group(function () {
@@ -71,6 +73,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/contracts/{id}/comments', [WebContractController::class, 'addComment'])->name('contracts.comments');
         Route::post('/checkitems/{id}/toggle', [WebContractController::class, 'toggleCheckitem'])->name('checkitems.toggle');
         Route::post('/contracts/{id}/generate-doc', [WebContractController::class, 'generateDoc'])->name('contracts.generateDoc');
+        Route::post('/documents/{id}/update', [WebContractController::class, 'updateDocument'])->name('contracts.documents.update');
+        Route::post('/documents/{id}/regenerate', [WebContractController::class, 'regenerateDocument'])->name('contracts.documents.regenerate');
+        Route::post('/contracts/{id}/duplicate', [WebContractController::class, 'duplicate'])->name('contracts.duplicate');
     });
 
     // Commercial Offers

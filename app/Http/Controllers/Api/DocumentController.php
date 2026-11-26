@@ -24,15 +24,14 @@ class DocumentController extends BaseApiController
 
         $file = GeneratedFile::findOrFail($generatedFileId);
         $contract = Contract::findOrFail($contractId);
-        $template = $file->template ?: Template::where('type', $file->fileType)->first();
-
-        if (!$template) {
-            return response()->json('Template not found', 404);
-        }
 
         try {
-            $newFile = $this->docService->render($template, $contract, $request->user()?->id);
-            return response()->json('OK', 200);
+            $updatedFile = $this->docService->regenerate($file, $contract, $request->user()?->id);
+            return response()->json([
+                'status' => 'OK',
+                'message' => 'Document updated & overwritten successfully',
+                'file' => $updatedFile,
+            ], 200);
         } catch (\Throwable $e) {
             $code = $e->getCode() >= 400 && $e->getCode() < 600 ? $e->getCode() : 500;
             return response()->json($e->getMessage(), $code);

@@ -35,12 +35,18 @@ class Pack extends Model
 
     public function packingList()
     {
-        return $this->belongsTo(PackingList::class, 'packinglist_id', 'id');
+        $fk = \Illuminate\Support\Facades\Schema::hasColumn('packs', 'packing_list_id') ? 'packing_list_id' : 'packinglist_id';
+        return $this->belongsTo(PackingList::class, $fk, 'id');
     }
 
     public function product()
     {
         return $this->belongsTo(Product::class, 'product_id', 'id');
+    }
+
+    public function packType()
+    {
+        return $this->belongsTo(PackType::class, 'pack_type_id', 'id');
     }
 
     public function dealProduct()

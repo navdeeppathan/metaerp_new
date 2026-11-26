@@ -53,6 +53,9 @@ class ContractActionService
             $contract->stage_contract_id = $targetStage->id;
             $contract->save();
 
+            // Auto-generate stage documents for target stage
+            $this->docService->ensureDefaultDocumentsForContract($contract, $userId);
+
             // 4. Execute IN actions of target stage
             foreach ($targetStage->stageActions as $sa) {
                 if ($sa->trigger_type === 'IN') {

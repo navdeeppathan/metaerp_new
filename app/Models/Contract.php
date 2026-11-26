@@ -256,6 +256,141 @@ class Contract extends Model
         $this->attributes['cancellation_date'] = static::normalizeDateValue($value);
     }
 
+    protected static array $tableColumnsCache = [];
+
+    public static function getTableColumns(): array
+    {
+        $table = (new static)->getTable();
+        if (!isset(static::$tableColumnsCache[$table])) {
+            try {
+                static::$tableColumnsCache[$table] = \Illuminate\Support\Facades\Schema::getColumnListing($table);
+            } catch (\Throwable $e) {
+                static::$tableColumnsCache[$table] = [];
+            }
+        }
+        return static::$tableColumnsCache[$table];
+    }
+
+    public function save(array $options = [])
+    {
+        $cols = static::getTableColumns();
+        if (!empty($cols)) {
+            $colFlip = array_flip($cols);
+
+            $pairs = [
+                'orderCode' => 'order_code',
+                'orderDescription' => 'description',
+                'dueDate' => 'due_date',
+                'loadingDate' => 'loading_date',
+                'priceAgreed' => 'transport_price_agreed',
+                'transportNotes' => 'transport_notes',
+                'specialNotes' => 'transport_special_notes',
+                'portOfLoading' => 'port_of_loading',
+                'portOfDelivery' => 'port_of_delivery',
+                'modeOfTransport' => 'mode_of_transport',
+                'weightTolerance' => 'weight_tolerance',
+                'suppliesNote' => 'supplies_note',
+                'customerPurchaseOrder' => 'customer_purchase_order',
+                'modeOfPayment' => 'mode_of_payment',
+                'qualityCheck' => 'quality_check',
+                'deliveryTerms' => 'delivery_terms',
+                'contractStatus' => 'status',
+            ];
+
+            foreach ($pairs as $camel => $snake) {
+                $val = $this->attributes[$camel] ?? ($this->attributes[$snake] ?? null);
+                if ($val !== null) {
+                    if (isset($colFlip[$camel])) {
+                        $this->attributes[$camel] = $val;
+                    }
+                    if (isset($colFlip[$snake])) {
+                        $this->attributes[$snake] = $val;
+                    }
+                }
+            }
+
+            $this->attributes = array_intersect_key($this->attributes, $colFlip);
+        }
+        return parent::save($options);
+    }
+
+    public function getDescriptionAttribute()
+    {
+        return $this->attributes['description'] ?? ($this->attributes['orderDescription'] ?? '');
+    }
+
+    public function setDescriptionAttribute($value)
+    {
+        $this->attributes['description'] = $value;
+        $this->attributes['orderDescription'] = $value;
+    }
+
+    public function getTransportPriceAgreedAttribute()
+    {
+        return $this->attributes['transport_price_agreed'] ?? ($this->attributes['priceAgreed'] ?? null);
+    }
+
+    public function setTransportPriceAgreedAttribute($value)
+    {
+        $this->attributes['transport_price_agreed'] = $value;
+        $this->attributes['priceAgreed'] = $value;
+    }
+
+    public function getTransportNotesAttribute()
+    {
+        return $this->attributes['transport_notes'] ?? ($this->attributes['transportNotes'] ?? '');
+    }
+
+    public function setTransportNotesAttribute($value)
+    {
+        $this->attributes['transport_notes'] = $value;
+        $this->attributes['transportNotes'] = $value;
+    }
+
+    public function getTransportSpecialNotesAttribute()
+    {
+        return $this->attributes['transport_special_notes'] ?? ($this->attributes['specialNotes'] ?? '');
+    }
+
+    public function setTransportSpecialNotesAttribute($value)
+    {
+        $this->attributes['transport_special_notes'] = $value;
+        $this->attributes['specialNotes'] = $value;
+    }
+
+    public function getPortOfLoadingAttribute()
+    {
+        return $this->attributes['port_of_loading'] ?? ($this->attributes['portOfLoading'] ?? '');
+    }
+
+    public function setPortOfLoadingAttribute($value)
+    {
+        $this->attributes['port_of_loading'] = $value;
+        $this->attributes['portOfLoading'] = $value;
+    }
+
+    public function getPortOfDeliveryAttribute()
+    {
+        return $this->attributes['port_of_delivery'] ?? ($this->attributes['portOfDelivery'] ?? '');
+    }
+
+    public function setPortOfDeliveryAttribute($value)
+    {
+        $this->attributes['port_of_delivery'] = $value;
+        $this->attributes['portOfDelivery'] = $value;
+    }
+
+    public function getModeOfTransportAttribute()
+    {
+        return $this->attributes['mode_of_transport'] ?? ($this->attributes['modeOfTransport'] ?? '');
+    }
+
+    public function setModeOfTransportAttribute($value)
+    {
+        $this->attributes['mode_of_transport'] = $value;
+        $this->attributes['modeOfTransport'] = $value;
+    }
+
     public function getFormattedDueDateAttribute()
     {
         if ($this->due_date) {

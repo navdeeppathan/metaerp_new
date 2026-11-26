@@ -3,6 +3,20 @@
     $purchaseDeal = $contract->purchase;
     $saleDeal = $contract->sale;
     $activeTabDefault = in_array($contract->type, ['SELL']) ? 'selling' : 'buying';
+
+    $contractTags = collect();
+    try {
+        if (\Illuminate\Support\Facades\Schema::hasTable('contract_tags') && \Illuminate\Support\Facades\Schema::hasColumn('contract_tags', 'contract_id')) {
+            $contractTags = $contract->tags ?? collect();
+        }
+    } catch (\Throwable $e) {}
+
+    $contractMembers = collect();
+    try {
+        if (\Illuminate\Support\Facades\Schema::hasTable('contract_member_ids') && \Illuminate\Support\Facades\Schema::hasColumn('contract_member_ids', 'contract_id')) {
+            $contractMembers = $contract->members ?? collect();
+        }
+    } catch (\Throwable $e) {}
 @endphp
 
 <form action="{{ route('contracts.update', $contract->id) }}" method="POST" id="contractModalForm-{{ $contract->id }}"
@@ -27,6 +41,14 @@
                           disableMobile: true
                       });
                   }
+                  const loadEl = $el.querySelector('input[name=\'loading_date\']');
+                  if (loadEl && !loadEl._flatpickr) {
+                      flatpickr(loadEl, {
+                          dateFormat: 'd/m/Y',
+                          allowInput: true,
+                          disableMobile: true
+                      });
+                  }
               }
           });
       "
@@ -38,7 +60,7 @@
           openToolbarMenu: null,
           orderDateValue: '{{ $contract->due_date ? \Carbon\Carbon::parse($contract->due_date)->format('d/m/Y h:i A') : ($contract->dueDate ? \Carbon\Carbon::parse($contract->dueDate)->format('d/m/Y h:i A') : now()->format('d/m/Y h:i A')) }}',
           dueDateInput: '',
-          selectedLabels: @js($contract->tags ? $contract->tags->map(fn($t) => ['id' => $t->id ?? $t->tags, 'title' => $t->tags, 'class' => 'bg-indigo-600 text-white', 'color' => '#6366f1']) : []),
+          selectedLabels: @js($contractTags->map(fn($t) => ['id' => $t->id ?? $t->tags, 'title' => $t->tags, 'class' => 'bg-indigo-600 text-white', 'color' => '#6366f1'])),
           availableLabels: [
               { id: 1, title: 'High Priority', class: 'bg-red-500 text-white', color: '#ef4444' },
               { id: 2, title: 'Design', class: 'bg-blue-500 text-white', color: '#3b82f6' },
@@ -46,11 +68,106 @@
               { id: 4, title: 'Feature', class: 'bg-purple-500 text-white', color: '#8b5cf6' },
               { id: 5, title: 'Urgent', class: 'bg-amber-500 text-white', color: '#f59e0b' }
           ],
-          selectedMembers: @js($contract->members ? $contract->members->map(fn($m) => $m->member ?? ['id' => $m->member_ids, 'name' => 'Member '.$m->member_ids]) : []),
+          selectedMembers: @js($contractMembers->map(fn($m) => ['id' => $m->id ?? $m->member_ids, 'name' => $m->name ?? ('Member ' . ($m->member_ids ?? $m->id))])),
           availableMembers: @js($users ?? []),
           attachedFiles: [],
+          commentsList: @js($contract->comments ? $contract->comments->map(fn($c) => ['id' => $c->id, 'message' => $c->message, 'userName' => $c->user?->name ?? 'User', 'time' => $c->created_at ? \Carbon\Carbon::parse($c->created_at)->format('d M y H:i') : ($c->time ? \Carbon\Carbon::parse($c->time)->format('d M y H:i') : '')])->values() : []),
+          commentSubmitting: false,
           checklists: @js($contract->checklists ? $contract->checklists->map(fn($c) => ['id' => $c->id, 'name' => $c->name ?? 'Checklist', 'checkItems' => $c->checkitems ? $c->checkitems->map(fn($ci) => ['id' => $ci->id, 'name' => $ci->name, 'checked' => (bool)$ci->checked]) : []]) : []),
           newChecklistTitle: '',
+          generatedFiles: @js($contract->generatedFiles ? $contract->generatedFiles->map(fn($f) => ['id' => $f->id, 'name' => $f->name, 'html' => $f->html, 'content' => $f->content]) : []),
+          activeDocMenu: null,
+          viewDocModal: false,
+          editDocModal: false,
+          currentDoc: null,
+          editDocHtml: '',
+          docSaving: false,
+          docRegenerating: false,
+          confirmRegenerateModal: false,
+          docToRegenerate: null,
+
+          openViewDoc(doc) {
+              this.currentDoc = doc;
+              this.activeDocMenu = null;
+              this.viewDocModal = true;
+          },
+          openEditDoc(doc) {
+              this.currentDoc = doc;
+              this.editDocHtml = doc.html || '';
+              this.activeDocMenu = null;
+              this.viewDocModal = false;
+              this.editDocModal = true;
+          },
+          saveDocEdit() {
+              if (!this.currentDoc) return;
+              this.docSaving = true;
+              fetch(`/documents/${this.currentDoc.id}/update`, {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                      'Accept': 'application/json'
+                  },
+                  body: JSON.stringify({ html: this.editDocHtml })
+              })
+              .then(res => res.json())
+              .then(data => {
+                  this.docSaving = false;
+                  this.currentDoc.html = this.editDocHtml;
+                  const idx = this.generatedFiles.findIndex(f => f.id === this.currentDoc.id);
+                  if (idx !== -1) {
+                      this.generatedFiles[idx].html = this.editDocHtml;
+                  }
+                  this.editDocModal = false;
+                  if (window.showToast) window.showToast('Document updated successfully', 'success');
+              })
+              .catch(err => {
+                  this.docSaving = false;
+                  console.error(err);
+                  if (window.showToast) window.showToast('Failed to save document', 'error');
+              });
+          },
+          confirmRegenerate(doc) {
+              this.docToRegenerate = doc;
+              this.activeDocMenu = null;
+              this.confirmRegenerateModal = true;
+          },
+          executeRegenerate() {
+              if (!this.docToRegenerate) return;
+              this.docRegenerating = true;
+              fetch(`/documents/${this.docToRegenerate.id}/regenerate`, {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                      'Accept': 'application/json'
+                  },
+                  body: JSON.stringify({ contract_id: {{ $contract->id }} })
+              })
+              .then(res => res.json())
+              .then(data => {
+                  this.docRegenerating = false;
+                  if (data.file && data.file.html) {
+                      this.docToRegenerate.html = data.file.html;
+                      const idx = this.generatedFiles.findIndex(f => f.id === this.docToRegenerate.id);
+                      if (idx !== -1) {
+                          this.generatedFiles[idx].html = data.file.html;
+                      }
+                  }
+                  this.confirmRegenerateModal = false;
+                  if (window.showToast) window.showToast('Update & overwrite successfully', 'success');
+              })
+              .catch(err => {
+                  this.docRegenerating = false;
+                  console.error(err);
+                  if (window.showToast) window.showToast('Failed to regenerate document', 'error');
+              });
+          },
+          downloadDoc(doc) {
+              if (!doc) return;
+              this.activeDocMenu = null;
+              window.open(`/documents/${doc.id}/download`, '_blank');
+          },
 
           formatDueDate(val) {
               if (!val) return '';
@@ -143,6 +260,50 @@
               checklist.checkItems = checklist.checkItems.filter(item => item.id !== itemId);
               this.hasChanges = true;
           },
+          toggleCheckItem(item) {
+              if (!item || !item.id) return;
+              this.hasChanges = true;
+              fetch(`/checkitems/${item.id}/toggle`, {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                      'Accept': 'application/json'
+                  }
+              }).catch(err => console.error(err));
+          },
+          submitComment() {
+              if (!this.commentText || !this.commentText.trim() || this.commentSubmitting) return;
+              this.commentSubmitting = true;
+              const text = this.commentText.trim();
+              fetch(`/contracts/{{ $contract->id }}/comments`, {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                      'Accept': 'application/json'
+                  },
+                  body: JSON.stringify({ message: text })
+              })
+              .then(res => res.json())
+              .then(data => {
+                  this.commentSubmitting = false;
+                  this.commentText = '';
+                  const newCom = {
+                      id: data.id || Date.now(),
+                      message: data.message || text,
+                      userName: (data.user && data.user.name) ? data.user.name : '{{ Auth::user()->name ?? "User" }}',
+                      time: data.created_at ? new Date(data.created_at).toLocaleString() : 'Just now'
+                  };
+                  this.commentsList.unshift(newCom);
+                  if (window.showToast) window.showToast('Comment added', 'success');
+              })
+              .catch(err => {
+                  this.commentSubmitting = false;
+                  console.error(err);
+                  if (window.showToast) window.showToast('Failed to add comment', 'error');
+              });
+          },
           getChecklistProgress(checklist) {
               if (!checklist.checkItems || checklist.checkItems.length === 0) return 0;
               const checked = checklist.checkItems.filter(i => i.checked).length;
@@ -150,16 +311,76 @@
           },
           duplicateContract() {
               this.openToolbarMenu = null;
-              if (window.showToast) window.showToast('Contract duplicate action triggered', 'success');
+              if (!confirm('Are you sure you want to duplicate this contract?')) return;
+              fetch(`/contracts/{{ $contract->id }}/duplicate`, {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                      'Accept': 'application/json'
+                  }
+              })
+              .then(res => res.json())
+              .then(data => {
+                  if (window.showToast) window.showToast(data.message || 'Contract duplicated successfully', 'success');
+                  if (data.redirect_url) {
+                      setTimeout(() => { window.location.href = data.redirect_url; }, 800);
+                  } else {
+                      setTimeout(() => { window.location.reload(); }, 800);
+                  }
+              })
+              .catch(err => {
+                  console.error(err);
+                  if (window.showToast) window.showToast('Failed to duplicate contract', 'error');
+              });
           },
           finishContract() {
               this.openToolbarMenu = null;
-              if (window.showToast) window.showToast('Contract marked as finished', 'success');
+              if (!confirm('Are you sure you want to finish this contract?')) return;
+              fetch(`/contracts/{{ $contract->id }}/close`, {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                      'Accept': 'application/json'
+                  }
+              })
+              .then(res => res.json())
+              .then(data => {
+                  if (data && data.success === false) {
+                      if (window.showToast) window.showToast(data.message || 'Cannot finish contract', 'error');
+                      return;
+                  }
+                  if (typeof showCardModal !== 'undefined') showCardModal = false;
+                  if (window.showToast) window.showToast('Contract finished successfully', 'success');
+                  setTimeout(() => { window.location.reload(); }, 600);
+              })
+              .catch(err => {
+                  console.error(err);
+                  if (window.showToast) window.showToast('Failed to finish contract', 'error');
+              });
           },
           cancelContract() {
               this.openToolbarMenu = null;
-              showCardModal = false;
-              if (window.showToast) window.showToast('Contract cancelled', 'info');
+              if (!confirm('Are you sure you want to cancel this contract?')) return;
+              fetch(`/contracts/{{ $contract->id }}/cancel`, {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                      'Accept': 'application/json'
+                  }
+              })
+              .then(res => res.json())
+              .then(data => {
+                  if (typeof showCardModal !== 'undefined') showCardModal = false;
+                  if (window.showToast) window.showToast('Contract cancelled', 'info');
+                  setTimeout(() => { window.location.reload(); }, 600);
+              })
+              .catch(err => {
+                  console.error(err);
+                  if (window.showToast) window.showToast('Failed to cancel contract', 'error');
+              });
           }
       }"
       @input="hasChanges = true"
@@ -307,7 +528,7 @@
                         <template x-for="(item, iIndex) in chk.checkItems" :key="item.id">
                             <div class="flex items-center justify-between group py-1 px-2 rounded-md hover:bg-white transition">
                                 <label class="flex items-center gap-2.5 text-xs text-slate-700 cursor-pointer flex-1">
-                                    <input type="checkbox" x-model="item.checked" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                                    <input type="checkbox" x-model="item.checked" @change="toggleCheckItem(item)" class="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
                                     <span :class="item.checked ? 'line-through text-slate-400' : 'text-slate-800'" x-text="item.name"></span>
                                 </label>
                                 <button type="button" @click="removeChecklistItem(chk, item.id)" class="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-red-500 text-xs transition cursor-pointer">✕</button>
@@ -322,6 +543,56 @@
                     </div>
                 </div>
             </template>
+        </div>
+
+        <!-- Documents Section (Matching exact screenshot & React BoardCardForm.js) -->
+        <div x-show="generatedFiles.length > 0" class="space-y-3 pt-3 border-t border-slate-200/80">
+            <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-slate-500 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+                </svg>
+                <h3 class="text-sm font-bold text-slate-800 tracking-tight">Documents</h3>
+            </div>
+
+            <!-- Documents Grid: 4 cards per row matching screenshot -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <template x-for="doc in generatedFiles" :key="doc.id">
+                    <div class="bg-[#f8fafc] border border-slate-200/90 rounded-lg p-3.5 flex flex-col justify-between min-h-[96px] shadow-2xs hover:shadow-xs transition relative">
+                        <div class="mb-3">
+                            <span class="text-[13px] font-bold text-slate-800 tracking-tight leading-snug break-all select-all block" x-text="doc.name"></span>
+                        </div>
+                        <div class="relative">
+                            <button type="button" 
+                                    @click="activeDocMenu = (activeDocMenu === doc.id ? null : doc.id)"
+                                    class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 border border-slate-300 rounded px-3 py-1 bg-white hover:bg-slate-50 transition cursor-pointer shadow-2xs">
+                                <span>Actions</span>
+                                <svg class="w-3.5 h-3.5 text-slate-500 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </button>
+
+                            <!-- Actions Dropdown Menu (View, Download, Update and Overwrite) -->
+                            <div x-show="activeDocMenu === doc.id" 
+                                 @click.outside="activeDocMenu = null" 
+                                 class="absolute left-0 bottom-full mb-1 w-44 bg-white rounded-lg shadow-xl border border-slate-200 py-1 z-30 text-xs font-medium"
+                                 x-cloak>
+                                <button type="button" @click="openViewDoc(doc)" class="w-full text-left px-3.5 py-2 hover:bg-slate-50 text-slate-700 flex items-center gap-2 cursor-pointer">
+                                    <span class="material-icons text-sm text-slate-400">visibility</span>
+                                    <span>View</span>
+                                </button>
+                                <button type="button" @click="downloadDoc(doc)" class="w-full text-left px-3.5 py-2 hover:bg-slate-50 text-slate-700 flex items-center gap-2 cursor-pointer">
+                                    <span class="material-icons text-sm text-slate-400">download</span>
+                                    <span>Download</span>
+                                </button>
+                                <button type="button" @click="confirmRegenerate(doc)" class="w-full text-left px-3.5 py-2 hover:bg-slate-50 text-slate-700 flex items-center gap-2 cursor-pointer border-t border-slate-100">
+                                    <span class="material-icons text-sm text-indigo-500">autorenew</span>
+                                    <span>Update and Overwrite</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
         </div>
 
         <!-- Deal Tabs: Buying from / Selling to (Screenshot 2) -->
@@ -725,22 +996,99 @@
             </div>
         </div>
 
-        <!-- Section: Transport (Screenshot 4: only under Selling tab) -->
+        <!-- Section: Transport (Screenshot 4 & React BoardCardForm.js lines 717-869) -->
         <div class="border-t-2 border-slate-200/80 pt-4 space-y-3" x-show="activeDealTab === 'selling'">
             <div class="flex items-center gap-2">
                 <span class="material-icons-outlined text-slate-700 text-lg">local_shipping</span>
                 <h4 class="text-sm font-semibold text-slate-800">Transport</h4>
             </div>
 
+            @php
+                $stageNameUpper = strtoupper($contract->stage?->name ?? $contract->stage?->type ?? '');
+                $isTransportStage = in_array($stageNameUpper, ['SALES_ORDER', 'TRANSPORT_ORDER', 'SHIPPING_ORDER', 'ORDER_COMPLETION', 'SALES ORDER', 'TRANSPORT ORDER', 'SHIPPING ORDER', 'ORDER COMPLETION'])
+                    || !empty($contract->loading_date) || !empty($contract->transport_price_agreed) || !empty($contract->port_of_loading);
+            @endphp
+
+            @if($isTransportStage)
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <!-- Loading date -->
+                <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center cursor-pointer"
+                     @click="const el = $el.querySelector('input[name=\'loading_date\']'); if (el && el._flatpickr) el._flatpickr.open(); else if (el) el.focus();">
+                    <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Loading date</label>
+                    <input type="text" name="loading_date" 
+                           value="{{ $contract->loading_date ? \Carbon\Carbon::parse($contract->loading_date)->format('d/m/Y') : ($contract->loadingDate ? \Carbon\Carbon::parse($contract->loadingDate)->format('d/m/Y') : '') }}" 
+                           placeholder="Choose a loading date" 
+                           class="text-xs text-slate-800 font-normal w-full bg-transparent border-none focus:outline-none p-0 cursor-pointer">
+                    <span class="material-icons text-slate-400 text-base ml-2 cursor-pointer">calendar_today</span>
+                </div>
+
+                <!-- Price Agreed -->
+                <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                    <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Price Agreed</label>
+                    <input type="number" step="any" name="transport_price_agreed" 
+                           value="{{ $contract->transport_price_agreed ?? $contract->priceAgreed ?? '' }}" 
+                           placeholder="Price agreed" 
+                           class="text-xs text-slate-800 font-normal w-full bg-transparent border-none focus:outline-none p-0">
+                </div>
+
+                <!-- Notes -->
+                <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                    <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Notes</label>
+                    <input type="text" name="transport_notes" 
+                           value="{{ $contract->transport_notes ?? $contract->transportNotes ?? '' }}" 
+                           placeholder="Transport notes" 
+                           class="text-xs text-slate-800 font-normal w-full bg-transparent border-none focus:outline-none p-0">
+                </div>
+            </div>
+
+            <!-- Special Notes -->
+            <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white">
+                <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Special Notes</label>
+                <textarea name="transport_special_notes" rows="3" placeholder="Special notes" 
+                          class="text-xs text-slate-800 font-normal w-full bg-transparent border-none focus:outline-none p-0 resize-y">{{ $contract->transport_special_notes ?? $contract->specialNotes ?? '' }}</textarea>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <!-- Port of Loading -->
+                <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                    <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Port of Loading</label>
+                    <input type="text" name="port_of_loading" 
+                           value="{{ $contract->port_of_loading ?? $contract->portOfLoading ?? '' }}" 
+                           placeholder="Port of loading" 
+                           class="text-xs text-slate-800 font-normal w-full bg-transparent border-none focus:outline-none p-0">
+                </div>
+
+                <!-- Port of Delivery -->
+                <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                    <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Port of Delivery</label>
+                    <input type="text" name="port_of_delivery" 
+                           value="{{ $contract->port_of_delivery ?? $contract->portOfDelivery ?? '' }}" 
+                           placeholder="Port of delivery" 
+                           class="text-xs text-slate-800 font-normal w-full bg-transparent border-none focus:outline-none p-0">
+                </div>
+
+                <!-- Mode of transport -->
+                <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
+                    <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Mode of transport *</label>
+                    <select name="mode_of_transport" class="w-full text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 cursor-pointer">
+                        <option value="">Select a mode of transport</option>
+                        <option value="SEA" {{ (in_array($contract->mode_of_transport ?? $contract->modeOfTransport ?? '', ['SEA'])) ? 'selected' : '' }}>SEA</option>
+                        <option value="ROAD" {{ (in_array($contract->mode_of_transport ?? $contract->modeOfTransport ?? '', ['ROAD'])) ? 'selected' : '' }}>ROAD</option>
+                        <option value="SEA/ROAD" {{ (in_array($contract->mode_of_transport ?? $contract->modeOfTransport ?? '', ['SEA/ROAD'])) ? 'selected' : '' }}>SEA/ROAD</option>
+                    </select>
+                </div>
+            </div>
+            @else
             <div class="relative border border-slate-300 rounded-md px-3 pt-2.5 pb-2 bg-white min-h-[46px] flex items-center">
                 <label class="absolute -top-2 left-2.5 bg-white px-1 text-[11px] text-slate-500 font-normal leading-none pointer-events-none">Mode of transport *</label>
                 <select name="mode_of_transport" class="w-full text-xs text-slate-800 bg-transparent border-none focus:outline-none p-0 cursor-pointer">
                     <option value="">Select a mode of transport</option>
-                    <option value="SEA" {{ ($contract->mode_of_transport == 'SEA') ? 'selected' : '' }}>SEA</option>
-                    <option value="ROAD" {{ ($contract->mode_of_transport == 'ROAD') ? 'selected' : '' }}>ROAD</option>
-                    <option value="SEA/ROAD" {{ ($contract->mode_of_transport == 'SEA/ROAD') ? 'selected' : '' }}>SEA/ROAD</option>
+                    <option value="SEA" {{ (in_array($contract->mode_of_transport ?? $contract->modeOfTransport ?? '', ['SEA'])) ? 'selected' : '' }}>SEA</option>
+                    <option value="ROAD" {{ (in_array($contract->mode_of_transport ?? $contract->modeOfTransport ?? '', ['ROAD'])) ? 'selected' : '' }}>ROAD</option>
+                    <option value="SEA/ROAD" {{ (in_array($contract->mode_of_transport ?? $contract->modeOfTransport ?? '', ['SEA/ROAD'])) ? 'selected' : '' }}>SEA/ROAD</option>
                 </select>
             </div>
+            @endif
         </div>
 
         <!-- Section: Comment (Screenshot 4) -->
@@ -759,37 +1107,36 @@
                     <textarea x-model="commentText" 
                               placeholder="Add comment" 
                               rows="3" 
+                              @keydown.ctrl.enter.prevent="submitComment()"
                               class="w-full text-xs border border-slate-300 rounded-md p-2.5 focus:outline-none focus:border-indigo-500 transition resize-y"></textarea>
                     <div>
                         <button type="button" 
-                                :disabled="!commentText.trim()"
-                                :class="commentText.trim() ? 'bg-indigo-600 hover:bg-indigo-700 text-white cursor-pointer' : 'bg-slate-200 text-slate-400 cursor-not-allowed'"
+                                @click="submitComment()"
+                                :disabled="!commentText.trim() || commentSubmitting"
+                                :class="(commentText.trim() && !commentSubmitting) ? 'bg-indigo-600 hover:bg-indigo-700 text-white cursor-pointer' : 'bg-slate-200 text-slate-400 cursor-not-allowed'"
                                 class="px-5 py-1.5 rounded-full text-xs font-semibold transition">
-                            Add
+                            <span x-text="commentSubmitting ? 'Adding...' : 'Add'"></span>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Existing Comments List if any -->
-            @if($contract->comments && $contract->comments->isNotEmpty())
-            <div class="space-y-3 pt-2">
-                @foreach($contract->comments as $com)
-                <div class="flex items-start gap-3 p-3 bg-slate-50 rounded-lg border border-slate-100">
-                    <div class="w-7 h-7 rounded-full bg-slate-300 flex items-center justify-center text-xs font-bold text-slate-700 shrink-0">
-                        {{ substr($com->user?->name ?? 'U', 0, 1) }}
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-center justify-between text-[11px] text-slate-500 mb-1">
-                            <span class="font-semibold text-slate-800">{{ $com->user?->name ?? 'User' }}</span>
-                            <span>{{ $com->created_at ? $com->created_at->format('d M y H:i') : '' }}</span>
+            <!-- Comments List from Alpine (real-time responsive) -->
+            <div class="space-y-3 pt-2" x-show="commentsList.length > 0">
+                <template x-for="com in commentsList" :key="com.id">
+                    <div class="flex items-start gap-3 p-3 bg-slate-50 rounded-lg border border-slate-100">
+                        <div class="w-7 h-7 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-xs font-bold shrink-0" x-text="(com.userName || 'U').charAt(0).toUpperCase()">
                         </div>
-                        <p class="text-xs text-slate-700">{{ $com->message }}</p>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between text-[11px] text-slate-500 mb-1">
+                                <span class="font-semibold text-slate-800" x-text="com.userName || 'User'"></span>
+                                <span x-text="com.time || ''"></span>
+                            </div>
+                            <p class="text-xs text-slate-700" x-text="com.message"></p>
+                        </div>
                     </div>
-                </div>
-                @endforeach
+                </template>
             </div>
-            @endif
         </div>
 
         <!-- Section: Activities (Screenshot 4) -->
@@ -1012,6 +1359,88 @@
                         <span>Cancel contract</span>
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW DOCUMENT MODAL (DialogViewHtml) -->
+    <div x-show="viewDocModal" class="fixed inset-0 z-70 overflow-hidden flex flex-col bg-slate-900/70 backdrop-blur-xs" style="display: none;" @keydown.escape.window="viewDocModal = false" x-cloak>
+        <div class="bg-indigo-600 text-white px-6 py-3.5 flex items-center justify-between shadow-md shrink-0">
+            <div class="flex items-center gap-3">
+                <button type="button" @click="viewDocModal = false" class="text-white/80 hover:text-white p-1 rounded-full hover:bg-white/10 transition cursor-pointer">
+                    <span class="material-icons text-xl">close</span>
+                </button>
+                <h3 class="text-base font-bold tracking-tight text-white" x-text="currentDoc ? currentDoc.name : 'Document Preview'"></h3>
+            </div>
+            <div class="flex items-center gap-2">
+                <button type="button" @click="openEditDoc(currentDoc)" class="bg-white/20 hover:bg-white/30 text-white font-semibold text-xs px-4 py-1.5 rounded-md transition cursor-pointer flex items-center gap-1.5">
+                    <span class="material-icons text-sm">edit</span>
+                    <span>Edit</span>
+                </button>
+                <button type="button" @click="downloadDoc(currentDoc)" class="bg-white text-indigo-600 hover:bg-slate-100 font-semibold text-xs px-4 py-1.5 rounded-md transition cursor-pointer flex items-center gap-1.5 shadow-2xs">
+                    <span class="material-icons text-sm">download</span>
+                    <span>Download</span>
+                </button>
+            </div>
+        </div>
+        <div class="flex-1 overflow-y-auto p-4 sm:p-8 bg-slate-100 flex justify-center custom-scrollbar">
+            <div class="bg-white shadow-lg border border-slate-200 rounded-lg p-8 sm:p-12 max-w-4xl w-full min-h-[700px] my-auto" x-html="currentDoc ? (currentDoc.html || '') : ''"></div>
+        </div>
+    </div>
+
+    <!-- EDIT DOCUMENT MODAL (DialogEditHtml) -->
+    <div x-show="editDocModal" class="fixed inset-0 z-70 overflow-hidden flex flex-col bg-slate-900/70 backdrop-blur-xs" style="display: none;" @keydown.escape.window="editDocModal = false" x-cloak>
+        <div class="bg-slate-800 text-white px-6 py-3.5 flex items-center justify-between shadow-md shrink-0">
+            <div class="flex items-center gap-3">
+                <button type="button" @click="editDocModal = false" class="text-white/80 hover:text-white p-1 rounded-full hover:bg-white/10 transition cursor-pointer">
+                    <span class="material-icons text-xl">close</span>
+                </button>
+                <h3 class="text-base font-bold tracking-tight text-white flex items-center gap-2">
+                    <span class="text-amber-400 text-xs px-2 py-0.5 rounded bg-amber-400/20 font-bold uppercase">Editing</span>
+                    <span x-text="currentDoc ? currentDoc.name : 'Edit Document'"></span>
+                </h3>
+            </div>
+            <div class="flex items-center gap-2">
+                <button type="button" @click="editDocModal = false" class="text-slate-300 hover:text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-slate-700 transition cursor-pointer">
+                    Cancel
+                </button>
+                <button type="button" @click="saveDocEdit()" :disabled="docSaving" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs px-5 py-1.5 rounded-md transition cursor-pointer flex items-center gap-1.5 shadow-2xs disabled:opacity-50">
+                    <span class="material-icons text-sm" x-show="!docSaving">save</span>
+                    <span x-text="docSaving ? 'Saving...' : 'Save Document'"></span>
+                </button>
+            </div>
+        </div>
+        <div class="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-100 flex flex-col items-center custom-scrollbar">
+            <div class="bg-white shadow-lg border border-slate-200 rounded-lg p-6 max-w-4xl w-full flex-1 flex flex-col gap-3 min-h-[500px]">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-100 text-xs text-slate-500 font-medium">
+                    <span>Direct HTML & Template Editor</span>
+                    <span>Changes will update & overwrite this document</span>
+                </div>
+                <textarea x-model="editDocHtml" class="w-full flex-1 min-h-[500px] font-mono text-xs p-4 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-indigo-500 leading-relaxed custom-scrollbar"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONFIRM REGENERATE & OVERWRITE MODAL -->
+    <div x-show="confirmRegenerateModal" class="fixed inset-0 z-80 overflow-y-auto flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4" style="display: none;" @keydown.escape.window="confirmRegenerateModal = false" x-cloak>
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-md w-full p-6 space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center shrink-0">
+                    <span class="material-icons text-xl">autorenew</span>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-slate-900">Update & overwrite</h3>
+                    <p class="text-xs text-slate-500 mt-0.5">Do you want to update & overwrite this document?</p>
+                </div>
+            </div>
+            <p class="text-xs text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-200" x-text="'Document: ' + (docToRegenerate ? docToRegenerate.name : '')"></p>
+            <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                <button type="button" @click="confirmRegenerateModal = false" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition cursor-pointer">
+                    Cancel
+                </button>
+                <button type="button" @click="executeRegenerate()" :disabled="docRegenerating" class="px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition cursor-pointer disabled:opacity-50">
+                    <span x-text="docRegenerating ? 'Overwriting...' : 'Update & Overwrite'"></span>
+                </button>
             </div>
         </div>
     </div>

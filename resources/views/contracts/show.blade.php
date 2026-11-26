@@ -678,41 +678,32 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                @php
-                    $orderCode = $contract->orderCode ?? $contract->order_code ?? 'CONTRACT';
-                    $documentCards = [
-                        ['title' => 'PURCHASE_ORDER_' . $orderCode, 'subtitle' => null],
-                        ['title' => 'PROFORMA_INVOICE_' . $orderCode, 'subtitle' => null],
-                        ['title' => 'DELIVERY_NOTE_' . $orderCode, 'subtitle' => null],
-                        ['title' => 'CONTRACT_OF_SALES_' . $orderCode, 'subtitle' => null],
-                        ['title' => 'SPECIMEN_CONTRACT_' . $orderCode, 'subtitle' => null],
-                        ['title' => 'EXPORT_LIABILITY_' . $orderCode, 'subtitle' => null],
-                        ['title' => 'TRANSPORT_ORDER_' . $orderCode, 'subtitle' => null],
-                        ['title' => 'PACKING_LIST_' . $orderCode, 'subtitle' => 'ME-CI26-437'],
-                        ['title' => 'COMMERCIAL_INVOICE_' . $orderCode, 'subtitle' => 'ME-CI26-437'],
-                    ];
-                @endphp
-
-                @foreach($documentCards as $doc)
+                @forelse($contract->generatedFiles as $doc)
                 <div class="bg-white border border-slate-200 rounded-lg p-4 flex flex-col justify-between h-28 shadow-2xs hover:shadow-xs transition" x-data="{ menuOpen: false }">
                     <div>
-                        <div class="text-xs font-bold text-slate-900 tracking-tight leading-snug">{{ $doc['title'] }}</div>
-                        @if($doc['subtitle'])
-                            <div class="text-[11px] text-slate-400 mt-0.5">{{ $doc['subtitle'] }}</div>
-                        @endif
+                        <div class="text-xs font-bold text-slate-900 tracking-tight leading-snug break-all">{{ $doc->name }}</div>
                     </div>
                     <div class="relative">
-                        <button type="button" @click="menuOpen = !menuOpen" class="inline-flex items-center gap-1 text-xs font-semibold text-slate-700 border border-slate-300 rounded px-2.5 py-1 bg-white hover:bg-slate-50 transition">
+                        <button type="button" @click="menuOpen = !menuOpen" class="inline-flex items-center gap-1 text-xs font-semibold text-slate-700 border border-slate-300 rounded px-2.5 py-1 bg-white hover:bg-slate-50 transition cursor-pointer">
                             Actions
                             <span class="material-icons text-sm">arrow_drop_down</span>
                         </button>
-                        <div x-show="menuOpen" @click.away="menuOpen = false" class="absolute left-0 bottom-full mb-1 w-32 bg-white rounded shadow-lg border border-slate-100 py-1 z-20 text-xs">
-                            <a href="#" class="block px-3 py-1.5 hover:bg-slate-50 text-slate-700">Preview</a>
-                            <a href="#" class="block px-3 py-1.5 hover:bg-slate-50 text-slate-700">Download</a>
+                        <div x-show="menuOpen" @click.away="menuOpen = false" class="absolute left-0 bottom-full mb-1 w-36 bg-white rounded shadow-lg border border-slate-100 py-1 z-20 text-xs" x-cloak>
+                            <a href="{{ route('contracts.documents.view', $doc->id) }}" target="_blank" class="block px-3 py-1.5 hover:bg-slate-50 text-slate-700">Preview</a>
+                            <a href="{{ route('contracts.documents.download', $doc->id) }}" class="block px-3 py-1.5 hover:bg-slate-50 text-slate-700">Download</a>
+                            <form action="{{ route('contracts.documents.regenerate', $doc->id) }}" method="POST" onsubmit="return confirm('Do you want to update & overwrite this document?');" class="block m-0 p-0">
+                                @csrf
+                                <input type="hidden" name="contract_id" value="{{ $contract->id }}">
+                                <button type="submit" class="w-full text-left px-3 py-1.5 hover:bg-slate-50 text-slate-700 cursor-pointer">Update & overwrite</button>
+                            </form>
                         </div>
                     </div>
                 </div>
-                @endforeach
+                @empty
+                <div class="col-span-full py-8 text-center text-slate-400 text-xs">
+                    No generated documents found for this contract.
+                </div>
+                @endforelse
             </div>
         </div>
     </div>
