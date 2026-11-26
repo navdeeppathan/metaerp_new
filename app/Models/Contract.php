@@ -116,7 +116,9 @@ class Contract extends Model
 
     public function generatedFiles()
     {
-        return $this->hasMany(GeneratedFile::class, 'contract_id', 'id');
+        return $this->hasMany(GeneratedFile::class, 'contract_id', 'id')->where(function ($q) {
+            $q->where('active', true)->orWhereNull('active');
+        });
     }
 
     public function dealProducts()

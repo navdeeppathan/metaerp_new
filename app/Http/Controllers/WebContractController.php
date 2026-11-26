@@ -688,6 +688,22 @@ class WebContractController extends Controller
     public function updateDocument(Request $request, $id)
     {
         $file = GeneratedFile::findOrFail($id);
+
+        // Record version snapshot in audit logs
+        try {
+            $dataIdCol = \Illuminate\Support\Facades\Schema::hasColumn('logs', 'data_id') ? 'data_id' : 'dataId';
+            $version = Log::where('module', 'GENERATED_FILE')->where($dataIdCol, $file->id)->count() + 1;
+            $history = json_encode([
+                'id' => $file->id,
+                'version' => $version,
+                'name' => $file->name,
+                'content' => base64_encode($file->html ?? ''),
+                'html' => $file->html ?? '',
+                'contractId' => $file->contract_id,
+            ]);
+            $this->auditService->register('GENERATED_FILE', $file->id, 'UPDATED', $history, Auth::id());
+        } catch (\Throwable $e) {}
+
         if ($request->has('html')) {
             $file->html = $request->input('html');
         } elseif ($request->has('content')) {
@@ -710,6 +726,21 @@ class WebContractController extends Controller
         $file = GeneratedFile::findOrFail($id);
         $contract = $file->contract ?: Contract::findOrFail($request->input('contract_id', $file->contract_id));
 
+        // Record version snapshot before regenerate
+        try {
+            $dataIdCol = \Illuminate\Support\Facades\Schema::hasColumn('logs', 'data_id') ? 'data_id' : 'dataId';
+            $version = Log::where('module', 'GENERATED_FILE')->where($dataIdCol, $file->id)->count() + 1;
+            $history = json_encode([
+                'id' => $file->id,
+                'version' => $version,
+                'name' => $file->name,
+                'content' => base64_encode($file->html ?? ''),
+                'html' => $file->html ?? '',
+                'contractId' => $file->contract_id,
+            ]);
+            $this->auditService->register('GENERATED_FILE', $file->id, 'UPDATED', $history, Auth::id());
+        } catch (\Throwable $e) {}
+
         try {
             $this->docService->regenerate($file, $contract, Auth::id());
             if ($request->expectsJson() || $request->ajax()) {
@@ -729,6 +760,108 @@ class WebContractController extends Controller
             }
             return back()->with('error', 'Failed to regenerate document: ' . $e->getMessage());
         }
+    }
+
+    public function deleteDocument($id)
+    {
+        $file = GeneratedFile::findOrFail($id);
+        $file->active = false;
+        $file->save();
+
+        try {
+            $this->auditService->register('GENERATED_FILE', $file->id, 'DELETED', "Document {$file->name} was deleted", Auth::id());
+        } catch (\Throwable $e) {}
+
+        if (request()->expectsJson() || request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Document {$file->name} deleted successfully"
+            ]);
+        }
+        return back()->with('success', "Document {$file->name} deleted successfully");
+    }
+
+    public function documentVersions($id)
+    {
+        $file = GeneratedFile::findOrFail($id);
+        $dataIdCol = \Illuminate\Support\Facades\Schema::hasColumn('logs', 'data_id') ? 'data_id' : 'dataId';
+        $logs = Log::with('user')
+            ->where('module', 'GENERATED_FILE')
+            ->where($dataIdCol, $file->id)
+            ->orderBy('id', 'desc')
+            ->get();
+
+        $versions = $logs->map(function ($log) {
+            $data = json_decode($log->history, true) ?: [];
+            $rawHtml = '';
+            if (!empty($data['html'])) {
+                $rawHtml = $data['html'];
+            } elseif (!empty($data['content'])) {
+                $decoded = base64_decode($data['content'], true);
+                $rawHtml = $decoded !== false ? $decoded : $data['content'];
+            }
+            return [
+                'id' => $log->id,
+                'version' => $data['version'] ?? 1,
+                'userName' => $log->user?->name ?? 'User',
+                'dateTime' => $log->date_time ? \Carbon\Carbon::parse($log->date_time)->format('d M y H:i:s') : '',
+                'action' => $log->action,
+                'html' => $rawHtml,
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'file' => [
+                'id' => $file->id,
+                'name' => $file->name,
+                'html' => $file->html,
+            ],
+            'versions' => $versions
+        ]);
+    }
+
+    public function restoreDocumentVersion(Request $request, $id)
+    {
+        $file = GeneratedFile::findOrFail($id);
+        $logId = $request->input('log_id');
+        $log = Log::findOrFail($logId);
+        $data = json_decode($log->history, true) ?: [];
+
+        $rawHtml = '';
+        if (!empty($data['html'])) {
+            $rawHtml = $data['html'];
+        } elseif (!empty($data['content'])) {
+            $decoded = base64_decode($data['content'], true);
+            $rawHtml = $decoded !== false ? $decoded : $data['content'];
+        }
+
+        if (empty($rawHtml)) {
+            return response()->json(['success' => false, 'message' => 'No content found in this version'], 422);
+        }
+
+        // Save current as version before restoring
+        try {
+            $currentVersion = Log::where('module', 'GENERATED_FILE')->where('data_id', $file->id)->count() + 1;
+            $history = json_encode([
+                'id' => $file->id,
+                'version' => $currentVersion,
+                'name' => $file->name,
+                'content' => base64_encode($file->html ?? ''),
+                'html' => $file->html ?? '',
+                'contractId' => $file->contract_id,
+            ]);
+            $this->auditService->register('GENERATED_FILE', $file->id, 'UPDATED', $history, Auth::id());
+        } catch (\Throwable $e) {}
+
+        $file->html = $rawHtml;
+        $file->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Document restored to version ' . ($data['version'] ?? ''),
+            'file' => $file
+        ]);
     }
 
     public function show($id)

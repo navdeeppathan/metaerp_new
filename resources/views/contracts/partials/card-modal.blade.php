@@ -85,6 +85,15 @@
           docRegenerating: false,
           confirmRegenerateModal: false,
           docToRegenerate: null,
+          confirmDeleteDocModal: false,
+          docToDelete: null,
+          docDeleting: false,
+          docVersionsModal: false,
+          currentDocVersions: [],
+          loadingDocVersions: false,
+          selectedVersionHtml: '',
+          selectedVersionInfo: null,
+          viewVersionModal: false,
 
           openViewDoc(doc) {
               this.currentDoc = doc;
@@ -161,6 +170,88 @@
                   this.docRegenerating = false;
                   console.error(err);
                   if (window.showToast) window.showToast('Failed to regenerate document', 'error');
+              });
+          },
+          confirmDeleteDoc(doc) {
+              this.docToDelete = doc;
+              this.activeDocMenu = null;
+              this.confirmDeleteDocModal = true;
+          },
+          executeDeleteDoc() {
+              if (!this.docToDelete) return;
+              this.docDeleting = true;
+              fetch(`/documents/${this.docToDelete.id}/delete`, {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                      'Accept': 'application/json'
+                  }
+              })
+              .then(res => res.json())
+              .then(data => {
+                  this.docDeleting = false;
+                  this.generatedFiles = this.generatedFiles.filter(f => f.id !== this.docToDelete.id);
+                  this.confirmDeleteDocModal = false;
+                  if (window.showToast) window.showToast('Document deleted successfully', 'success');
+              })
+              .catch(err => {
+                  this.docDeleting = false;
+                  console.error(err);
+                  if (window.showToast) window.showToast('Failed to delete document', 'error');
+              });
+          },
+          openDocVersions(doc) {
+              this.currentDoc = doc;
+              this.activeDocMenu = null;
+              this.docVersionsModal = true;
+              this.loadingDocVersions = true;
+              this.currentDocVersions = [];
+              fetch(`/documents/${doc.id}/versions`, {
+                  headers: { 'Accept': 'application/json' }
+              })
+              .then(res => res.json())
+              .then(data => {
+                  this.loadingDocVersions = false;
+                  this.currentDocVersions = data.versions || [];
+              })
+              .catch(err => {
+                  this.loadingDocVersions = false;
+                  console.error(err);
+                  if (window.showToast) window.showToast('Failed to load versions', 'error');
+              });
+          },
+          previewVersion(ver) {
+              this.selectedVersionHtml = ver.html || (this.currentDoc ? this.currentDoc.html : '') || '';
+              this.selectedVersionInfo = ver;
+              this.viewVersionModal = true;
+          },
+          restoreVersion(ver) {
+              if (!confirm('Are you sure you want to restore to version ' + ver.version + '?')) return;
+              fetch(`/documents/${this.currentDoc.id}/restore-version`, {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                      'Accept': 'application/json'
+                  },
+                  body: JSON.stringify({ log_id: ver.id })
+              })
+              .then(res => res.json())
+              .then(data => {
+                  if (data.file && data.file.html) {
+                      this.currentDoc.html = data.file.html;
+                      const idx = this.generatedFiles.findIndex(f => f.id === this.currentDoc.id);
+                      if (idx !== -1) {
+                          this.generatedFiles[idx].html = data.file.html;
+                      }
+                  }
+                  this.docVersionsModal = false;
+                  if (window.showToast) window.showToast('Document restored successfully', 'success');
+              })
+              .catch(err => {
+                  console.error(err);
+                  if (window.showToast) window.showToast('Failed to restore version', 'error');
               });
           },
           downloadDoc(doc) {
@@ -564,29 +655,32 @@
                         <div class="relative">
                             <button type="button" 
                                     @click="activeDocMenu = (activeDocMenu === doc.id ? null : doc.id)"
-                                    class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 border border-slate-300 rounded px-3 py-1 bg-white hover:bg-slate-50 transition cursor-pointer shadow-2xs">
+                                    class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 border border-slate-300 rounded-full px-3.5 py-1 bg-white hover:bg-slate-50 transition cursor-pointer shadow-2xs">
                                 <span>Actions</span>
-                                <svg class="w-3.5 h-3.5 text-slate-500 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-3.5 h-3.5 text-slate-500 stroke-[2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
                                 </svg>
                             </button>
 
-                            <!-- Actions Dropdown Menu (View, Download, Update and Overwrite) -->
+                            <!-- Actions Dropdown Menu (Matching Image 2: View, Download, Update and Overwrite, Delete, Show versions) -->
                             <div x-show="activeDocMenu === doc.id" 
                                  @click.outside="activeDocMenu = null" 
-                                 class="absolute left-0 bottom-full mb-1 w-44 bg-white rounded-lg shadow-xl border border-slate-200 py-1 z-30 text-xs font-medium"
+                                 class="absolute left-0 top-full mt-1.5 w-48 bg-white rounded-xl shadow-2xl border border-slate-200/90 py-1.5 z-50 text-xs font-normal select-none"
                                  x-cloak>
-                                <button type="button" @click="openViewDoc(doc)" class="w-full text-left px-3.5 py-2 hover:bg-slate-50 text-slate-700 flex items-center gap-2 cursor-pointer">
-                                    <span class="material-icons text-sm text-slate-400">visibility</span>
-                                    <span>View</span>
+                                <button type="button" @click="openViewDoc(doc)" class="w-full text-left px-4 py-2 hover:bg-slate-50 text-slate-700 transition cursor-pointer block">
+                                    View
                                 </button>
-                                <button type="button" @click="downloadDoc(doc)" class="w-full text-left px-3.5 py-2 hover:bg-slate-50 text-slate-700 flex items-center gap-2 cursor-pointer">
-                                    <span class="material-icons text-sm text-slate-400">download</span>
-                                    <span>Download</span>
+                                <button type="button" @click="downloadDoc(doc)" class="w-full text-left px-4 py-2 hover:bg-slate-50 text-slate-700 transition cursor-pointer block">
+                                    Download
                                 </button>
-                                <button type="button" @click="confirmRegenerate(doc)" class="w-full text-left px-3.5 py-2 hover:bg-slate-50 text-slate-700 flex items-center gap-2 cursor-pointer border-t border-slate-100">
-                                    <span class="material-icons text-sm text-indigo-500">autorenew</span>
-                                    <span>Update and Overwrite</span>
+                                <button type="button" @click="confirmRegenerate(doc)" class="w-full text-left px-4 py-2 hover:bg-slate-50 text-slate-700 transition cursor-pointer block">
+                                    Update and Overwrite
+                                </button>
+                                <button type="button" @click="confirmDeleteDoc(doc)" class="w-full text-left px-4 py-2 hover:bg-slate-50 text-slate-700 transition cursor-pointer block">
+                                    Delete
+                                </button>
+                                <button type="button" @click="openDocVersions(doc)" class="w-full text-left px-4 py-2 hover:bg-slate-50 text-slate-700 transition cursor-pointer block">
+                                    Show versions
                                 </button>
                             </div>
                         </div>
@@ -1442,6 +1536,133 @@
                     <span x-text="docRegenerating ? 'Overwriting...' : 'Update & Overwrite'"></span>
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- CONFIRM DELETE DOCUMENT MODAL -->
+    <div x-show="confirmDeleteDocModal" class="fixed inset-0 z-80 overflow-y-auto flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4" style="display: none;" @keydown.escape.window="confirmDeleteDocModal = false" x-cloak>
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-md w-full p-6 space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0">
+                    <span class="material-icons text-xl">delete_outline</span>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-slate-900">Delete document</h3>
+                    <p class="text-xs text-slate-500 mt-0.5">Are you sure you want to delete this document?</p>
+                </div>
+            </div>
+            <p class="text-xs text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-200" x-text="'Document: ' + (docToDelete ? docToDelete.name : '')"></p>
+            <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                <button type="button" @click="confirmDeleteDocModal = false" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition cursor-pointer">
+                    Cancel
+                </button>
+                <button type="button" @click="executeDeleteDoc()" :disabled="docDeleting" class="px-4 py-2 text-xs font-semibold text-white bg-red-600 hover:bg-red-700 rounded-lg transition cursor-pointer disabled:opacity-50">
+                    <span x-text="docDeleting ? 'Deleting...' : 'Delete'"></span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DOCUMENT VERSIONS MODAL (Show versions) -->
+    <div x-show="docVersionsModal" class="fixed inset-0 z-80 overflow-y-auto flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 sm:p-6" style="display: none;" @keydown.escape.window="docVersionsModal = false" x-cloak>
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-2xl w-full p-6 space-y-4 max-h-[85vh] flex flex-col">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center">
+                        <span class="material-icons text-lg">history</span>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-900">Document Versions</h3>
+                        <p class="text-xs text-slate-500" x-text="currentDoc ? currentDoc.name : ''"></p>
+                    </div>
+                </div>
+                <button type="button" @click="docVersionsModal = false" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition cursor-pointer">
+                    <span class="material-icons text-lg">close</span>
+                </button>
+            </div>
+
+            <!-- Loading indicator -->
+            <div x-show="loadingDocVersions" class="py-12 flex flex-col items-center justify-center text-slate-400 text-xs">
+                <span class="material-icons animate-spin text-2xl text-indigo-600 mb-2">refresh</span>
+                <span>Loading versions...</span>
+            </div>
+
+            <!-- Versions list -->
+            <div x-show="!loadingDocVersions" class="flex-1 overflow-y-auto space-y-3 custom-scrollbar pr-1">
+                <!-- Current Version Row -->
+                <div class="p-3.5 rounded-xl border border-indigo-200 bg-indigo-50/40 flex items-center justify-between">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-600 text-white uppercase tracking-wider">Current Version</span>
+                            <span class="text-xs font-semibold text-slate-800">Active Document</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500">Currently active and rendered in this contract.</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button type="button" @click="openViewDoc(currentDoc)" class="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg shadow-2xs transition cursor-pointer">
+                            View
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Historical Versions List -->
+                <template x-for="ver in currentDocVersions" :key="ver.id">
+                    <div class="p-3.5 rounded-xl border border-slate-200 hover:border-slate-300 bg-white flex items-center justify-between transition">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 uppercase" x-text="'v' + ver.version"></span>
+                                <span class="text-xs font-semibold text-slate-800" x-text="ver.userName || 'User'"></span>
+                            </div>
+                            <p class="text-[11px] text-slate-500 font-mono" x-text="ver.dateTime"></p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button type="button" @click="previewVersion(ver)" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition cursor-pointer">
+                                Preview
+                            </button>
+                            <button type="button" @click="restoreVersion(ver)" class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-lg transition cursor-pointer">
+                                Restore
+                            </button>
+                        </div>
+                    </div>
+                </template>
+
+                <div x-show="currentDocVersions.length === 0" class="py-6 text-center text-xs text-slate-400">
+                    No previous historical versions found. Previous versions are archived automatically when you edit or overwrite.
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end pt-3 border-t border-slate-100">
+                <button type="button" @click="docVersionsModal = false" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition cursor-pointer">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PREVIEW HISTORICAL VERSION MODAL -->
+    <div x-show="viewVersionModal" class="fixed inset-0 z-90 overflow-hidden flex flex-col bg-slate-900/70 backdrop-blur-xs" style="display: none;" @keydown.escape.window="viewVersionModal = false" x-cloak>
+        <div class="bg-slate-800 text-white px-6 py-3.5 flex items-center justify-between shadow-md shrink-0">
+            <div class="flex items-center gap-3">
+                <button type="button" @click="viewVersionModal = false" class="text-white/80 hover:text-white p-1 rounded-full hover:bg-white/10 transition cursor-pointer">
+                    <span class="material-icons text-xl">close</span>
+                </button>
+                <h3 class="text-base font-bold tracking-tight text-white flex items-center gap-2">
+                    <span class="text-indigo-400 text-xs px-2 py-0.5 rounded bg-indigo-400/20 font-bold uppercase" x-text="selectedVersionInfo ? ('v' + selectedVersionInfo.version) : 'Historical Version'"></span>
+                    <span x-text="currentDoc ? currentDoc.name : 'Version Preview'"></span>
+                </h3>
+            </div>
+            <div class="flex items-center gap-2">
+                <button type="button" @click="if(selectedVersionInfo) restoreVersion(selectedVersionInfo); viewVersionModal = false;" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs px-4 py-1.5 rounded-md transition cursor-pointer flex items-center gap-1.5 shadow-2xs">
+                    <span class="material-icons text-sm">restore</span>
+                    <span>Restore this version</span>
+                </button>
+                <button type="button" @click="viewVersionModal = false" class="text-slate-300 hover:text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-slate-700 transition cursor-pointer">
+                    Close
+                </button>
+            </div>
+        </div>
+        <div class="flex-1 overflow-y-auto p-4 sm:p-8 bg-slate-100 flex justify-center custom-scrollbar">
+            <div class="bg-white shadow-lg border border-slate-200 rounded-lg p-8 sm:p-12 max-w-4xl w-full min-h-[700px] my-auto" x-html="selectedVersionHtml || ''"></div>
         </div>
     </div>
 </form>

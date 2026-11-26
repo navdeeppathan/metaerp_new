@@ -61,6 +61,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/search/autocomplete/{text}', [\App\Http\Controllers\Api\SearchController::class, 'search'])->name('search.autocomplete');
         Route::get('/documents/{id}/view', [WebContractController::class, 'viewDocument'])->name('contracts.documents.view');
         Route::get('/documents/{id}/download', [WebContractController::class, 'downloadDocument'])->name('contracts.documents.download');
+        Route::get('/documents/{id}/versions', [WebContractController::class, 'documentVersions'])->name('contracts.documents.versions');
     });
 
     Route::middleware('permission:CONTRACT,FULL')->group(function () {
@@ -75,6 +76,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/contracts/{id}/generate-doc', [WebContractController::class, 'generateDoc'])->name('contracts.generateDoc');
         Route::post('/documents/{id}/update', [WebContractController::class, 'updateDocument'])->name('contracts.documents.update');
         Route::post('/documents/{id}/regenerate', [WebContractController::class, 'regenerateDocument'])->name('contracts.documents.regenerate');
+        Route::match(['post', 'delete'], '/documents/{id}/delete', [WebContractController::class, 'deleteDocument'])->name('contracts.documents.delete');
+        Route::post('/documents/{id}/restore-version', [WebContractController::class, 'restoreDocumentVersion'])->name('contracts.documents.restoreVersion');
         Route::post('/contracts/{id}/duplicate', [WebContractController::class, 'duplicate'])->name('contracts.duplicate');
     });
 

@@ -688,14 +688,19 @@
                             Actions
                             <span class="material-icons text-sm">arrow_drop_down</span>
                         </button>
-                        <div x-show="menuOpen" @click.away="menuOpen = false" class="absolute left-0 bottom-full mb-1 w-36 bg-white rounded shadow-lg border border-slate-100 py-1 z-20 text-xs" x-cloak>
-                            <a href="{{ route('contracts.documents.view', $doc->id) }}" target="_blank" class="block px-3 py-1.5 hover:bg-slate-50 text-slate-700">Preview</a>
-                            <a href="{{ route('contracts.documents.download', $doc->id) }}" class="block px-3 py-1.5 hover:bg-slate-50 text-slate-700">Download</a>
+                        <div x-show="menuOpen" @click.away="menuOpen = false" class="absolute left-0 bottom-full mb-1 w-44 bg-white rounded-xl shadow-xl border border-slate-100 py-1.5 z-20 text-xs" x-cloak>
+                            <a href="{{ route('contracts.documents.view', $doc->id) }}" target="_blank" class="block px-4 py-2 hover:bg-slate-50 text-slate-700">View</a>
+                            <a href="{{ route('contracts.documents.download', $doc->id) }}" class="block px-4 py-2 hover:bg-slate-50 text-slate-700">Download</a>
                             <form action="{{ route('contracts.documents.regenerate', $doc->id) }}" method="POST" onsubmit="return confirm('Do you want to update & overwrite this document?');" class="block m-0 p-0">
                                 @csrf
                                 <input type="hidden" name="contract_id" value="{{ $contract->id }}">
-                                <button type="submit" class="w-full text-left px-3 py-1.5 hover:bg-slate-50 text-slate-700 cursor-pointer">Update & overwrite</button>
+                                <button type="submit" class="w-full text-left px-4 py-2 hover:bg-slate-50 text-slate-700 cursor-pointer">Update and Overwrite</button>
                             </form>
+                            <form action="{{ route('contracts.documents.delete', $doc->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this document?');" class="block m-0 p-0">
+                                @csrf
+                                <button type="submit" class="w-full text-left px-4 py-2 hover:bg-slate-50 text-slate-700 cursor-pointer">Delete</button>
+                            </form>
+                            <a href="{{ route('contracts.documents.versions', $doc->id) }}" target="_blank" class="block px-4 py-2 hover:bg-slate-50 text-slate-700">Show versions</a>
                         </div>
                     </div>
                 </div>
