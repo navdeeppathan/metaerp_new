@@ -21,6 +21,8 @@ use App\Models\Log;
 use App\Models\GeneratedFile;
 use App\Models\Country;
 use App\Models\User;
+use App\Models\DetachedNote;
+use App\Models\DetachedNoteDetail;
 use App\Services\OrderCodeService;
 use App\Services\ContractActionService;
 use App\Services\ContractAssociationService;
@@ -145,10 +147,12 @@ class WebContractController extends Controller
             ->orderBy('date_time', 'desc')
             ->get();
 
+        $invoiceDiff = $this->docService->getInvoiceDifference($contract);
+
         return view('contracts.partials.card-modal', compact(
             'contract', 'stages', 'templates', 'companies', 'contacts', 
             'products', 'currencies', 'packTypes', 'paymentTypes', 'paymentTerms', 
-            'countries', 'activities', 'users'
+            'countries', 'activities', 'users', 'invoiceDiff'
         ));
     }
 
@@ -274,6 +278,12 @@ class WebContractController extends Controller
                 return back()->with('error', $e->getMessage());
             }
         }
+    }
+
+    public function moveStageDirect(Request $request, $contractId, $stageId)
+    {
+        $request->merge(['stage_id' => $stageId]);
+        return $this->moveStage($request, $contractId);
     }
 
     public function store(Request $request)
@@ -726,11 +736,17 @@ class WebContractController extends Controller
             $backUrl = url('/contracts/models/' . $stageId);
         }
 
+        $invoiceDiff = null;
+        if ($contract && str_starts_with($file->name, 'COMMERCIAL_INVOICE_')) {
+            $invoiceDiff = $this->docService->getInvoiceDifference($contract);
+        }
+
         return view('contracts.documents.view', [
             'document' => $file,
             'html' => $file->html,
             'contract' => $contract,
             'backUrl' => $backUrl,
+            'invoiceDiff' => $invoiceDiff,
         ]);
     }
 
@@ -802,11 +818,13 @@ class WebContractController extends Controller
 
         try {
             $this->docService->regenerate($file, $contract, Auth::id());
+            $diff = $this->docService->getInvoiceDifference($contract);
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
                     'success' => true,
                     'message' => 'Document updated & overwritten successfully',
-                    'file' => $file
+                    'file' => $file,
+                    'diff' => $diff,
                 ]);
             }
             return back()->with('success', 'Document updated & overwritten successfully');
@@ -920,6 +938,107 @@ class WebContractController extends Controller
             'success' => true,
             'message' => 'Document restored to version ' . ($data['version'] ?? ''),
             'file' => $file
+        ]);
+    }
+
+    /**
+     * Get the difference between Proforma Invoice and Commercial Invoice.
+     */
+    public function getInvoiceDiff($id)
+    {
+        $contract = Contract::with('generatedFiles')->findOrFail($id);
+        $diff = $this->docService->getInvoiceDifference($contract);
+        return response()->json($diff);
+    }
+
+    /**
+     * Automate creation of Credit Note or Debit Note based on difference between
+     * Proforma Invoice and Commercial Invoice totals.
+     */
+    public function createInvoiceNote(Request $request, $id)
+    {
+        $contract = Contract::with([
+            'sale.products.product',
+            'sale.currency',
+            'sale.metaCompany',
+            'sale.contact',
+            'sale.address',
+            'purchase.products.product',
+            'purchase.currency',
+            'purchase.metaCompany',
+            'purchase.contact',
+            'purchase.address',
+            'generatedFiles',
+        ])->findOrFail($id);
+
+        $diff = $this->docService->getInvoiceDifference($contract);
+
+        if (!$diff['has_difference']) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No difference between Proforma Invoice and Commercial Invoice totals.',
+            ], 422);
+        }
+
+        $type = $request->input('type') ?: $diff['type']; // 'CREDIT' or 'DEBIT'
+        $amount = (float)$diff['amount'];
+        $currency = $diff['currency'];
+
+        // Find or create DetachedNote
+        $note = DetachedNote::where('contract_id', $contract->id)
+            ->where('kind', $type)
+            ->first();
+
+        $complementText = 'Automated ' . ($type === 'CREDIT' ? 'Credit' : 'Debit') . ' Note: Difference between Proforma (' . $currency . ' ' . number_format($diff['proforma_total'], 2) . ') and Commercial Invoice (' . $currency . ' ' . number_format($diff['commercial_total'], 2) . ')';
+
+        if (!$note) {
+            $note = DetachedNote::create([
+                'kind' => $type,
+                'contract_id' => $contract->id,
+                'complement' => $complementText,
+            ]);
+        } else {
+            $note->complement = $complementText;
+            $note->save();
+        }
+
+        // Deal product for detail item
+        $dealProduct = $contract->sale?->products?->first() ?? $contract->purchase?->products?->first();
+
+        // Clear existing details and re-create with exact difference
+        $note->details()->delete();
+
+        DetachedNoteDetail::create([
+            'detached_note_id' => $note->id,
+            'credit_debit_type_id' => 11, // Discrepancy in Quantity Identified During Receipt of Goods / Invoice discrepancy
+            'deal_product_id' => $dealProduct?->id,
+            'container' => null,
+            'amount' => $amount,
+            'complement' => 'Invoice discrepancy adjustment: ' . $diff['reason'],
+        ]);
+
+        // Determine user for signature & stamp (auth user -> contract user -> default 1)
+        $userId = $request->input('user_id') ?: (Auth::id() ?: ($contract->user_id ?: 1));
+
+        // Generate or update the document
+        $note->load(['details.dealProduct.product', 'details.creditDebitType', 'contract.purchase', 'contract.sale']);
+        $file = $this->docService->generateForDetachedNote($note, $userId);
+
+        // Recalculate updated difference
+        $contract->load('generatedFiles');
+        $updatedDiff = $this->docService->getInvoiceDifference($contract);
+
+        return response()->json([
+            'success' => true,
+            'message' => ($type === 'CREDIT' ? 'Credit Note' : 'Debit Note') . ' generated successfully for ' . $currency . ' ' . number_format($amount, 2),
+            'note' => $note,
+            'file' => [
+                'id' => $file->id,
+                'name' => $file->name,
+                'html' => $file->html,
+                'content' => $file->content,
+            ],
+            'diff' => $updatedDiff,
         ]);
     }
 

@@ -76,6 +76,8 @@
           checklists: @js($contract->checklists ? $contract->checklists->map(fn($c) => ['id' => $c->id, 'name' => $c->name ?? 'Checklist', 'checkItems' => $c->checkitems ? $c->checkitems->map(fn($ci) => ['id' => $ci->id, 'name' => $ci->name, 'checked' => (bool)$ci->checked]) : []]) : []),
           newChecklistTitle: '',
           generatedFiles: @js($contract->generatedFiles ? $contract->generatedFiles->map(fn($f) => ['id' => $f->id, 'name' => $f->name, 'html' => $f->html, 'content' => $f->content]) : []),
+          invoiceDiff: @js($invoiceDiff ?? null),
+          noteGenerating: false,
           activeDocMenu: null,
           viewDocModal: false,
           editDocModal: false,
@@ -163,6 +165,9 @@
                       if (idx !== -1) {
                           this.generatedFiles[idx].html = data.file.html;
                       }
+                  }
+                  if (data.diff) {
+                      this.invoiceDiff = data.diff;
                   }
                   this.confirmRegenerateModal = false;
                   if (window.showToast) window.showToast('Update & overwrite successfully', 'success');
@@ -259,6 +264,58 @@
               if (!doc) return;
               this.activeDocMenu = null;
               window.open(`/documents/${doc.id}/download`, '_blank');
+          },
+          createInvoiceNote(type) {
+              if (this.noteGenerating) return;
+              this.noteGenerating = true;
+              this.activeDocMenu = null;
+
+              fetch(`/contracts/{{ $contract->id }}/create-invoice-note`, {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                      'Accept': 'application/json'
+                  },
+                  body: JSON.stringify({ type: type })
+              })
+              .then(res => res.json())
+              .then(data => {
+                  this.noteGenerating = false;
+                  if (data.success) {
+                      if (data.diff) {
+                          this.invoiceDiff = data.diff;
+                      }
+                      if (data.file) {
+                          const idx = this.generatedFiles.findIndex(f => f.id === data.file.id || f.name === data.file.name);
+                          if (idx !== -1) {
+                              this.generatedFiles[idx] = data.file;
+                          } else {
+                              this.generatedFiles.push(data.file);
+                          }
+                      }
+                      if (window.showToast) {
+                          window.showToast(data.message, 'success');
+                      } else {
+                          alert(data.message);
+                      }
+                  } else {
+                      if (window.showToast) {
+                          window.showToast(data.message || 'Failed to generate note', 'error');
+                      } else {
+                          alert(data.message || 'Failed to generate note');
+                      }
+                  }
+              })
+              .catch(err => {
+                  this.noteGenerating = false;
+                  console.error(err);
+                  if (window.showToast) {
+                      window.showToast('Error generating note', 'error');
+                  } else {
+                      alert('Error generating note');
+                  }
+              });
           },
 
           formatDueDate(val) {
@@ -691,7 +748,7 @@
                             <!-- Actions Dropdown Menu (Matching Image 2: View, Download, Update and Overwrite, Delete, Show versions) -->
                             <div x-show="activeDocMenu === doc.id" 
                                  @click.outside="activeDocMenu = null" 
-                                 class="absolute left-0 top-full mt-1.5 w-48 bg-white rounded-xl shadow-2xl border border-slate-200/90 py-1.5 z-50 text-xs font-normal select-none"
+                                 class="absolute left-0 top-full mt-1.5 w-56 min-w-[220px] bg-white rounded-xl shadow-2xl border border-slate-200/90 py-1.5 z-50 text-xs font-normal select-none"
                                  x-cloak>
                                 <a :href="'/documents/' + doc.id + '/view'" @click="activeDocMenu = null" class="w-full text-left px-4 py-2 hover:bg-slate-50 text-slate-700 transition cursor-pointer block">
                                     View
@@ -708,6 +765,34 @@
                                 <button type="button" @click="openDocVersions(doc)" class="w-full text-left px-4 py-2 hover:bg-slate-50 text-slate-700 transition cursor-pointer block">
                                     Show versions
                                 </button>
+
+                                <!-- Automated Credit / Debit Note Action (Strictly for COMMERCIAL_INVOICE when invoice discrepancy exists) -->
+                                <template x-if="doc.name && doc.name.startsWith('COMMERCIAL_INVOICE_') && invoiceDiff && invoiceDiff.has_difference">
+                                    <div class="border-t border-slate-100 my-1 pt-1">
+                                        <template x-if="invoiceDiff.type === 'CREDIT'">
+                                            <button type="button" 
+                                                    @click="createInvoiceNote('CREDIT')" 
+                                                    :disabled="noteGenerating"
+                                                    class="w-full text-left px-4 py-2 hover:bg-emerald-50 text-emerald-700 font-semibold transition cursor-pointer flex items-center gap-1.5">
+                                                <svg class="w-3.5 h-3.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                                </svg>
+                                                <span x-text="noteGenerating ? 'Generating...' : (invoiceDiff.already_has_note ? 'Re-create Credit Note (' + invoiceDiff.currency + ' ' + invoiceDiff.formatted_amount + ')' : 'Create Credit Note (' + invoiceDiff.currency + ' ' + invoiceDiff.formatted_amount + ')')"></span>
+                                            </button>
+                                        </template>
+                                        <template x-if="invoiceDiff.type === 'DEBIT'">
+                                            <button type="button" 
+                                                    @click="createInvoiceNote('DEBIT')" 
+                                                    :disabled="noteGenerating"
+                                                    class="w-full text-left px-4 py-2 hover:bg-amber-50 text-amber-700 font-semibold transition cursor-pointer flex items-center gap-1.5">
+                                                <svg class="w-3.5 h-3.5 text-amber-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                                </svg>
+                                                <span x-text="noteGenerating ? 'Generating...' : (invoiceDiff.already_has_note ? 'Re-create Debit Note (' + invoiceDiff.currency + ' ' + invoiceDiff.formatted_amount + ')' : 'Create Debit Note (' + invoiceDiff.currency + ' ' + invoiceDiff.formatted_amount + ')')"></span>
+                                            </button>
+                                        </template>
+                                    </div>
+                                </template>
                             </div>
                         </div>
                     </div>

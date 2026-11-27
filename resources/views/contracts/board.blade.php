@@ -42,6 +42,46 @@
         <span x-text="toast.message"></span>
     </div>
 
+    <!-- CONFIRM MOVE CONTRACT MODAL (Matching exact React DialogMeta in Screenshot) -->
+    <div x-show="confirmMoveModal" 
+         class="fixed inset-0 z-50 overflow-y-auto flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4" 
+         style="display: none;" 
+         @keydown.escape.window="cancelMove()" 
+         x-cloak>
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200/90 max-w-md w-full p-6 space-y-4"
+             @click.outside="cancelMove()">
+            
+            <!-- Dialog Title (Contract Order Code) -->
+            <div>
+                <h3 class="text-lg font-bold text-slate-800 tracking-tight" 
+                    x-text="pendingMove ? (pendingMove.orderCode || 'Confirmation') : 'Confirmation'">
+                </h3>
+            </div>
+
+            <!-- Dialog Content (Description & Subtext) -->
+            <div class="space-y-1.5 text-sm text-slate-600">
+                <p x-text="pendingMove ? ('Do you want to move this contract to ' + pendingMove.targetStageName + ' column?') : ''"></p>
+                <p class="text-xs text-slate-400">This action cannot be undone</p>
+            </div>
+
+            <!-- Dialog Actions (Yes / No) matching React Material-UI DialogMeta -->
+            <div class="flex items-center justify-end gap-3 pt-3">
+                <button type="button" 
+                        @click="confirmMove()" 
+                        :disabled="moveSubmitting"
+                        class="px-4 py-1.5 text-sm font-semibold text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50/60 rounded-md transition cursor-pointer disabled:opacity-50">
+                    <span x-text="moveSubmitting ? 'Moving...' : 'Yes'"></span>
+                </button>
+                <button type="button" 
+                        @click="cancelMove()" 
+                        :disabled="moveSubmitting"
+                        class="px-4 py-1.5 text-sm font-semibold text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50/60 rounded-md transition cursor-pointer disabled:opacity-50">
+                    No
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Kanban Stages Horizontal Scroll Container -->
     <div class="flex gap-4 overflow-x-auto pb-6 pt-1 items-start min-h-[calc(100vh-220px)] select-none">
         @forelse($stages as $stage)
@@ -52,7 +92,7 @@
              :class="dropTargetStageId == {{ $stage->id }} ? 'border-2 border-dashed !border-indigo-500 bg-indigo-50/50' : 'border-slate-200/60'"
              @dragover.prevent="onDragOver($event, {{ $stage->id }})"
              @dragleave="onDragLeave($event, {{ $stage->id }})"
-             @drop.prevent="onDrop($event, {{ $stage->id }})">
+             @drop.prevent="onDrop($event, {{ $stage->id }}, '{{ addslashes($stage->description ?? $stage->name) }}')">
             
             <!-- Stage Header (Matching Screenshot 3 & 4) -->
             <div class="flex items-center justify-between pb-3 mb-2 px-1">
@@ -90,7 +130,7 @@
                      data-company="{{ strtolower($companyName) }}"
                      x-show="matchesSearch('{{ strtolower($contract->orderCode ?? '') }}', '{{ strtolower($companyName) }}')"
                      @click="openCardModal({{ $contract->id }})"
-                     @dragstart="onDragStart($event, {{ $contract->id }}, {{ $stage->id }})"
+                     @dragstart="onDragStart($event, {{ $contract->id }}, {{ $stage->id }}, '{{ addslashes($contract->orderCode ?? '') }}')"
                      @dragend="onDragEnd($event)">
                     
                     <!-- Top Pill Tag & Arrow (Matching React BoardCard.js & Tailwind theme) -->
@@ -1158,7 +1198,11 @@ function kanbanBoard() {
         searchQuery: '',
         draggingContractId: null,
         draggingSourceStageId: null,
+        draggingOrderCode: '',
         dropTargetStageId: null,
+        confirmMoveModal: false,
+        pendingMove: null,
+        moveSubmitting: false,
 
         openCardModal(id) {
             this.activeContractId = id;
@@ -1495,11 +1539,12 @@ function kanbanBoard() {
             return code.includes(q) || company.includes(q);
         },
 
-        onDragStart(event, contractId, stageId) {
+        onDragStart(event, contractId, stageId, orderCode) {
             this.draggingContractId = contractId;
             this.draggingSourceStageId = stageId;
+            this.draggingOrderCode = orderCode || '';
             event.dataTransfer.effectAllowed = 'move';
-            event.dataTransfer.setData('text/plain', JSON.stringify({ contractId, stageId }));
+            event.dataTransfer.setData('text/plain', JSON.stringify({ contractId, stageId, orderCode }));
             
             setTimeout(() => {
                 if (event.target) {
@@ -1526,14 +1571,43 @@ function kanbanBoard() {
             }
         },
 
-        onDrop(event, targetStageId) {
+        onDrop(event, targetStageId, targetStageName) {
             this.dropTargetStageId = null;
             const contractId = this.draggingContractId;
             const sourceStageId = this.draggingSourceStageId;
+            const orderCode = this.draggingOrderCode;
+
+            // Remove visual dragging class from card
+            if (contractId) {
+                const cardEl = document.getElementById(`card-contract-${contractId}`);
+                if (cardEl) {
+                    cardEl.classList.remove('opacity-40', 'scale-95');
+                }
+            }
 
             if (!contractId || sourceStageId === targetStageId) {
+                this.draggingContractId = null;
+                this.draggingSourceStageId = null;
+                this.draggingOrderCode = '';
                 return;
             }
+
+            // Open confirmation dialog matching React DialogMeta (screenshot media_1795779033530_84f36a90.jpg)
+            this.pendingMove = {
+                contractId: contractId,
+                sourceStageId: sourceStageId,
+                targetStageId: targetStageId,
+                orderCode: orderCode || 'Contract',
+                targetStageName: targetStageName || 'Target'
+            };
+            this.confirmMoveModal = true;
+        },
+
+        confirmMove() {
+            if (!this.pendingMove || this.moveSubmitting) return;
+
+            const { contractId, sourceStageId, targetStageId } = this.pendingMove;
+            this.moveSubmitting = true;
 
             const cardEl = document.getElementById(`card-contract-${contractId}`);
             const sourceCol = document.getElementById(`column-stage-${sourceStageId}`);
@@ -1541,6 +1615,7 @@ function kanbanBoard() {
             const sourceBadge = document.getElementById(`badge-stage-${sourceStageId}`);
             const targetBadge = document.getElementById(`badge-stage-${targetStageId}`);
 
+            // Optimistically move card in DOM
             if (cardEl && targetCol) {
                 const targetEmpty = targetCol.querySelector('.empty-placeholder');
                 if (targetEmpty) targetEmpty.remove();
@@ -1557,33 +1632,89 @@ function kanbanBoard() {
                     const count = parseInt(targetBadge.innerText || '0') + 1;
                     targetBadge.innerText = count;
                 }
-
-                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-                
-                fetch(`/contracts/${contractId}/move-stage`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken
-                    },
-                    body: JSON.stringify({ stage_id: targetStageId })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        this.showToast('Contract moved successfully');
-                    } else {
-                        console.warn('Move returned false:', data);
-                    }
-                })
-                .catch(err => {
-                    console.error('Failed to move contract stage:', err);
-                });
             }
 
+            const csrfToken = '{{ csrf_token() }}';
+
+            fetch(`/contracts/${contractId}/move-stage`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({ stage_id: targetStageId })
+            })
+            .then(res => res.json())
+            .then(data => {
+                this.moveSubmitting = false;
+                this.confirmMoveModal = false;
+                this.pendingMove = null;
+                this.draggingContractId = null;
+                this.draggingSourceStageId = null;
+                this.draggingOrderCode = '';
+
+                if (data.success) {
+                    this.showToast('Contract moved');
+                } else {
+                    this.rollbackCard(contractId, sourceStageId, targetStageId);
+                    if (window.showToast) {
+                        window.showToast(data.message || 'Failed to move contract', 'error');
+                    } else {
+                        alert(data.message || 'Failed to move contract');
+                    }
+                }
+            })
+            .catch(err => {
+                this.moveSubmitting = false;
+                this.confirmMoveModal = false;
+                this.pendingMove = null;
+                this.draggingContractId = null;
+                this.draggingSourceStageId = null;
+                this.draggingOrderCode = '';
+
+                console.error('Failed to move contract stage:', err);
+                this.rollbackCard(contractId, sourceStageId, targetStageId);
+                if (window.showToast) {
+                    window.showToast('Network error moving contract', 'error');
+                } else {
+                    alert('Network error moving contract');
+                }
+            });
+        },
+
+        cancelMove() {
+            if (this.moveSubmitting) return;
+            const contractId = this.pendingMove ? this.pendingMove.contractId : this.draggingContractId;
+            if (contractId) {
+                const cardEl = document.getElementById(`card-contract-${contractId}`);
+                if (cardEl) {
+                    cardEl.classList.remove('opacity-40', 'scale-95');
+                }
+            }
+            this.confirmMoveModal = false;
+            this.pendingMove = null;
             this.draggingContractId = null;
             this.draggingSourceStageId = null;
+            this.draggingOrderCode = '';
+        },
+
+        rollbackCard(contractId, sourceStageId, targetStageId) {
+            const cardEl = document.getElementById(`card-contract-${contractId}`);
+            const sourceCol = document.getElementById(`column-stage-${sourceStageId}`);
+            const sourceBadge = document.getElementById(`badge-stage-${sourceStageId}`);
+            const targetBadge = document.getElementById(`badge-stage-${targetStageId}`);
+
+            if (cardEl && sourceCol) {
+                sourceCol.prepend(cardEl);
+                cardEl.setAttribute('data-stage-id', sourceStageId);
+                if (sourceBadge) {
+                    sourceBadge.innerText = parseInt(sourceBadge.innerText || '0') + 1;
+                }
+                if (targetBadge) {
+                    targetBadge.innerText = Math.max(0, parseInt(targetBadge.innerText || '0') - 1);
+                }
+            }
         }
     };
 }

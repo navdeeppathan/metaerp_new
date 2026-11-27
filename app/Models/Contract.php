@@ -501,5 +501,70 @@ class Contract extends Model
         }
         return $codes->unique()->values();
     }
+
+    public function isCreditNote(): bool
+    {
+        return $this->checkNote(true);
+    }
+
+    public function isDebitNote(): bool
+    {
+        return $this->checkNote(false);
+    }
+
+    public function checkNote(bool $isCreditNote): bool
+    {
+        $weightTolerance = $this->weight_tolerance;
+        if ($weightTolerance === null) {
+            return false;
+        }
+
+        $containers = $this->getContainersSummary();
+        foreach ($containers as $c) {
+            $received = $c['quantity_received'] ?? null;
+            $net = $c['net_weight'] ?? null;
+            if ($received !== null && $net !== null) {
+                $diff = abs($received - $net);
+                $exceedsTolerance = ($diff - (float)$weightTolerance) > 0.0001;
+                $isDiscrepancy = $isCreditNote ? ($received < $net) : ($received > $net);
+                if ($isDiscrepancy && $exceedsTolerance) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public function getContainersSummary(): array
+    {
+        $containers = [];
+        $this->loadMissing('packingLists.packs.dealProduct');
+        if ($this->packingLists) {
+            foreach ($this->packingLists as $pl) {
+                if ($pl->packs) {
+                    foreach ($pl->packs as $pack) {
+                        $containerNumber = $pack->container_number ?? $pack->containerNumber;
+                        $dealProductId = $pack->deal_product_id ?? $pack->dealProduct?->id;
+                        if ($containerNumber && $dealProductId) {
+                            $key = $containerNumber . '_' . $dealProductId;
+                            if (!isset($containers[$key])) {
+                                $containers[$key] = [
+                                    'container_number' => $containerNumber,
+                                    'deal_product_id' => $dealProductId,
+                                    'gross_weight' => 0.0,
+                                    'net_weight' => 0.0,
+                                    'quantity_received' => 0.0,
+                                ];
+                            }
+                            $containers[$key]['gross_weight'] += (float)($pack->gross_weight ?? $pack->grossWeight ?? 0);
+                            $containers[$key]['net_weight'] += (float)($pack->net_weight ?? $pack->netWeight ?? 0);
+                            $containers[$key]['quantity_received'] += (float)($pack->quantity_received ?? $pack->quantityReceived ?? 0);
+                        }
+                    }
+                }
+            }
+        }
+        return array_values($containers);
+    }
 }
 

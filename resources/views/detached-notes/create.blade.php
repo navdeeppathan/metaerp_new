@@ -46,6 +46,7 @@
             <!-- Hidden Inputs for Form Submission -->
             <input type="hidden" name="contract_id" :value="contractId">
             <input type="hidden" name="kind" :value="kind">
+            <input type="hidden" name="user_id" :value="userId">
             <input type="hidden" name="complement" :value="complement">
 
             <!-- Hidden repeater for details items -->
@@ -108,6 +109,23 @@
                     <select x-model="kind" required class="w-full bg-transparent text-sm text-slate-900 font-semibold focus:outline-none cursor-pointer appearance-none pr-8">
                         <option value="CREDIT">CREDIT</option>
                         <option value="DEBIT">DEBIT</option>
+                    </select>
+                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center text-slate-400">
+                        <span class="material-icons text-base">arrow_drop_down</span>
+                    </div>
+                </div>
+
+                <!-- Authorised Person (Approved by) * -->
+                <div class="relative border border-slate-300 rounded-md px-3.5 pt-2.5 pb-2 bg-white focus-within:border-indigo-600 transition">
+                    <label class="absolute -top-2 left-3 bg-white px-1 text-[11px] text-slate-500 font-medium">Authorised Person (Approved by) *</label>
+                    <select x-model="userId" required class="w-full bg-transparent text-sm text-slate-900 font-semibold focus:outline-none cursor-pointer appearance-none pr-8">
+                        @if(isset($users))
+                            @foreach($users as $u)
+                            <option value="{{ $u->id }}">
+                                {{ $u->name }} {{ $u->occupation ? ' (' . $u->occupation . ')' : '' }}
+                            </option>
+                            @endforeach
+                        @endif
                     </select>
                     <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none flex items-center text-slate-400">
                         <span class="material-icons text-base">arrow_drop_down</span>
@@ -244,6 +262,7 @@ function detachedNoteForm() {
         contractSearch: '{{ $selectedContract->orderCode ?? "" }}',
         contractDropdownOpen: false,
         kind: 'CREDIT',
+        userId: '{{ auth()->id() ?? (isset($users[0]) ? $users[0]->id : 1) }}',
         complement: '',
         
         creditDebitTypes: @json($creditDebitTypes),

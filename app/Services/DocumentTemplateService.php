@@ -5,6 +5,9 @@ namespace App\Services;
 use App\Models\Contract;
 use App\Models\Template;
 use App\Models\GeneratedFile;
+use App\Models\User;
+use App\Models\Company;
+use App\Models\Archive;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
@@ -111,6 +114,11 @@ class DocumentTemplateService
                 $alt = trim($mAlt[2]);
             }
 
+            // If src already has data:image, preserve it
+            if (str_starts_with($src, 'data:image')) {
+                return $match[0];
+            }
+
             $newSrc = null;
 
             // 1. If ID is numeric, query archive table
@@ -148,6 +156,26 @@ class DocumentTemplateService
                 }
             }
 
+            // 4. If ID or alt indicates stamp
+            if (empty($newSrc)) {
+                if ($imgId === '{company_stamp}' || $imgId === 'company_stamp' || stripos($alt, 'stamp') !== false) {
+                    $defStamp = \App\Models\Archive::find(9) ?: \App\Models\Archive::find(2);
+                    if ($defStamp && !empty($defStamp->content)) {
+                        $newSrc = 'data:image/jpeg;base64,' . $defStamp->content;
+                    }
+                }
+            }
+
+            // 5. If ID or alt indicates signature
+            if (empty($newSrc)) {
+                if ($imgId === '{user_signature}' || $imgId === 'user_signature' || stripos($alt, 'signature') !== false) {
+                    $defSig = \App\Models\Archive::find(6) ?: \App\Models\Archive::find(1);
+                    if ($defSig && !empty($defSig->content)) {
+                        $newSrc = 'data:image/png;base64,' . $defSig->content;
+                    }
+                }
+            }
+
             // If we found a valid replacement source, update or insert src
             if (!empty($newSrc)) {
                 if (preg_match('/\bsrc=(["\']).*?\1/i', $attrs)) {
@@ -179,6 +207,12 @@ class DocumentTemplateService
             $docTypes = self::STAGE_DOCUMENTS['SHIPPING_ORDER'];
         } elseif (str_contains($stageName, 'COMPLETION')) {
             $docTypes = self::STAGE_DOCUMENTS['ORDER_COMPLETION'];
+            if (method_exists($contract, 'isCreditNote') && $contract->isCreditNote()) {
+                $docTypes[] = 'CREDIT_NOTE';
+            }
+            if (method_exists($contract, 'isDebitNote') && $contract->isDebitNote()) {
+                $docTypes[] = 'DEBIT_NOTE';
+            }
         }
 
         $existingFiles = $contract->generatedFiles()->get();
@@ -201,6 +235,19 @@ class DocumentTemplateService
                 $file = $this->createDocumentOfType($type, $contract, $template, $userId);
                 $created->push($file);
             }
+        }
+
+        // Ensure all detached notes for this contract have their generated files
+        try {
+            $detachedNotes = \App\Models\DetachedNote::where('contract_id', $contract->id)->get();
+            foreach ($detachedNotes as $dNote) {
+                if (!$dNote->generated_file_id || !\App\Models\GeneratedFile::where('id', $dNote->generated_file_id)->exists()) {
+                    $dNote->load(['details.dealProduct.product', 'details.creditDebitType', 'contract.purchase', 'contract.sale']);
+                    $this->generateForDetachedNote($dNote, $userId);
+                }
+            }
+        } catch (\Throwable $e) {
+            \Log::error('Error ensuring detached notes for contract ' . $contract->id . ': ' . $e->getMessage());
         }
 
         return $contract->generatedFiles()->get();
@@ -263,11 +310,305 @@ class DocumentTemplateService
     }
 
     /**
+     * Generate or update a GeneratedFile document for a DetachedNote (Credit Note or Debit Note).
+     */
+    public function generateForDetachedNote(\App\Models\DetachedNote $note, ?int $userId = null): GeneratedFile
+    {
+        $note->loadMissing([
+            'contract.sale.metaCompany',
+            'contract.sale.contact',
+            'contract.sale.address.country',
+            'contract.sale.currency',
+            'contract.purchase.metaCompany',
+            'contract.purchase.contact',
+            'contract.purchase.address.country',
+            'contract.purchase.currency',
+            'details.dealProduct.product',
+            'details.creditDebitType'
+        ]);
+
+        $contract = $note->contract;
+        if (!$contract) {
+            throw new \InvalidArgumentException("DetachedNote has no contract assigned");
+        }
+
+        $isCredit = strtoupper($note->kind ?? '') === 'CREDIT';
+        $templateType = $isCredit ? 'CREDIT_NOTE_DETACHED' : 'DEBIT_NOTE_DETACHED';
+        $subTemplateType = $isCredit ? 'PRODUCT_CREDIT_NOTE_DETACHED' : 'PRODUCT_DEBIT_NOTE_DETACHED';
+        $docPrefix = $isCredit ? 'CREDIT_NOTE_' : 'DEBIT_NOTE_';
+
+        $template = Template::where('type', $templateType)->first()
+            ?: Template::where('type', $isCredit ? 'CREDIT_NOTE' : 'DEBIT_NOTE')->first();
+
+        $subTemplate = Template::where('type', $subTemplateType)->first()
+            ?: Template::where('type', $isCredit ? 'PRODUCT_CREDIT_NOTE' : 'PRODUCT_DEBIT_NOTE')->first();
+
+        $saleDeal = $contract->sale;
+        $purchaseDeal = $contract->purchase;
+        $deal = $saleDeal ?: $purchaseDeal;
+
+        $saleMeta = $deal?->metaCompany;
+        $saleContact = $deal?->contact;
+        $saleAddress = $deal?->address;
+        $currency = $deal?->currency?->encode_html_symbol ?? '$';
+
+        $subHtml = $subTemplate ? $subTemplate->html : '';
+        $rowsHtml = '';
+        $totalAmount = 0.0;
+        $rowNo = 1;
+
+        foreach ($note->details as $d) {
+            $amount = (float)($d->amount ?? 0);
+            $totalAmount += $amount;
+            $prodName = $d->dealProduct?->product?->name ?? ($d->dealProduct?->description ?? 'Product');
+            $prodCode = $d->dealProduct?->product?->code ?? '';
+            $reasonText = ($d->creditDebitType?->description ?? '')
+                . ($d->container ? ' - ' . $d->container : '')
+                . ($d->complement ? ' - ' . $d->complement : '');
+
+            if (!empty($subHtml)) {
+                $row = $subHtml;
+                if ($isCredit) {
+                    $row = str_replace('{product_credit_note_number}', (string)$rowNo, $row);
+                    $row = str_replace('{product_credit_note_code}', (string)$prodCode, $row);
+                    $row = str_replace('{product_credit_note_description}', htmlspecialchars($prodName), $row);
+                    $row = str_replace('{reason}', htmlspecialchars($reasonText), $row);
+                    $row = str_replace('{product_credit_note_quantity}', '', $row);
+                    $row = str_replace('{product_credit_note_price}', '', $row);
+                    $row = str_replace('{product_credit_note_amount}', $currency . ' ' . number_format($amount, 2), $row);
+                } else {
+                    $row = str_replace('{product_debit_note_number}', (string)$rowNo, $row);
+                    $row = str_replace('{product_debit_note_code}', (string)$prodCode, $row);
+                    $row = str_replace('{product_debit_note_description}', htmlspecialchars($prodName), $row);
+                    $row = str_replace('{reason}', htmlspecialchars($reasonText), $row);
+                    $row = str_replace('{product_debit_note_quantity}', '', $row);
+                    $row = str_replace('{product_debit_note_price}', '', $row);
+                    $row = str_replace('{product_debit_note_amount}', $currency . ' ' . number_format($amount, 2), $row);
+                }
+                $rowsHtml .= $row;
+            }
+            $rowNo++;
+        }
+
+        $rawHtml = $template ? $template->html : $this->generateDefaultHtmlForType($templateType, $contract);
+        if ($isCredit) {
+            $rawHtml = str_replace('[{credit_note:product_of_the_credit_note}]', $rowsHtml, $rawHtml);
+        } else {
+            $rawHtml = str_replace('[{debit_note:product_of_the_debit_note}]', $rowsHtml, $rawHtml);
+        }
+
+        $cinvFormatted = $contract->commercial_invoice_number_formatted ?? $contract->commercialInvoiceNumberFormatted ?? '';
+        $cinvNum = $cinvFormatted ? preg_replace('/[^0-9-]/', '', $cinvFormatted) : $contract->order_code;
+        $noteNumber = ($isCredit ? 'CN' : 'DN') . $cinvNum . '-' . $note->id;
+
+        // Resolve authorising user, signature, title, and company stamp
+        $authUser = null;
+        if ($userId) {
+            $authUser = User::find($userId);
+        }
+        if (!$authUser && Auth::check()) {
+            $authUser = Auth::user();
+        }
+        if (!$authUser) {
+            $authUser = User::whereNotNull('archive_signature_id')->first() ?: User::find(1);
+        }
+
+        $authName = trim($authUser?->name ?? 'Authorised Signatory');
+        $authRole = $authUser?->occupation ?: ($authUser?->role ?: 'Authorised Signatory');
+        $authEmail = $authUser?->email ?? ($authUser?->username ?? '');
+
+        // Resolve user signature image data URI
+        $userSigUri = '';
+        if ($authUser?->archive_signature_id) {
+            $archSig = \App\Models\Archive::find($authUser->archive_signature_id);
+            if ($archSig && !empty($archSig->content)) {
+                $userSigUri = str_starts_with($archSig->content, 'data:image') 
+                    ? $archSig->content 
+                    : ('data:image/png;base64,' . $archSig->content);
+            }
+        }
+        if (empty($userSigUri) && !empty($authUser?->signature_file)) {
+            $userSigUri = str_starts_with($authUser->signature_file, 'data:image') 
+                ? $authUser->signature_file 
+                : ('data:image/png;base64,' . $authUser->signature_file);
+        }
+
+        // Resolve company stamp image data URI
+        $companyStampUri = '';
+        if ($saleMeta?->archive_stamp_id) {
+            $archStamp = \App\Models\Archive::find($saleMeta->archive_stamp_id);
+            if ($archStamp && !empty($archStamp->content)) {
+                $companyStampUri = str_starts_with($archStamp->content, 'data:image') 
+                    ? $archStamp->content 
+                    : ('data:image/jpeg;base64,' . $archStamp->content);
+            }
+        }
+        if (empty($companyStampUri) && !empty($saleMeta?->stamp_file)) {
+            $companyStampUri = str_starts_with($saleMeta->stamp_file, 'data:image') 
+                ? $saleMeta->stamp_file 
+                : ('data:image/jpeg;base64,' . $saleMeta->stamp_file);
+        }
+        if (empty($companyStampUri)) {
+            $defaultStampArch = \App\Models\Archive::find(9) ?: \App\Models\Archive::find(2);
+            if ($defaultStampArch && !empty($defaultStampArch->content)) {
+                $companyStampUri = 'data:image/jpeg;base64,' . $defaultStampArch->content;
+            }
+        }
+
+        $companyName = $saleMeta?->name ?? 'Metaenterprices LTD';
+        $currentDate = date('d/m/Y');
+
+        // Formatted Authorised Person, Stamp, and Signature Block
+        $signatureBlockRow = '<tr style="height:115pt">'
+            . '<td style="width:485pt; border:2pt solid black; padding: 12px 18px; vertical-align: top;" colspan="8">'
+            . '<table style="width: 100%; border: none; border-collapse: collapse;">'
+            . '<tr>'
+            . '<td style="width: 55%; vertical-align: top; border: none; font-size: 11px; line-height: 1.4em;">'
+            . '<div style="font-weight: bold; color: #1e293b; margin-bottom: 6px; font-size: 12px;">'
+            . 'Authorised &amp; Approved by:'
+            . '</div>'
+            . '<div style="min-height: 48px; margin-bottom: 6px;">'
+            . ($userSigUri ? '<img src="' . $userSigUri . '" id="user_signature" style="height: 18mm; max-width: 60mm; object-fit: contain;" alt="Signature" />' : '<div style="height: 16mm;"></div>')
+            . '</div>'
+            . '<div style="font-weight: bold; color: #0f172a; font-size: 13px;">'
+            . htmlspecialchars($authName)
+            . '</div>'
+            . '<div style="color: #475569; font-size: 11px; margin-top: 1px;">'
+            . htmlspecialchars($authRole)
+            . '</div>'
+            . '<div style="color: #64748b; font-size: 10px; margin-top: 2px;">'
+            . 'For and on behalf of <strong>' . htmlspecialchars($companyName) . '</strong>'
+            . '</div>'
+            . '</td>'
+            . '<td style="width: 45%; vertical-align: top; text-align: right; border: none; font-size: 11px; line-height: 1.4em;">'
+            . '<div style="font-weight: bold; color: #1e293b; margin-bottom: 6px; font-size: 12px;">'
+            . 'Official Company Stamp:'
+            . '</div>'
+            . '<div style="min-height: 48px; margin-bottom: 6px;">'
+            . ($companyStampUri ? '<img src="' . $companyStampUri . '" id="company_stamp" style="height: 22mm; max-width: 65mm; object-fit: contain;" alt="Stamp" />' : '<div style="height: 20mm;"></div>')
+            . '</div>'
+            . '<div style="color: #475569; font-size: 11px; margin-top: 4px;">'
+            . 'Date: <span style="font-weight: 600; color: #0f172a;">' . $currentDate . '</span>'
+            . '</div>'
+            . '</td>'
+            . '</tr>'
+            . '</table>'
+            . '</td>'
+            . '</tr>';
+
+        // Embed signature block in place of the empty 250pt bottom row
+        if (preg_match('/<tr style="height:122pt">\s*<td[^>]*colspan="8"[^>]*><\/td>\s*<\/tr>/is', $rawHtml)) {
+            $rawHtml = preg_replace('/<tr style="height:122pt">\s*<td[^>]*colspan="8"[^>]*><\/td>\s*<\/tr>/is', $signatureBlockRow, $rawHtml);
+        } else {
+            // Fallback: if template uses slightly different height or whitespace
+            $rawHtml = preg_replace('/<tr[^>]*>\s*<td[^>]*height:250pt[^>]*colspan="8"[^>]*><\/td>\s*<\/tr>/is', $signatureBlockRow, $rawHtml);
+        }
+
+        $replacements = [
+            '{company_url_logo}' => self::getLogoDataUri(),
+            '{company_url_footer}' => self::getFooterDataUri(),
+            '{user_signature}' => $userSigUri,
+            '{company_stamp}' => $companyStampUri,
+            '{authorised_person_name}' => $authName,
+            '{approved_by}' => $authName,
+            '{user_name}' => $authName,
+            '{user_email}' => $authEmail,
+            '{user_occupation}' => $authRole,
+            '{meta_company_name}' => $saleMeta?->name ?? 'Metaenterprices LTD',
+            '{meta_company_number}' => $saleMeta?->company_number ?? '',
+            '{meta_company_vat}' => $saleMeta?->vat_number ?? '',
+            '{meta_company_address_line1}' => $saleMeta?->address?->address_line1 ?? ($saleMeta?->address?->addressLine1 ?? ''),
+            '{meta_company_address_line2}' => $saleMeta?->address?->address_line2 ?? ($saleMeta?->address?->addressLine2 ?? ''),
+            '{meta_company_address_postal_code}' => $saleMeta?->address?->postal_code ?? ($saleMeta?->address?->postalCode ?? ''),
+            '{meta_company_address_city}' => $saleMeta?->address?->city ?? '',
+            '{meta_company_address_state}' => $saleMeta?->address?->state ?? '',
+            '{meta_company_country}' => $saleMeta?->address?->country?->name ?? 'United Kingdom',
+            '{meta_company_tel}' => $saleMeta?->phone_number ?? '',
+            '{meta_company_email}' => $saleMeta?->email ?? '',
+            '{meta_company_website}' => $saleMeta?->website ?? '',
+            '{meta_company_fax}' => $saleMeta?->fax_number ?? '',
+            '{meta_company_eori}' => $saleMeta?->eori_number ?? '',
+            '{buyer_name}' => $saleContact?->name ?? 'Customer',
+            '{buyer_address_line1}' => $saleAddress?->address_line1 ?? ($saleAddress?->addressLine1 ?? ''),
+            '{buyer_address_line2}' => $saleAddress?->address_line2 ?? ($saleAddress?->addressLine2 ?? ''),
+            '{buyer_address_city}' => $saleAddress?->city ?? '',
+            '{buyer_address_postal_code}' => $saleAddress?->postal_code ?? ($saleAddress?->postalCode ?? ''),
+            '{buyer_address_country}' => $saleAddress?->country?->name ?? '',
+            '{credit_note_number}' => $noteNumber,
+            '{debit_note_number}' => $noteNumber,
+            '{sales_invoice_number}' => $cinvFormatted ?: $contract->order_code,
+            '{current_date}' => date('d/m/Y'),
+            '{contract_date}' => $contract->due_date ? date('d/m/Y', strtotime($contract->due_date)) : date('d/m/Y'),
+            '{contract_code}' => $contract->order_code,
+            '{contract_seller_name}' => $saleContact?->name ?? '',
+            '{contract_seller_address_line1}' => $saleAddress?->address_line1 ?? ($saleAddress?->addressLine1 ?? ''),
+            '{contract_seller_address_line2}' => $saleAddress?->address_line2 ?? ($saleAddress?->addressLine2 ?? ''),
+            '{contract_seller_address_country}' => $saleAddress?->country?->name ?? '',
+            '{contract_total_vat}' => '0',
+            '{country_of_delivery_vat_rate}' => '0',
+            '{country_of_origin}' => $deal?->countryOfOrigin?->name ?? '',
+            '{product_credit_note_total}' => $currency . ' ' . number_format($totalAmount, 2),
+            '{product_credit_note_general_total}' => $currency . ' ' . number_format($totalAmount, 2),
+            '{product_debit_note_total}' => $currency . ' ' . number_format($totalAmount, 2),
+            '{product_debit_note_general_total}' => $currency . ' ' . number_format($totalAmount, 2),
+            '{notes}' => $note->complement ?: 'No notes',
+        ];
+
+        foreach ($replacements as $k => $val) {
+            $rawHtml = str_replace($k, $val, $rawHtml);
+        }
+
+        $rawHtml = self::populateBase64inHtml($rawHtml);
+
+        $docName = $docPrefix . $contract->order_code;
+
+        $gf = null;
+        if ($note->generated_file_id) {
+            $gf = GeneratedFile::find($note->generated_file_id);
+        }
+        if (!$gf) {
+            $gf = GeneratedFile::where('contract_id', $contract->id)->where('name', $docName)->first();
+        }
+        if (!$gf) {
+            $gf = new GeneratedFile();
+            $gf->contract_id = $contract->id;
+            $gf->name = $docName;
+            $gf->template_id = $template?->id;
+            $gf->active = true;
+            $gf->user_id = $userId ?: (Auth::id() ?: 1);
+        }
+
+        $gf->content = base64_encode($rawHtml);
+        $gf->html = $rawHtml;
+        $gf->active = true;
+        $gf->save();
+
+        if ($note->generated_file_id !== $gf->id) {
+            $note->generated_file_id = $gf->id;
+            $note->save();
+        }
+
+        return $gf;
+    }
+
+    /**
      * Regenerate an existing GeneratedFile from latest contract data.
      */
     public function regenerate(GeneratedFile $file, Contract $contract, ?int $userId = null): GeneratedFile
     {
         $type = $this->extractTypeFromFileName($file->name);
+
+        // Special handling for Credit Note / Debit Note which are detached notes
+        if ($type === 'CREDIT_NOTE' || $type === 'DEBIT_NOTE') {
+            $isCredit = $type === 'CREDIT_NOTE';
+            $kind = $isCredit ? 'CREDIT' : 'DEBIT';
+            $dNote = \App\Models\DetachedNote::where('generated_file_id', $file->id)->first()
+                ?: \App\Models\DetachedNote::where('contract_id', $contract->id)->where('kind', $kind)->first();
+            if ($dNote) {
+                return $this->generateForDetachedNote($dNote, $userId);
+            }
+        }
+
         $template = $file->template ?: Template::where('type', $type)->first();
 
         $html = '';
@@ -427,6 +768,36 @@ class DocumentTemplateService
         $iban = 'GB52CLYD82601310128364';
         $swift = 'CLYDGB21028';
 
+        // Signature & Stamp resolution for contract documents
+        $stampUri = '';
+        if ($metaCompany?->archive_stamp_id) {
+            $archStamp = Archive::find($metaCompany->archive_stamp_id);
+            if ($archStamp && !empty($archStamp->content)) {
+                $stampUri = str_starts_with($archStamp->content, 'data:image') ? $archStamp->content : ('data:image/jpeg;base64,' . $archStamp->content);
+            }
+        }
+        if (empty($stampUri) && !empty($metaCompany?->stamp_file)) {
+            $stampUri = str_starts_with($metaCompany->stamp_file, 'data:image') ? $metaCompany->stamp_file : ('data:image/jpeg;base64,' . $metaCompany->stamp_file);
+        }
+        if (empty($stampUri)) {
+            $defArch = Archive::find(9) ?: Archive::find(2);
+            if ($defArch && !empty($defArch->content)) {
+                $stampUri = 'data:image/jpeg;base64,' . $defArch->content;
+            }
+        }
+
+        $defaultUser = User::whereNotNull('archive_signature_id')->first() ?: User::find(1);
+        $sigUri = '';
+        if ($defaultUser?->archive_signature_id) {
+            $archSig = Archive::find($defaultUser->archive_signature_id);
+            if ($archSig && !empty($archSig->content)) {
+                $sigUri = str_starts_with($archSig->content, 'data:image') ? $archSig->content : ('data:image/png;base64,' . $archSig->content);
+            }
+        }
+        if (empty($sigUri) && !empty($defaultUser?->signature_file)) {
+            $sigUri = str_starts_with($defaultUser->signature_file, 'data:image') ? $defaultUser->signature_file : ('data:image/png;base64,' . $defaultUser->signature_file);
+        }
+
         return [
             'meta' => [
                 'name' => $compName,
@@ -444,6 +815,10 @@ class DocumentTemplateService
                 'eori' => $compEori,
                 'logo_uri' => self::getLogoDataUri(),
                 'footer_uri' => self::getFooterDataUri(),
+                'stamp_uri' => $stampUri,
+                'signature_uri' => $sigUri,
+                'user_name' => $defaultUser?->name ?? 'Authorised Signatory',
+                'user_email' => $defaultUser?->email ?? ($defaultUser?->username ?? ''),
             ],
             'buyer' => [
                 'name' => $buyerName,
@@ -642,6 +1017,13 @@ class DocumentTemplateService
             '{supplier_address_state}' => $v['meta']['state'],
             '{supplier_address_country}' => $v['meta']['country'],
 
+            '{user_signature}' => $v['meta']['signature_uri'] ?? '',
+            '{company_stamp}' => $v['meta']['stamp_uri'] ?? '',
+            '{user_name}' => $v['meta']['user_name'] ?? 'Authorised Signatory',
+            '{user_email}' => $v['meta']['user_email'] ?? '',
+            '{authorised_person_name}' => $v['meta']['user_name'] ?? 'Authorised Signatory',
+            '{approved_by}' => $v['meta']['user_name'] ?? 'Authorised Signatory',
+
             '[{proforma_invoice:product_proforma_invoice}]' => $proformaProdRows,
             '[{subtemplate:delyvery_note_products}]' => $deliveryProdRows,
             '[{subject_contract_of_sales:subject_contract_of_sales}]' => $salesContractRows,
@@ -649,11 +1031,19 @@ class DocumentTemplateService
 
         $html = str_replace(array_keys($replacements), array_values($replacements), $rawHtml);
 
-        // Fix img src for logo and footer if still referencing id
+        // Fix img src for logo, footer, stamp and signature if still referencing id
         $html = preg_replace('/<img\s+([^>]*?)id="\{company_url_logo\}"([^>]*?)src=""([^>]*?)>/i', '<img $1id="{company_url_logo}"$2src="' . $v['meta']['logo_uri'] . '"$3>', $html);
         $html = preg_replace('/<img\s+([^>]*?)src=""([^>]*?)id="\{company_url_logo\}"([^>]*?)>/i', '<img $1src="' . $v['meta']['logo_uri'] . '"$2id="{company_url_logo}"$3>', $html);
         $html = preg_replace('/<img\s+([^>]*?)id="\{company_url_footer\}"([^>]*?)src=""([^>]*?)>/i', '<img $1id="{company_url_footer}"$2src="' . $v['meta']['footer_uri'] . '"$3>', $html);
         $html = preg_replace('/<img\s+([^>]*?)src=""([^>]*?)id="\{company_url_footer\}"([^>]*?)>/i', '<img $1src="' . $v['meta']['footer_uri'] . '"$2id="{company_url_footer}"$3>', $html);
+        if (!empty($v['meta']['stamp_uri'])) {
+            $html = preg_replace('/<img\s+([^>]*?)id="\{company_stamp\}"([^>]*?)src=""([^>]*?)>/i', '<img $1id="{company_stamp}"$2src="' . $v['meta']['stamp_uri'] . '"$3>', $html);
+            $html = preg_replace('/<img\s+([^>]*?)src=""([^>]*?)id="\{company_stamp\}"([^>]*?)>/i', '<img $1src="' . $v['meta']['stamp_uri'] . '"$2id="{company_stamp}"$3>', $html);
+        }
+        if (!empty($v['meta']['signature_uri'])) {
+            $html = preg_replace('/<img\s+([^>]*?)id="\{user_signature\}"([^>]*?)src=""([^>]*?)>/i', '<img $1id="{user_signature}"$2src="' . $v['meta']['signature_uri'] . '"$3>', $html);
+            $html = preg_replace('/<img\s+([^>]*?)src=""([^>]*?)id="\{user_signature\}"([^>]*?)>/i', '<img $1src="' . $v['meta']['signature_uri'] . '"$2id="{user_signature}"$3>', $html);
+        }
 
         return self::populateBase64inHtml($html);
     }
@@ -1530,5 +1920,146 @@ HTML;
     protected function buildPackingListHtml(array $v): string
     {
         return $this->buildDeliveryNoteHtml($v);
+    }
+
+    /**
+     * Extract invoice total amount from HTML.
+     */
+    public static function extractInvoiceTotalFromHtml(?string $html): ?float
+    {
+        if (empty($html)) {
+            return null;
+        }
+
+        // 1. Look for Total or Grand Total row in table
+        if (preg_match_all('/(?:Total\s*(?:<br\s*\/?>)?|Grand Total)\s*<\/td>\s*<td[^>]*>\s*([^<]+)<\/td>/i', $html, $matches)) {
+            $last = trim(end($matches[1]));
+            $clean = preg_replace('/[^0-9.]/', '', str_replace(',', '', $last));
+            if (is_numeric($clean)) {
+                return (float)$clean;
+            }
+        }
+
+        // 2. Fallback to Sub Total if Total is absent
+        if (preg_match('/Sub\s*Total\s*(?:<br\s*\/?>)?\s*<\/td>\s*<td[^>]*>\s*([^<]+)<\/td>/i', $html, $m)) {
+            $clean = preg_replace('/[^0-9.]/', '', str_replace(',', '', $m[1]));
+            if (is_numeric($clean)) {
+                return (float)$clean;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Compare Proforma Invoice and Commercial Invoice totals for a contract
+     * and calculate any difference for Credit/Debit Note automation.
+     */
+    public function getInvoiceDifference(Contract $contract): array
+    {
+        $defaultResult = [
+            'has_difference' => false,
+            'type' => null, // 'CREDIT' or 'DEBIT'
+            'amount' => 0.0,
+            'formatted_amount' => '0.00',
+            'currency' => '$',
+            'proforma_total' => null,
+            'commercial_total' => null,
+            'diff' => 0.0,
+            'proforma_file_id' => null,
+            'commercial_file_id' => null,
+            'already_has_note' => false,
+            'existing_note_id' => null,
+            'existing_file_id' => null,
+            'reason' => '',
+        ];
+
+        try {
+            $files = $contract->generatedFiles ?? $contract->generatedFiles()->get();
+            $proforma = $files->first(function ($f) {
+                return str_starts_with($f->name, 'PROFORMA_INVOICE_') ||
+                       (isset($f->template) && $f->template->type === 'PROFORMA_INVOICE');
+            });
+            $commercial = $files->first(function ($f) {
+                return str_starts_with($f->name, 'COMMERCIAL_INVOICE_') ||
+                       (isset($f->template) && $f->template->type === 'COMMERCIAL_INVOICE');
+            });
+
+            if (!$proforma || !$commercial) {
+                return $defaultResult;
+            }
+
+            $htmlProforma = $proforma->html ?: (empty($proforma->content) ? '' : base64_decode($proforma->content));
+            $htmlCommercial = $commercial->html ?: (empty($commercial->content) ? '' : base64_decode($commercial->content));
+
+            $totalProforma = self::extractInvoiceTotalFromHtml($htmlProforma);
+            $totalCommercial = self::extractInvoiceTotalFromHtml($htmlCommercial);
+
+            if ($totalProforma === null || $totalCommercial === null) {
+                return $defaultResult;
+            }
+
+            $diff = round($totalProforma - $totalCommercial, 2);
+
+            // Determine currency symbol
+            $currency = '$';
+            $deal = $contract->sale ?: $contract->purchase;
+            if ($deal && $deal->currency && !empty($deal->currency->encode_html_symbol)) {
+                $currency = $deal->currency->encode_html_symbol;
+            } elseif (preg_match('/([$€£¥₹]|USD|EUR|GBP)/', $htmlCommercial, $cm)) {
+                $currency = $cm[1];
+            }
+
+            $hasDiff = abs($diff) >= 0.01;
+            $type = null;
+            $amount = 0.0;
+            $reason = '';
+
+            if ($hasDiff) {
+                if ($diff > 0) {
+                    // Proforma > Commercial: Credit Note (customer paid more / invoiced higher than actual delivery)
+                    $type = 'CREDIT';
+                    $amount = $diff;
+                    $reason = "Proforma total ({$currency} " . number_format($totalProforma, 2) . ") exceeds Commercial Invoice ({$currency} " . number_format($totalCommercial, 2) . ")";
+                } else {
+                    // Commercial > Proforma: Debit Note (commercial cost higher than initial proforma)
+                    $type = 'DEBIT';
+                    $amount = abs($diff);
+                    $reason = "Commercial Invoice ({$currency} " . number_format($totalCommercial, 2) . ") exceeds Proforma total ({$currency} " . number_format($totalProforma, 2) . ")";
+                }
+            }
+
+            // Check if a Credit / Debit note already exists
+            $existingNote = null;
+            $existingFile = null;
+            if ($type) {
+                $existingNote = \App\Models\DetachedNote::where('contract_id', $contract->id)
+                    ->where('kind', $type)
+                    ->first();
+                $existingFile = $files->first(function ($f) use ($type) {
+                    return str_starts_with($f->name, $type . '_NOTE_');
+                });
+            }
+
+            return [
+                'has_difference' => $hasDiff,
+                'type' => $type,
+                'amount' => $amount,
+                'formatted_amount' => number_format($amount, 2),
+                'currency' => $currency,
+                'proforma_total' => $totalProforma,
+                'commercial_total' => $totalCommercial,
+                'diff' => $diff,
+                'proforma_file_id' => $proforma->id,
+                'commercial_file_id' => $commercial->id,
+                'already_has_note' => ($existingNote !== null || $existingFile !== null),
+                'existing_note_id' => $existingNote?->id,
+                'existing_file_id' => $existingFile?->id,
+                'reason' => $reason,
+            ];
+        } catch (\Throwable $e) {
+            \Log::error("Error calculating invoice difference for contract {$contract->id}: " . $e->getMessage());
+            return $defaultResult;
+        }
     }
 }

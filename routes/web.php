@@ -69,6 +69,7 @@ Route::middleware('auth')->group(function () {
         Route::match(['post', 'put'], '/contracts/{id}', [WebContractController::class, 'update'])->name('contracts.update');
         Route::match(['post', 'put'], '/contracts/{id}/move', [WebContractController::class, 'moveStage'])->name('contracts.move');
         Route::match(['post', 'put'], '/contracts/{id}/move-stage', [WebContractController::class, 'moveStage'])->name('contracts.move-stage');
+        Route::match(['post', 'put'], '/contracts/{id}/move/{stageId}', [WebContractController::class, 'moveStageDirect'])->name('contracts.move.direct');
         Route::match(['post', 'put'], '/contracts/{id}/cancel', [WebContractController::class, 'cancel'])->name('contracts.cancel');
         Route::match(['post', 'put'], '/contracts/{id}/close', [WebContractController::class, 'close'])->name('contracts.close');
         Route::match(['post', 'put'], '/contracts/{id}/reactivate', [WebContractController::class, 'reactivate'])->name('contracts.reactivate');
@@ -81,6 +82,8 @@ Route::middleware('auth')->group(function () {
         Route::match(['post', 'delete'], '/documents/{id}/delete', [WebContractController::class, 'deleteDocument'])->name('contracts.documents.delete');
         Route::post('/documents/{id}/restore-version', [WebContractController::class, 'restoreDocumentVersion'])->name('contracts.documents.restoreVersion');
         Route::post('/contracts/{id}/duplicate', [WebContractController::class, 'duplicate'])->name('contracts.duplicate');
+        Route::post('/contracts/{id}/create-invoice-note', [WebContractController::class, 'createInvoiceNote'])->name('contracts.createInvoiceNote');
+        Route::get('/contracts/{id}/invoice-diff', [WebContractController::class, 'getInvoiceDiff'])->name('contracts.invoiceDiff');
     });
 
     // Commercial Offers

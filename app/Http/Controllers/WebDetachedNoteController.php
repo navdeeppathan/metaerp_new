@@ -9,10 +9,19 @@ use App\Models\CreditDebitType;
 use App\Models\Company;
 use App\Models\Contact;
 use App\Models\Currency;
+use App\Models\GeneratedFile;
+use App\Services\DocumentTemplateService;
 use Illuminate\Http\Request;
 
 class WebDetachedNoteController extends Controller
 {
+    protected DocumentTemplateService $docService;
+
+    public function __construct(DocumentTemplateService $docService)
+    {
+        $this->docService = $docService;
+    }
+
     public function index(Request $request)
     {
         $contracts = Contract::whereNotNull('order_code')
@@ -157,12 +166,15 @@ class WebDetachedNoteController extends Controller
             $creditDebitTypes = $this->getDefaultCreditDebitTypes();
         }
 
+        $users = \App\Models\User::where('active', true)->orderBy('name')->get();
+
         return view('detached-notes.create', compact(
             'contracts',
             'selectedCode',
             'selectedContract',
             'contractProducts',
-            'creditDebitTypes'
+            'creditDebitTypes',
+            'users'
         ));
     }
 
@@ -230,6 +242,7 @@ class WebDetachedNoteController extends Controller
         $validated = $request->validate([
             'kind' => 'required|string|in:CREDIT,DEBIT',
             'contract_id' => 'required|integer',
+            'user_id' => 'nullable|integer',
             'complement' => 'nullable|string|max:500',
             'details' => 'nullable|array',
             'details.*.credit_debit_type_id' => 'nullable|integer',
@@ -262,6 +275,15 @@ class WebDetachedNoteController extends Controller
             }
         }
 
+        // Generate document immediately matching Java DetachedNoteService.save()
+        try {
+            $note->load(['details.dealProduct.product', 'details.creditDebitType', 'contract.purchase', 'contract.sale']);
+            $userId = !empty($validated['user_id']) ? (int)$validated['user_id'] : (auth()->id() ?? 1);
+            $this->docService->generateForDetachedNote($note, $userId);
+        } catch (\Throwable $e) {
+            \Log::error('Error generating document for detached note #' . $note->id . ': ' . $e->getMessage());
+        }
+
         return redirect()->route('detached-notes.index', ['code' => $contract->orderCode])
             ->with('success', 'Detached note data have been saved');
     }
@@ -271,6 +293,11 @@ class WebDetachedNoteController extends Controller
         $note = DetachedNote::findOrFail($id);
         $contractCode = $note->contract?->orderCode;
         
+        // Delete associated GeneratedFile if present (matching Java DetachedNoteService.delete())
+        if ($note->generated_file_id) {
+            GeneratedFile::where('id', $note->generated_file_id)->delete();
+        }
+
         $note->details()->delete();
         $note->delete();
 

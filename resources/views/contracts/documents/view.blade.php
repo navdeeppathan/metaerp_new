@@ -137,6 +137,36 @@
               } finally {
                   this.saving = false;
               }
+          },
+          noteGenerating: false,
+          async createInvoiceNote(type) {
+              if (this.noteGenerating) return;
+              this.noteGenerating = true;
+              try {
+                  const res = await fetch('/contracts/{{ $contract?->id }}/create-invoice-note', {
+                      method: 'POST',
+                      headers: {
+                          'Content-Type': 'application/json',
+                          'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                          'Accept': 'application/json'
+                      },
+                      body: JSON.stringify({ type: type })
+                  });
+                  const data = await res.json();
+                  if (data.success) {
+                      alert(data.message);
+                      if (data.file && data.file.id) {
+                          window.location.href = `/documents/${data.file.id}/view`;
+                      }
+                  } else {
+                      alert(data.message || 'Failed to generate note');
+                  }
+              } catch (e) {
+                  console.error(e);
+                  alert('Error generating note');
+              } finally {
+                  this.noteGenerating = false;
+              }
           }
       }">
 
@@ -157,6 +187,18 @@
 
             <!-- Right Side: Edit / Save / Download Actions -->
             <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+                <!-- Commercial Invoice Credit / Debit Note Action Button -->
+                @if(isset($invoiceDiff) && $invoiceDiff['has_difference'] && str_starts_with($document->name, 'COMMERCIAL_INVOICE_'))
+                    <button type="button"
+                            @click="createInvoiceNote('{{ $invoiceDiff['type'] }}')"
+                            :disabled="noteGenerating"
+                            class="px-3.5 py-1.5 {{ $invoiceDiff['type'] === 'CREDIT' ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-amber-600 hover:bg-amber-500' }} text-white font-medium text-xs sm:text-sm rounded shadow transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50 tracking-wide"
+                            title="{{ $invoiceDiff['reason'] }}">
+                        <span class="material-icons text-base">post_add</span>
+                        <span x-text="noteGenerating ? 'Generating...' : '{{ $invoiceDiff['type'] === 'CREDIT' ? 'Create Credit Note' : 'Create Debit Note' }} ({{ $invoiceDiff['currency'] }} {{ $invoiceDiff['formatted_amount'] }})'"></span>
+                    </button>
+                @endif
+
                 <!-- Save Status Feedback -->
                 <span x-show="saveSuccess" x-cloak class="text-xs text-emerald-400 font-medium px-2 py-1 bg-emerald-950/40 rounded border border-emerald-500/30">
                     Saved successfully!
