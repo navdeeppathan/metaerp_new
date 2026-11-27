@@ -300,24 +300,43 @@ class ContractController extends BaseApiController
         $query = Contract::with([
             'stage', 'purchase.metaCompany', 'purchase.contact',
             'sale.metaCompany', 'sale.contact', 'dealProducts.product'
-        ])->where('active', true);
+        ]);
 
         if ($request->filled('status')) {
-            $query->where('status', $request->input('status'));
+            $st = strtoupper($request->input('status'));
+            if ($st === 'CLOSED') {
+                $query->whereIn('status', ['CLOSED', 'STORED']);
+            } elseif ($st === 'OPEN') {
+                $query->where(function($sq) {
+                    $sq->whereIn('status', ['OPEN', 'ACTIVE'])->orWhereNull('status');
+                });
+            } else {
+                $query->where('status', $st);
+            }
         }
         if ($request->filled('type')) {
             $query->where('type', $request->input('type'));
         }
         if ($request->filled('startDate')) {
             $startDate = $this->parseTimestamp($request->input('startDate'));
-            if ($startDate) $query->where('due_date', '>=', $startDate);
+            if ($startDate) {
+                $query->where(function($dq) use ($startDate) {
+                    $dq->where('due_date', '>=', $startDate)
+                       ->orWhere('date', '>=', $startDate);
+                });
+            }
         }
         if ($request->filled('endDate')) {
             $endDate = $this->parseTimestamp($request->input('endDate'));
-            if ($endDate) $query->where('due_date', '<=', $endDate);
+            if ($endDate) {
+                $query->where(function($dq) use ($endDate) {
+                    $dq->where('due_date', '<=', $endDate)
+                       ->orWhere('date', '<=', $endDate);
+                });
+            }
         }
 
-        $contracts = $query->orderBy('id', 'desc')->get();
+        $contracts = $query->orderBy('due_date', 'desc')->orderBy('id', 'desc')->get();
         return response()->json($contracts->map(fn($c) => $this->formatContractDetail($c)));
     }
 

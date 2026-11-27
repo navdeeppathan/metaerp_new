@@ -15,12 +15,9 @@ class WebSearchController extends Controller
         $status = $request->input('status', 'OPEN');
         $type = $request->input('type', 'ALL');
 
-        // Default date range: 60 days before today to today (matches screenshot: 19/09/2026 - 18/11/2026)
-        $defaultFrom = Carbon::now()->subDays(60)->format('d/m/Y');
-        $defaultTo = Carbon::now()->format('d/m/Y');
-
-        $fromDateRaw = $request->input('from_date', $request->input('startDate', $defaultFrom));
-        $toDateRaw = $request->input('to_date', $request->input('endDate', $defaultTo));
+        // Allow dates to be optional so contracts across all periods (e.g. historical closed/cancelled) can be found
+        $fromDateRaw = $request->input('from_date', $request->input('startDate', ''));
+        $toDateRaw = $request->input('to_date', $request->input('endDate', ''));
 
         $fromDate = null;
         $toDate = null;
@@ -45,28 +42,22 @@ class WebSearchController extends Controller
             }
         }
 
-        $hasDateFilter = $request->has('from_date') || $request->has('startDate') || $request->has('to_date') || $request->has('endDate');
-        if (!$hasDateFilter && ($request->filled('q') || $request->filled('search'))) {
-            $fromDate = null;
-            $toDate = null;
-        }
-
         $query = Contract::with([
             'stage',
             'purchase.contact',
             'purchase.metaCompany',
             'sale.contact',
             'sale.metaCompany'
-        ])->where(function($q) {
-            $q->where('active', true)->orWhereNull('active');
-        });
+        ]);
 
         if ($request->filled('q') || $request->filled('search')) {
             $searchTerm = $request->input('q', $request->input('search'));
             $query->where(function($sub) use ($searchTerm) {
                 $sub->where('order_code', 'like', "%{$searchTerm}%")
+                    ->orWhere('orderCode', 'like', "%{$searchTerm}%")
                     ->orWhere('customer_purchase_order', 'like', "%{$searchTerm}%")
                     ->orWhere('description', 'like', "%{$searchTerm}%")
+                    ->orWhere('orderDescription', 'like', "%{$searchTerm}%")
                     ->orWhereHas('purchase.contact', fn($c) => $c->where('name', 'like', "%{$searchTerm}%"))
                     ->orWhereHas('sale.contact', fn($c) => $c->where('name', 'like', "%{$searchTerm}%"));
             });
@@ -76,6 +67,8 @@ class WebSearchController extends Controller
             $st = strtoupper($status);
             if ($st === 'CLOSED') {
                 $query->whereIn('status', ['CLOSED', 'STORED']);
+            } elseif ($st === 'CANCELLED') {
+                $query->where('status', 'CANCELLED');
             } elseif ($st === 'OPEN') {
                 $query->where(function($sq) {
                     $sq->whereIn('status', ['OPEN', 'ACTIVE'])->orWhereNull('status');
@@ -90,11 +83,17 @@ class WebSearchController extends Controller
         }
 
         if ($fromDate) {
-            $query->where('due_date', '>=', $fromDate);
+            $query->where(function($dq) use ($fromDate) {
+                $dq->where('due_date', '>=', $fromDate)
+                   ->orWhere('date', '>=', $fromDate);
+            });
         }
 
         if ($toDate) {
-            $query->where('due_date', '<=', $toDate);
+            $query->where(function($dq) use ($toDate) {
+                $dq->where('due_date', '<=', $toDate)
+                   ->orWhere('date', '<=', $toDate);
+            });
         }
 
         $perPage = (int) ($request->input('per_page') ?? $request->input('perPage') ?? $request->input('rowsPerPage') ?? $request->input('size') ?? 10);

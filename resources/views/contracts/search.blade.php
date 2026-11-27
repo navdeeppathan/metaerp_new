@@ -44,6 +44,11 @@
                 <button type="button" id="to_calendar_btn" class="text-slate-400 hover:text-slate-600 focus:outline-none ml-1.5 flex items-center">
                     <span class="material-icons-outlined text-lg">calendar_today</span>
                 </button>
+                @if(!empty($fromDateRaw) || !empty($toDateRaw))
+                <button type="button" onclick="document.getElementById('from_date').value='';document.getElementById('to_date').value='';document.getElementById('searchFilterForm').submit();" class="text-slate-400 hover:text-red-500 ml-2 text-xs font-bold transition" title="Clear date filter">
+                    ✕
+                </button>
+                @endif
             </div>
 
             <!-- Status Dropdown Pill -->
@@ -148,6 +153,13 @@
                                 <div>{{ \Carbon\Carbon::parse($c->close_date)->format('d M') }}</div>
                                 <div>{{ \Carbon\Carbon::parse($c->close_date)->format('y') }}</div>
                             </div>
+                        @elseif($c->finishDate)
+                            <div class="leading-tight">
+                                <div>{{ \Carbon\Carbon::parse($c->finishDate)->format('d M') }}</div>
+                                <div>{{ \Carbon\Carbon::parse($c->finishDate)->format('y') }}</div>
+                            </div>
+                        @else
+                            -
                         @endif
                     </td>
                     <td class="py-4 sm:py-5 px-4 font-normal text-slate-800 whitespace-nowrap">
@@ -161,6 +173,13 @@
                                 <div>{{ \Carbon\Carbon::parse($c->cancellation_date)->format('d M') }}</div>
                                 <div>{{ \Carbon\Carbon::parse($c->cancellation_date)->format('y') }}</div>
                             </div>
+                        @elseif($c->cancellationDate)
+                            <div class="leading-tight">
+                                <div>{{ \Carbon\Carbon::parse($c->cancellationDate)->format('d M') }}</div>
+                                <div>{{ \Carbon\Carbon::parse($c->cancellationDate)->format('y') }}</div>
+                            </div>
+                        @else
+                            -
                         @endif
                     </td>
                 </tr>
