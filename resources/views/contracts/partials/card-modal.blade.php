@@ -1457,58 +1457,50 @@
         </div>
     </div>
 
-    <!-- VIEW DOCUMENT MODAL (DialogViewHtml) -->
-    <div x-show="viewDocModal" class="fixed inset-0 z-70 overflow-hidden flex flex-col bg-slate-900/70 backdrop-blur-xs" style="display: none;" @keydown.escape.window="viewDocModal = false" x-cloak>
-        <div class="bg-indigo-600 text-white px-6 py-3.5 flex items-center justify-between shadow-md shrink-0">
-            <div class="flex items-center gap-3">
-                <button type="button" @click="viewDocModal = false" class="text-white/80 hover:text-white p-1 rounded-full hover:bg-white/10 transition cursor-pointer">
-                    <span class="material-icons text-xl">close</span>
+    <!-- VIEW DOCUMENT MODAL (DialogViewHtml - exact match to React / MUI fullscreen dialog) -->
+    <div x-show="viewDocModal" class="fixed inset-0 z-70 overflow-hidden flex flex-col bg-slate-900/60 backdrop-blur-xs" style="display: none;" @keydown.escape.window="viewDocModal = false" x-cloak>
+        <!-- MUI style AppBar -->
+        <div class="bg-[#1e293b] text-white px-6 py-3.5 flex items-center justify-between shadow-md shrink-0 border-b border-slate-700/60">
+            <div class="flex items-center gap-4">
+                <button type="button" @click="viewDocModal = false" aria-label="close" class="text-white/80 hover:text-white p-1 rounded-full hover:bg-white/10 transition cursor-pointer flex items-center justify-center">
+                    <span class="material-icons text-2xl">close</span>
                 </button>
-                <h3 class="text-base font-bold tracking-tight text-white" x-text="currentDoc ? currentDoc.name : 'Document Preview'"></h3>
+                <h2 class="text-xl font-normal tracking-wide text-white" x-text="currentDoc ? currentDoc.name : ''"></h2>
             </div>
-            <div class="flex items-center gap-2">
-                <button type="button" @click="openEditDoc(currentDoc)" class="bg-white/20 hover:bg-white/30 text-white font-semibold text-xs px-4 py-1.5 rounded-md transition cursor-pointer flex items-center gap-1.5">
-                    <span class="material-icons text-sm">edit</span>
-                    <span>Edit</span>
-                </button>
-                <button type="button" @click="downloadDoc(currentDoc)" class="bg-white text-indigo-600 hover:bg-slate-100 font-semibold text-xs px-4 py-1.5 rounded-md transition cursor-pointer flex items-center gap-1.5 shadow-2xs">
-                    <span class="material-icons text-sm">download</span>
-                    <span>Download</span>
+            <div class="flex items-center gap-3">
+                <button type="button" @click="openEditDoc(currentDoc)" class="text-white hover:text-white font-medium text-sm px-4 py-1.5 rounded hover:bg-white/10 transition cursor-pointer uppercase tracking-wider">
+                    Edit
                 </button>
             </div>
         </div>
-        <div class="flex-1 overflow-y-auto p-4 sm:p-8 bg-slate-100 flex justify-center custom-scrollbar">
-            <div class="bg-white shadow-lg border border-slate-200 rounded-lg p-8 sm:p-12 max-w-4xl w-full min-h-[700px] my-auto" x-html="currentDoc ? (currentDoc.html || '') : ''"></div>
+        <!-- MUI style document container with dashed border -->
+        <div class="flex-1 overflow-y-auto bg-slate-100 flex justify-center custom-scrollbar">
+            <div class="p-10 border-dashed border border-gray-400 bg-white m-10 w-fit shadow-xs shrink-0" x-html="currentDoc ? (currentDoc.html || '') : ''"></div>
         </div>
     </div>
 
-    <!-- EDIT DOCUMENT MODAL (DialogEditHtml) -->
-    <div x-show="editDocModal" class="fixed inset-0 z-70 overflow-hidden flex flex-col bg-slate-900/70 backdrop-blur-xs" style="display: none;" @keydown.escape.window="editDocModal = false" x-cloak>
-        <div class="bg-slate-800 text-white px-6 py-3.5 flex items-center justify-between shadow-md shrink-0">
-            <div class="flex items-center gap-3">
-                <button type="button" @click="editDocModal = false" class="text-white/80 hover:text-white p-1 rounded-full hover:bg-white/10 transition cursor-pointer">
-                    <span class="material-icons text-xl">close</span>
+    <!-- EDIT DOCUMENT MODAL (DialogEditHtml - exact match to React / MUI fullscreen editor dialog) -->
+    <div x-show="editDocModal" class="fixed inset-0 z-70 overflow-hidden flex flex-col bg-slate-900/60 backdrop-blur-xs" style="display: none;" @keydown.escape.window="editDocModal = false" x-cloak>
+        <!-- MUI style AppBar -->
+        <div class="bg-[#1e293b] text-white px-6 py-3.5 flex items-center justify-between shadow-md shrink-0 border-b border-slate-700/60">
+            <div class="flex items-center gap-4">
+                <button type="button" @click="editDocModal = false" aria-label="close" class="text-white/80 hover:text-white p-1 rounded-full hover:bg-white/10 transition cursor-pointer flex items-center justify-center">
+                    <span class="material-icons text-2xl">close</span>
                 </button>
-                <h3 class="text-base font-bold tracking-tight text-white flex items-center gap-2">
-                    <span class="text-amber-400 text-xs px-2 py-0.5 rounded bg-amber-400/20 font-bold uppercase">Editing</span>
-                    <span x-text="currentDoc ? currentDoc.name : 'Edit Document'"></span>
-                </h3>
+                <h2 class="text-xl font-normal tracking-wide text-white" x-text="currentDoc ? currentDoc.name : ''"></h2>
             </div>
-            <div class="flex items-center gap-2">
-                <button type="button" @click="editDocModal = false" class="text-slate-300 hover:text-white font-medium text-xs px-3 py-1.5 rounded-md hover:bg-slate-700 transition cursor-pointer">
-                    Cancel
-                </button>
-                <button type="button" @click="saveDocEdit()" :disabled="docSaving" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs px-5 py-1.5 rounded-md transition cursor-pointer flex items-center gap-1.5 shadow-2xs disabled:opacity-50">
-                    <span class="material-icons text-sm" x-show="!docSaving">save</span>
-                    <span x-text="docSaving ? 'Saving...' : 'Save Document'"></span>
+            <div class="flex items-center gap-3">
+                <button type="button" @click="saveDocEdit()" :disabled="docSaving" class="text-white hover:text-white font-medium text-sm px-4 py-1.5 rounded hover:bg-white/10 transition cursor-pointer uppercase tracking-wider disabled:opacity-50">
+                    <span x-text="docSaving ? 'Saving...' : 'Save'"></span>
                 </button>
             </div>
         </div>
-        <div class="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-100 flex flex-col items-center custom-scrollbar">
-            <div class="bg-white shadow-lg border border-slate-200 rounded-lg p-6 max-w-4xl w-full flex-1 flex flex-col gap-3 min-h-[500px]">
+        <!-- MUI style Editor container -->
+        <div class="flex-1 overflow-y-auto p-4 sm:p-8 bg-slate-100 flex flex-col items-center custom-scrollbar">
+            <div class="bg-white shadow-lg border border-slate-200 rounded-lg p-6 max-w-5xl w-full flex-1 flex flex-col gap-3 min-h-[550px]">
                 <div class="flex items-center justify-between pb-2 border-b border-slate-100 text-xs text-slate-500 font-medium">
-                    <span>Direct HTML & Template Editor</span>
-                    <span>Changes will update & overwrite this document</span>
+                    <span>HTML Document Source Editor</span>
+                    <span>Click 'Save' in top bar to save changes & version</span>
                 </div>
                 <textarea x-model="editDocHtml" class="w-full flex-1 min-h-[500px] font-mono text-xs p-4 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-indigo-500 leading-relaxed custom-scrollbar"></textarea>
             </div>
@@ -1661,8 +1653,8 @@
                 </button>
             </div>
         </div>
-        <div class="flex-1 overflow-y-auto p-4 sm:p-8 bg-slate-100 flex justify-center custom-scrollbar">
-            <div class="bg-white shadow-lg border border-slate-200 rounded-lg p-8 sm:p-12 max-w-4xl w-full min-h-[700px] my-auto" x-html="selectedVersionHtml || ''"></div>
+        <div class="flex-1 overflow-y-auto bg-slate-100 flex justify-center custom-scrollbar">
+            <div class="p-10 border-dashed border border-gray-400 bg-white m-10 w-fit shadow-xs shrink-0" x-html="selectedVersionHtml || ''"></div>
         </div>
     </div>
 </form>
