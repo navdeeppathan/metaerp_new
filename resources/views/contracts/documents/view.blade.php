@@ -32,6 +32,9 @@
     <!-- Alpine.js -->
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
 
+    <!-- TinyMCE (Matching React DialogEditHtml) -->
+    <script src="https://cdn.tiny.cloud/1/601a2kfecmwhj92bpfvqwu493mx5uw6p31qswtm55jzhiyz4/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+
     <style>
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -71,13 +74,43 @@
 <body class="min-h-full flex flex-col bg-slate-100 text-slate-800 antialiased"
       x-data="{
           isEditing: false,
+          editorInitialized: false,
           docHtml: @js($html),
           saving: false,
           saveSuccess: false,
           errorMessage: '',
+          toggleEdit() {
+              this.isEditing = !this.isEditing;
+              if (this.isEditing && !this.editorInitialized) {
+                  this.$nextTick(() => {
+                      if (window.tinymce) {
+                          tinymce.init({
+                              selector: '#docTinymceEditor',
+                              height: 650,
+                              menubar: false,
+                              plugins: [
+                                  'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+                                  'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+                                  'insertdatetime', 'media', 'table', 'help', 'wordcount'
+                              ],
+                              toolbar: 'undo redo | blocks | bold italic forecolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
+                              setup: (editor) => {
+                                  editor.on('change', () => {
+                                      this.docHtml = editor.getContent();
+                                  });
+                              }
+                          });
+                          this.editorInitialized = true;
+                      }
+                  });
+              }
+          },
           async saveDocument() {
               this.saving = true;
               this.errorMessage = '';
+              if (window.tinymce && tinymce.get('docTinymceEditor')) {
+                  this.docHtml = tinymce.get('docTinymceEditor').getContent();
+              }
               try {
                   const res = await fetch('{{ route('contracts.documents.update', $document->id) }}', {
                       method: 'POST',
@@ -142,7 +175,7 @@
 
                 <!-- Toggle Edit / View Button -->
                 <button type="button"
-                        @click="isEditing = !isEditing"
+                        @click="toggleEdit()"
                         class="px-4 py-1.5 text-white/90 hover:text-white font-medium text-sm rounded hover:bg-white/10 transition cursor-pointer uppercase tracking-wider">
                     <span x-text="isEditing ? 'Cancel' : 'Edit'">Edit</span>
                 </button>
@@ -172,28 +205,29 @@
     </div>
 
     <!-- Main Content Area -->
-    <main class="flex-1 overflow-y-auto flex flex-col items-center">
-        <!-- View Mode: Document Paper (Exact match to React DialogViewHtml & Image 4 & 5) -->
-        <div x-show="!isEditing" class="w-full flex justify-center py-6 sm:py-10">
-            <div class="document-paper p-10 border-dashed border border-gray-400 bg-white m-4 sm:m-10 w-fit shadow-xs mx-auto text-slate-900"
+    <main class="flex-1 overflow-y-auto bg-slate-100">
+        <!-- View Mode: Document Paper (Exact match to React DialogViewHtml & Images 3 & 4) -->
+        <div x-show="!isEditing" class="p-4 sm:p-10 flex justify-start">
+            <div class="document-paper p-10 border-dashed border border-gray-400 bg-white w-fit shadow-xs text-slate-900"
                  x-ref="docContainer">
                 {!! $html !!}
             </div>
         </div>
 
-        <!-- Edit Mode: Full-page HTML Source Editor (Matching React DialogEditHtml) -->
-        <div x-show="isEditing" x-cloak class="w-full max-w-6xl p-4 sm:p-8 flex flex-col flex-1">
-            <div class="bg-white rounded-xl shadow-lg border border-slate-200 p-6 flex flex-col flex-1 gap-4 min-h-[600px]">
+        <!-- Edit Mode: Full-page Visual & HTML Editor (Matching React DialogEditHtml) -->
+        <div x-show="isEditing" x-cloak class="p-4 sm:p-8 flex flex-col flex-1 w-full max-w-7xl mx-auto">
+            <div class="bg-white rounded-xl shadow-lg border border-slate-200 p-6 flex flex-col flex-1 gap-4 min-h-[700px]">
                 <div class="flex items-center justify-between pb-3 border-b border-slate-100 text-xs text-slate-500 font-medium">
                     <div class="flex items-center gap-2">
-                        <span class="material-icons text-base text-indigo-500">code</span>
-                        <span class="font-semibold text-slate-700">HTML Document Source Editor</span>
+                        <span class="material-icons text-base text-indigo-500">edit_note</span>
+                        <span class="font-semibold text-slate-700">Document Editor</span>
                     </div>
-                    <span>Click 'Save' in top bar to save changes & update document</span>
+                    <span>Make changes below and click <strong>SAVE</strong> in the top bar</span>
                 </div>
-                <textarea x-model="docHtml"
-                          class="w-full flex-1 min-h-[550px] font-mono text-xs p-4 bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:border-indigo-500 focus:bg-white leading-relaxed resize-y"
-                          placeholder="HTML content..."></textarea>
+                <!-- Visual TinyMCE Editor Container -->
+                <div class="flex-1 min-h-[650px]">
+                    <textarea id="docTinymceEditor" x-model="docHtml" class="w-full h-full min-h-[650px] font-mono text-xs p-4 bg-slate-50 border border-slate-300 rounded-lg">{!! $html !!}</textarea>
+                </div>
             </div>
         </div>
     </main>

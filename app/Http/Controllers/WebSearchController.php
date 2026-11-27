@@ -73,7 +73,16 @@ class WebSearchController extends Controller
         }
 
         if ($status && strtoupper($status) !== 'ALL') {
-            $query->where('status', strtoupper($status));
+            $st = strtoupper($status);
+            if ($st === 'CLOSED') {
+                $query->whereIn('status', ['CLOSED', 'STORED']);
+            } elseif ($st === 'OPEN') {
+                $query->where(function($sq) {
+                    $sq->whereIn('status', ['OPEN', 'ACTIVE'])->orWhereNull('status');
+                });
+            } else {
+                $query->where('status', $st);
+            }
         }
 
         if ($type && strtoupper($type) !== 'ALL') {

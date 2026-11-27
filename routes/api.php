@@ -98,6 +98,8 @@ Route::get('/contracts/{saleContractId}/associatedContractsWithOrderCode', [Cont
 Route::get('/contracts/{purchaseContractId}/listProductsRemainingBalance', [ContractController::class, 'listProductsRemainingBalance']);
 Route::put('/contracts/cancel/{id}', [ContractController::class, 'cancel']);
 Route::put('/contracts/close/{id}', [ContractController::class, 'close']);
+Route::match(['post', 'put'], '/contracts/reactivate/{id}', [ContractReactivationController::class, 'reactivate']);
+Route::match(['post', 'put'], '/contracts/{id}/reactivate', [ContractReactivationController::class, 'reactivate']);
 
 // File management routes
 Route::get('/contracts/{contractId}/files', [ContractController::class, 'listFilesForContract']);

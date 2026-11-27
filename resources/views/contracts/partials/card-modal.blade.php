@@ -473,6 +473,31 @@
                   console.error(err);
                   if (window.showToast) window.showToast('Failed to cancel contract', 'error');
               });
+          },
+          reactivateContract() {
+              if (!confirm('Do you want to reactivate this contract?')) return;
+              fetch(`/contracts/${this.card.id}/reactivate`, {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                      'Accept': 'application/json'
+                  }
+              })
+              .then(res => res.json())
+              .then(data => {
+                  if (data.success) {
+                      if (typeof showCardModal !== 'undefined') showCardModal = false;
+                      if (window.showToast) window.showToast('Contract reactivated successfully', 'success');
+                      setTimeout(() => { window.location.reload(); }, 600);
+                  } else {
+                      if (window.showToast) window.showToast(data.message || 'Failed to reactivate contract', 'error');
+                  }
+              })
+              .catch(err => {
+                  console.error(err);
+                  if (window.showToast) window.showToast('Failed to reactivate contract', 'error');
+              });
           }
       }"
       @input="hasChanges = true"
@@ -1449,6 +1474,12 @@
                         <span>Duplicate Contract</span>
                     </button>
                     <div class="h-px bg-slate-100 my-1"></div>
+                    <template x-if="card && (card.status === 'CLOSED' || card.status === 'CANCELLED' || card.status === 'STORED' || card.contractStatus === 'CANCELLED' || card.contractStatus === 'CLOSED')">
+                        <button type="button" @click="reactivateContract()" class="w-full px-4 py-2 text-left text-xs text-indigo-600 hover:bg-indigo-50 transition flex items-center gap-2 cursor-pointer font-medium">
+                            <span class="material-icons text-sm text-indigo-500">restore</span>
+                            <span>Reactivate contract</span>
+                        </button>
+                    </template>
                     <button type="button" @click="cancelContract()" class="w-full px-4 py-2 text-left text-xs text-red-600 hover:bg-red-50 transition flex items-center gap-2 cursor-pointer">
                         <span class="material-icons text-sm text-red-500">cancel</span>
                         <span>Cancel contract</span>

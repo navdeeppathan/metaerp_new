@@ -71,6 +71,8 @@ Route::middleware('auth')->group(function () {
         Route::match(['post', 'put'], '/contracts/{id}/move-stage', [WebContractController::class, 'moveStage'])->name('contracts.move-stage');
         Route::match(['post', 'put'], '/contracts/{id}/cancel', [WebContractController::class, 'cancel'])->name('contracts.cancel');
         Route::match(['post', 'put'], '/contracts/{id}/close', [WebContractController::class, 'close'])->name('contracts.close');
+        Route::match(['post', 'put'], '/contracts/{id}/reactivate', [WebContractController::class, 'reactivate'])->name('contracts.reactivate');
+        Route::match(['post', 'put'], '/contracts/reactivate/{id}', [WebContractController::class, 'reactivate']);
         Route::post('/contracts/{id}/comments', [WebContractController::class, 'addComment'])->name('contracts.comments');
         Route::post('/checkitems/{id}/toggle', [WebContractController::class, 'toggleCheckitem'])->name('checkitems.toggle');
         Route::post('/contracts/{id}/generate-doc', [WebContractController::class, 'generateDoc'])->name('contracts.generateDoc');

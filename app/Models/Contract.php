@@ -435,12 +435,24 @@ class Contract extends Model
 
     public function getStatusAttribute()
     {
-        return $this->attributes['status'] ?? 'OPEN';
+        return $this->attributes['status'] ?? ($this->attributes['contractStatus'] ?? 'OPEN');
+    }
+
+    public function setStatusAttribute($value)
+    {
+        $this->attributes['status'] = $value;
+        $this->attributes['contractStatus'] = $value;
     }
 
     public function getContractStatusAttribute()
     {
-        return $this->attributes['status'] ?? 'OPEN';
+        return $this->attributes['status'] ?? ($this->attributes['contractStatus'] ?? 'OPEN');
+    }
+
+    public function setContractStatusAttribute($value)
+    {
+        $this->attributes['status'] = $value;
+        $this->attributes['contractStatus'] = $value;
     }
 
     public function getAssociationStatusAttribute()

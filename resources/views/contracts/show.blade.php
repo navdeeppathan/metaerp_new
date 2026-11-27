@@ -3,15 +3,121 @@
 @section('title', ($contract->orderCode ?? $contract->order_code) . ' - Contract Detail')
 
 @section('content')
-<div class="w-full space-y-4 pb-12" x-data="{ activeTab: 'info' }">
-    <!-- Breadcrumb & Title Matching Screenshot 1 -->
-    <div>
-        <a href="{{ route('contracts.search') }}" class="inline-flex items-center gap-1 text-xs font-normal text-slate-500 hover:text-slate-800 transition mb-1.5">
-            <span class="material-icons text-sm">arrow_back</span>
-            Contracts
-        </a>
-        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">{{ $contract->orderCode ?? $contract->order_code }}</h1>
+<div class="w-full space-y-4 pb-12" x-data="{ activeTab: 'info', confirmReactivate: false }">
+    <!-- Success / Error Flash Notifications -->
+    @if(session('success'))
+        <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-sm flex items-center justify-between shadow-2xs">
+            <div class="flex items-center gap-2">
+                <span class="material-icons text-emerald-600">check_circle</span>
+                <span>{{ session('success') }}</span>
+            </div>
+            <button type="button" onclick="this.parentElement.remove()" class="text-emerald-500 hover:text-emerald-700">✕</button>
+        </div>
+    @endif
+    @if(session('error'))
+        <div class="p-4 bg-red-50 border border-red-200 text-red-800 rounded-xl text-sm flex items-center justify-between shadow-2xs">
+            <div class="flex items-center gap-2">
+                <span class="material-icons text-red-600">error</span>
+                <span>{{ session('error') }}</span>
+            </div>
+            <button type="button" onclick="this.parentElement.remove()" class="text-red-500 hover:text-red-700">✕</button>
+        </div>
+    @endif
+    @if(session('info'))
+        <div class="p-4 bg-blue-50 border border-blue-200 text-blue-800 rounded-xl text-sm flex items-center justify-between shadow-2xs">
+            <div class="flex items-center gap-2">
+                <span class="material-icons text-blue-600">info</span>
+                <span>{{ session('info') }}</span>
+            </div>
+            <button type="button" onclick="this.parentElement.remove()" class="text-blue-500 hover:text-blue-700">✕</button>
+        </div>
+    @endif
+
+    <!-- Breadcrumb, Title, Status & Reactivate Action (Matching Screenshot) -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <a href="{{ route('contracts.search') }}" class="inline-flex items-center gap-1 text-xs font-normal text-slate-500 hover:text-slate-800 transition mb-1.5">
+                <span class="material-icons text-sm">arrow_back</span>
+                Contracts
+            </a>
+            <div class="flex items-center gap-3">
+                <h1 class="text-2xl font-bold text-slate-900 tracking-tight">{{ $contract->orderCode ?? $contract->order_code }}</h1>
+                @php
+                    $rawStatus = strtoupper(trim($contract->status ?? $contract->contractStatus ?? 'OPEN'));
+                @endphp
+                @if($rawStatus === 'CLOSED' || $rawStatus === 'STORED')
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-300 uppercase tracking-wide">
+                        CLOSED
+                    </span>
+                @elseif($rawStatus === 'CANCELLED')
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-red-700 border border-red-200 uppercase tracking-wide">
+                        CANCELLED
+                    </span>
+                @else
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700 border border-emerald-200 uppercase tracking-wide">
+                        OPEN
+                    </span>
+                @endif
+            </div>
+        </div>
+
+        @if(in_array($rawStatus, ['CLOSED', 'CANCELLED', 'STORED']))
+        <div class="flex items-center gap-3">
+            <button
+                type="button"
+                @click="confirmReactivate = true"
+                class="inline-flex items-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-semibold rounded-lg shadow-sm transition-all cursor-pointer whitespace-nowrap"
+            >
+                <span class="material-icons text-base">restore</span>
+                <span>Reactivate</span>
+            </button>
+        </div>
+        @endif
     </div>
+
+    @if(in_array($rawStatus, ['CLOSED', 'CANCELLED', 'STORED']))
+    <!-- Confirm Reactivate Modal (For both CLOSED and CANCELLED contracts) -->
+    <div
+        x-show="confirmReactivate"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4"
+        style="display: none;"
+        @keydown.escape.window="confirmReactivate = false"
+        x-cloak
+    >
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4 border border-slate-200" @click.away="confirmReactivate = false">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
+                    <span class="material-icons text-xl">restore</span>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-slate-900">Reactivate Contract</h3>
+                    <p class="text-xs text-slate-500 mt-0.5">Are you sure you want to reactivate contract <span class="font-semibold text-slate-700">{{ $contract->orderCode ?? $contract->order_code }}</span>?</p>
+                </div>
+            </div>
+            <p class="text-xs text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-200 leading-relaxed">
+                Reactivating will restore this contract to <strong>OPEN</strong> status and return it to the active Kanban pipeline.
+            </p>
+            <div class="flex items-center justify-end gap-3 pt-2">
+                <button
+                    type="button"
+                    @click="confirmReactivate = false"
+                    class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition cursor-pointer"
+                >
+                    Cancel
+                </button>
+                <form action="{{ route('contracts.reactivate', $contract->id) }}" method="POST" class="inline m-0 p-0">
+                    @csrf
+                    <button
+                        type="submit"
+                        class="px-5 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg shadow transition cursor-pointer"
+                    >
+                        Yes, Reactivate
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    @endif
 
     <!-- Tabs Navigation Matching Screenshot 1 -->
     <div class="flex items-center gap-8 border-b border-slate-200 text-sm font-medium">
@@ -598,7 +704,7 @@
                 </div>
 
                 <div class="space-y-6 max-w-4xl pt-1">
-                    @forelse($activities as $act)
+                    @forelse($activities ?? [] as $act)
                     <div class="flex items-start gap-4">
                         <!-- Timestamp on left (Screenshot 5) -->
                         <div class="w-24 text-[11px] text-slate-400 font-mono text-right shrink-0 pt-0.5">

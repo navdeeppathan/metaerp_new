@@ -502,6 +502,13 @@ class WebContractController extends Controller
         $contract = Contract::findOrFail($id);
         $contract->contractStatus = 'CANCELLED';
         $contract->status = 'CANCELLED';
+        if (request()->filled('cancellationReason') || request()->filled('cancellation_reason')) {
+            $reason = request()->input('cancellationReason') ?: request()->input('cancellation_reason');
+            $contract->cancellation_reason = $reason;
+            $contract->cancellationReason = $reason;
+        }
+        $contract->cancellation_date = now();
+        $contract->cancellationDate = now();
         $contract->save();
 
         $this->auditService->register('CONTRACT', $contract->id, 'CANCEL', null);
@@ -529,8 +536,11 @@ class WebContractController extends Controller
             }
         }
 
-        $contract->contractStatus = 'STORED';
-        $contract->status = 'STORED';
+        $contract->contractStatus = 'CLOSED';
+        $contract->status = 'CLOSED';
+        $contract->close_date = now();
+        $contract->closeDate = now();
+        $contract->finishDate = now();
         $contract->save();
 
         $this->auditService->register('CONTRACT', $contract->id, 'CLOSE', null);
@@ -542,6 +552,42 @@ class WebContractController extends Controller
             ]);
         }
         return back()->with('success', "Contract {$contract->orderCode} was closed");
+    }
+
+    public function reactivate($id)
+    {
+        $contract = Contract::findOrFail($id);
+
+        $contract->status = 'OPEN';
+        $contract->contractStatus = 'OPEN';
+        $contract->close_date = null;
+        $contract->closeDate = null;
+        $contract->finishDate = null;
+        $contract->cancellation_date = null;
+        $contract->cancellationDate = null;
+        $contract->cancellation_reason = null;
+        $contract->cancellationReason = null;
+        $contract->active = true;
+
+        if (empty($contract->stage_id) || $contract->stage_id <= 0) {
+            $contract->stage_id = 1;
+        }
+
+        $contract->save();
+
+        try {
+            $this->auditService->register('CONTRACT', $contract->id, 'REACTIVATE', "Contract {$contract->orderCode} was reactivated", Auth::id());
+        } catch (\Throwable $e) {}
+
+        if (request()->expectsJson() || request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => "Contract {$contract->orderCode} has been reactivated successfully",
+                'contract' => $contract
+            ]);
+        }
+
+        return redirect()->route('contracts.show', $contract->id)->with('success', "Contract {$contract->orderCode} has been reactivated successfully!");
     }
 
     public function duplicate($id)
