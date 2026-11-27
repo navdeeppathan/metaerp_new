@@ -77,6 +77,92 @@ class DocumentTemplateService
     }
 
     /**
+     * Populate base64 data URIs into <img> tags in document HTML,
+     * replicating Java's ArchiveService.populateBase64inHtml logic.
+     */
+    public static function populateBase64inHtml(?string $html): string
+    {
+        if (empty($html)) {
+            return '';
+        }
+
+        $defaultLogo = self::getLogoDataUri();
+        $defaultFooter = self::getFooterDataUri();
+
+        // Process all <img> tags
+        return preg_replace_callback('/<img\b([^>]*)>/i', function ($match) use ($defaultLogo, $defaultFooter) {
+            $attrs = $match[1];
+
+            // Extract id attribute
+            $imgId = null;
+            if (preg_match('/\bid=(["\'])(.*?)\1/i', $attrs, $mId)) {
+                $imgId = trim($mId[2]);
+            }
+
+            // Extract src attribute
+            $src = '';
+            if (preg_match('/\bsrc=(["\'])(.*?)\1/i', $attrs, $mSrc)) {
+                $src = trim($mSrc[2]);
+            }
+
+            // Extract alt attribute
+            $alt = '';
+            if (preg_match('/\balt=(["\'])(.*?)\1/i', $attrs, $mAlt)) {
+                $alt = trim($mAlt[2]);
+            }
+
+            $newSrc = null;
+
+            // 1. If ID is numeric, query archive table
+            if (!empty($imgId) && is_numeric($imgId)) {
+                try {
+                    $archive = \App\Models\Archive::find((int) $imgId);
+                    if ($archive && !empty($archive->content)) {
+                        $content = $archive->content;
+                        if (str_starts_with($content, 'data:image')) {
+                            $newSrc = $content;
+                        } else {
+                            $newSrc = 'data:image/png;base64,' . $content;
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    // ignore
+                }
+            }
+
+            // 2. If ID or alt indicates logo
+            if (empty($newSrc)) {
+                if ($imgId === '{company_url_logo}' || $imgId === 'company_url_logo' || 
+                    stripos($alt, 'logo') !== false || stripos($alt, 'metaenterprises') !== false ||
+                    str_contains($src, 'metaenterprices.png')) {
+                    $newSrc = $defaultLogo;
+                }
+            }
+
+            // 3. If ID or alt indicates footer
+            if (empty($newSrc)) {
+                if ($imgId === '{company_url_footer}' || $imgId === 'company_url_footer' || 
+                    stripos($alt, 'rodape') !== false || stripos($alt, 'footer') !== false ||
+                    str_contains($src, 'footer.png')) {
+                    $newSrc = $defaultFooter;
+                }
+            }
+
+            // If we found a valid replacement source, update or insert src
+            if (!empty($newSrc)) {
+                if (preg_match('/\bsrc=(["\']).*?\1/i', $attrs)) {
+                    $newAttrs = preg_replace('/\bsrc=(["\']).*?\1/i', 'src="' . $newSrc . '"', $attrs);
+                } else {
+                    $newAttrs = $attrs . ' src="' . $newSrc . '"';
+                }
+                return '<img' . $newAttrs . '>';
+            }
+
+            return $match[0];
+        }, $html);
+    }
+
+    /**
      * Ensure the contract has default documents for its current stage.
      */
     public function ensureDefaultDocumentsForContract(Contract $contract, ?int $userId = null): Collection
@@ -569,7 +655,7 @@ class DocumentTemplateService
         $html = preg_replace('/<img\s+([^>]*?)id="\{company_url_footer\}"([^>]*?)src=""([^>]*?)>/i', '<img $1id="{company_url_footer}"$2src="' . $v['meta']['footer_uri'] . '"$3>', $html);
         $html = preg_replace('/<img\s+([^>]*?)src=""([^>]*?)id="\{company_url_footer\}"([^>]*?)>/i', '<img $1src="' . $v['meta']['footer_uri'] . '"$2id="{company_url_footer}"$3>', $html);
 
-        return $html;
+        return self::populateBase64inHtml($html);
     }
 
     /**

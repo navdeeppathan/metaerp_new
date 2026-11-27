@@ -124,16 +124,21 @@ class GeneratedFile extends Model
      */
     public function getHtmlAttribute()
     {
+        $rawHtml = '';
         if (isset($this->attributes['html']) && !empty($this->attributes['html'])) {
-            return $this->attributes['html'];
-        }
-        if (isset($this->attributes['content']) && !empty($this->attributes['content'])) {
+            $rawHtml = $this->attributes['html'];
+        } elseif (isset($this->attributes['content']) && !empty($this->attributes['content'])) {
             $raw = $this->attributes['content'];
             $decoded = base64_decode($raw, true);
             if ($decoded !== false && (str_contains($decoded, '<') || str_contains($decoded, 'html') || str_contains($decoded, 'div'))) {
-                return $decoded;
+                $rawHtml = $decoded;
+            } else {
+                $rawHtml = $raw;
             }
-            return $raw;
+        }
+        
+        if (!empty($rawHtml)) {
+            return \App\Services\DocumentTemplateService::populateBase64inHtml($rawHtml);
         }
         return '';
     }

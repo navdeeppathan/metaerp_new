@@ -12,7 +12,14 @@ class Archive extends Model
 
     protected $fillable = [
         'content',
+        'file',
+        'fileName',
     ];
+
+    public function getContentAttribute()
+    {
+        return $this->attributes['content'] ?? ($this->attributes['file'] ?? null);
+    }
 
     public function footerCompanies()
     {

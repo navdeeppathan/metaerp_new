@@ -96,9 +96,10 @@
           viewVersionModal: false,
 
           openViewDoc(doc) {
-              this.currentDoc = doc;
               this.activeDocMenu = null;
-              this.viewDocModal = true;
+              if (doc && doc.id) {
+                  window.location.href = `/documents/${doc.id}/view`;
+              }
           },
           openEditDoc(doc) {
               this.currentDoc = doc;
@@ -667,9 +668,9 @@
                                  @click.outside="activeDocMenu = null" 
                                  class="absolute left-0 top-full mt-1.5 w-48 bg-white rounded-xl shadow-2xl border border-slate-200/90 py-1.5 z-50 text-xs font-normal select-none"
                                  x-cloak>
-                                <button type="button" @click="openViewDoc(doc)" class="w-full text-left px-4 py-2 hover:bg-slate-50 text-slate-700 transition cursor-pointer block">
+                                <a :href="'/documents/' + doc.id + '/view'" @click="activeDocMenu = null" class="w-full text-left px-4 py-2 hover:bg-slate-50 text-slate-700 transition cursor-pointer block">
                                     View
-                                </button>
+                                </a>
                                 <button type="button" @click="downloadDoc(doc)" class="w-full text-left px-4 py-2 hover:bg-slate-50 text-slate-700 transition cursor-pointer block">
                                     Download
                                 </button>
@@ -1457,27 +1458,7 @@
         </div>
     </div>
 
-    <!-- VIEW DOCUMENT MODAL (DialogViewHtml - exact match to React / MUI fullscreen dialog) -->
-    <div x-show="viewDocModal" class="fixed inset-0 z-70 overflow-hidden flex flex-col bg-slate-900/60 backdrop-blur-xs" style="display: none;" @keydown.escape.window="viewDocModal = false" x-cloak>
-        <!-- MUI style AppBar -->
-        <div class="bg-[#1e293b] text-white px-6 py-3.5 flex items-center justify-between shadow-md shrink-0 border-b border-slate-700/60">
-            <div class="flex items-center gap-4">
-                <button type="button" @click="viewDocModal = false" aria-label="close" class="text-white/80 hover:text-white p-1 rounded-full hover:bg-white/10 transition cursor-pointer flex items-center justify-center">
-                    <span class="material-icons text-2xl">close</span>
-                </button>
-                <h2 class="text-xl font-normal tracking-wide text-white" x-text="currentDoc ? currentDoc.name : ''"></h2>
-            </div>
-            <div class="flex items-center gap-3">
-                <button type="button" @click="openEditDoc(currentDoc)" class="text-white hover:text-white font-medium text-sm px-4 py-1.5 rounded hover:bg-white/10 transition cursor-pointer uppercase tracking-wider">
-                    Edit
-                </button>
-            </div>
-        </div>
-        <!-- MUI style document container with dashed border -->
-        <div class="flex-1 overflow-y-auto bg-slate-100 flex justify-center custom-scrollbar">
-            <div class="p-10 border-dashed border border-gray-400 bg-white m-10 w-fit shadow-xs shrink-0" x-html="currentDoc ? (currentDoc.html || '') : ''"></div>
-        </div>
-    </div>
+
 
     <!-- EDIT DOCUMENT MODAL (DialogEditHtml - exact match to React / MUI fullscreen editor dialog) -->
     <div x-show="editDocModal" class="fixed inset-0 z-70 overflow-hidden flex flex-col bg-slate-900/60 backdrop-blur-xs" style="display: none;" @keydown.escape.window="editDocModal = false" x-cloak>
@@ -1591,9 +1572,9 @@
                         <p class="text-[11px] text-slate-500">Currently active and rendered in this contract.</p>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button type="button" @click="openViewDoc(currentDoc)" class="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg shadow-2xs transition cursor-pointer">
+                        <a :href="'/documents/' + (currentDoc ? currentDoc.id : '') + '/view'" class="px-3 py-1.5 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg shadow-2xs transition cursor-pointer inline-block">
                             View
-                        </button>
+                        </a>
                     </div>
                 </div>
 

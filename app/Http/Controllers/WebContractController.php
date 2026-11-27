@@ -672,7 +672,20 @@ class WebContractController extends Controller
     public function viewDocument($id)
     {
         $file = GeneratedFile::findOrFail($id);
-        return response($file->html, 200)->header('Content-Type', 'text/html; charset=utf-8');
+        $contract = $file->contract;
+
+        $backUrl = route('contracts.index');
+        if ($contract) {
+            $stageId = $contract->stage_id ?? 1;
+            $backUrl = url('/contracts/models/' . $stageId);
+        }
+
+        return view('contracts.documents.view', [
+            'document' => $file,
+            'html' => $file->html,
+            'contract' => $contract,
+            'backUrl' => $backUrl,
+        ]);
     }
 
     public function downloadDocument($id)
