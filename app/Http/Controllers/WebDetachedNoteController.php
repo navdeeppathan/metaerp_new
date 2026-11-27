@@ -101,6 +101,71 @@ class WebDetachedNoteController extends Controller
         ));
     }
 
+    public function create(Request $request)
+    {
+        $contracts = Contract::whereNotNull('order_code')
+            ->orderByDesc('id')
+            ->get(['id', 'order_code', 'type']);
+
+        $selectedCode = $request->input('code');
+        $selectedContract = null;
+        $contractProducts = collect();
+
+        if ($selectedCode) {
+            $selectedContract = Contract::where('order_code', $selectedCode)
+                ->orWhere('id', $selectedCode)
+                ->with([
+                    'purchase.products.product',
+                    'sale.products.product'
+                ])
+                ->first();
+
+            if ($selectedContract) {
+                if ($selectedContract->purchase && $selectedContract->purchase->products) {
+                    foreach ($selectedContract->purchase->products as $p) {
+                        $contractProducts->push([
+                            'id' => $p->id,
+                            'deal_type' => 'Purchase',
+                            'code' => $p->product?->code ?? ('PROD-' . $p->id),
+                            'name' => $p->product?->name ?? ($p->description ?? 'Deal Product #' . $p->id),
+                            'quantity' => $p->quantity,
+                            'rate' => $p->rate,
+                        ]);
+                    }
+                }
+                if ($selectedContract->sale && $selectedContract->sale->products) {
+                    foreach ($selectedContract->sale->products as $p) {
+                        $contractProducts->push([
+                            'id' => $p->id,
+                            'deal_type' => 'Sale',
+                            'code' => $p->product?->code ?? ('PROD-' . $p->id),
+                            'name' => $p->product?->name ?? ($p->description ?? 'Deal Product #' . $p->id),
+                            'quantity' => $p->quantity,
+                            'rate' => $p->rate,
+                        ]);
+                    }
+                }
+            }
+        }
+
+        try {
+            $creditDebitTypes = CreditDebitType::where('active', true)->orderBy('id')->get();
+            if ($creditDebitTypes->isEmpty()) {
+                $creditDebitTypes = $this->getDefaultCreditDebitTypes();
+            }
+        } catch (\Exception $e) {
+            $creditDebitTypes = $this->getDefaultCreditDebitTypes();
+        }
+
+        return view('detached-notes.create', compact(
+            'contracts',
+            'selectedCode',
+            'selectedContract',
+            'contractProducts',
+            'creditDebitTypes'
+        ));
+    }
+
     public function getProducts($contractId)
     {
         $contract = Contract::with([

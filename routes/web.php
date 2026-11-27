@@ -167,6 +167,7 @@ Route::middleware('auth')->group(function () {
     // Detached Notes
     Route::middleware('permission:DETACHED_NOTES|CONTRACT,READ')->group(function () {
         Route::get('/detached-notes', [WebDetachedNoteController::class, 'index'])->name('detached-notes.index');
+        Route::get('/detached-notes/create', [WebDetachedNoteController::class, 'create'])->name('detached-notes.create');
         Route::get('/detached-notes/{id}', [WebDetachedNoteController::class, 'show'])->name('detached-notes.show');
         Route::get('/detached-notes/{id}/document', [WebDetachedNoteController::class, 'downloadDocument'])->name('detached-notes.document');
         Route::get('/detached-notes/contract/{id}/products', [WebDetachedNoteController::class, 'getProducts'])->name('detached-notes.contract-products');

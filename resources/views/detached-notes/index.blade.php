@@ -65,12 +65,11 @@
             </div>
 
             <!-- + Add Button -->
-            <button type="button"
-                    @click="openAddModal()"
-                    class="bg-[#4f46e5] hover:bg-[#4338ca] text-white px-6 py-2.5 rounded-full font-semibold text-sm shadow-xs transition-colors cursor-pointer select-none whitespace-nowrap flex items-center justify-center gap-1.5">
+            <a href="{{ route('detached-notes.create', $selectedContract ? ['code' => $selectedContract->orderCode] : []) }}"
+               class="bg-[#4f46e5] hover:bg-[#4338ca] text-white px-6 py-2.5 rounded-full font-semibold text-sm shadow-xs transition-colors cursor-pointer select-none whitespace-nowrap flex items-center justify-center gap-1.5">
                 <span class="material-icons text-base font-bold leading-none">add</span>
                 <span>Add</span>
-            </button>
+            </a>
         </div>
     </div>
 
